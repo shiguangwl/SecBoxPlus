@@ -84,6 +84,10 @@ def addRepos(RepositoryHandler handler) {
         url 'https://jitpack.io'
         allowInsecureProtocol true
     }
+    handler.maven {
+        url 'https://repo1.maven.org/maven2/'
+        allowInsecureProtocol true
+    }
     handler.mavenCentral()
     handler.google()
 }

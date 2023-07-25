@@ -210,14 +210,14 @@ object SourceManger {
     }
 
     /**
-     * 获取指定key的源
+     * 获取指定key的源,未找到则返回为null
      */
-    fun getSource(key: String): IBaseSource {
+    fun getSource(key: String): IBaseSource? {
         // sourceList 获取指定key的value不存在则创建新的设置进并返回
         return sourceList.getOrPut(key) {
             val sourceBean = sourceBeanList.get(key)
             if (sourceBean == null) {
-                throw Exception("sourceBean is null")
+                return null
             }
             var spider: Spider? = null;
             if (sourceBean.api.contains(".js")) {
@@ -239,7 +239,9 @@ object SourceManger {
         sourceBeanList.values.forEach() {
             if (it.isSearchable || it.isSearchable) {
                 val source = getSource(it.key)
-                list.add(source)
+                source?.let {
+                    list.add(source)
+                }
             }
         }
         return list

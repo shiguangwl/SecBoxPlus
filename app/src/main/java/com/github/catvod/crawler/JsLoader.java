@@ -16,7 +16,7 @@ public class JsLoader {
         }
         try {
             SpiderJS sp = new SpiderJS(key, cls, ext);
-            sp.init(App.instance, ext);
+            // sp.init(App.instance, ext);
             spiders.put(key, sp);
             return sp;
         } catch (Throwable th) {

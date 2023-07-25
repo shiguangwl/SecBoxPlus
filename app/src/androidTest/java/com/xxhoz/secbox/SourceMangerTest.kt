@@ -25,4 +25,14 @@ class SourceMangerTest {
         LogUtils.e("11111111111111111")
         LogUtils.e("11111111111111111")
     }
+
+
+    @Test
+    fun SourceTest(){
+        SourceManger.initData("https://jihulab.com/clear1/yingmi/-/raw/main/xh.txt")
+
+
+        val sourceBeanList = SourceManger.getSourceBeanList()
+        LogUtils.i("获取站源数量:${sourceBeanList.size}")
+    }
 }

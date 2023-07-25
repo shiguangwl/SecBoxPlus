@@ -172,4 +172,8 @@ dependencies {
 
     // Banner
     implementation("io.github.youth5201314:banner:${versions.banner}")
+
+    // 友盟统计SDK
+    implementation  'com.umeng.umsdk:common:9.6.3'// 必选
+    implementation  'com.umeng.umsdk:asms:1.8.0'// 必选
 }

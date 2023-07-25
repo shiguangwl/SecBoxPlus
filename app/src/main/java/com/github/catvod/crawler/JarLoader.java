@@ -41,30 +41,30 @@ public class JarLoader {
             }
             classLoader = new DexClassLoader(cache, cacheDir.getAbsolutePath(), null, App.instance.getClassLoader());
             // make force wait here, some device async dex load
-            int count = 0;
-            do {
-                try {
-                    Class classInit = classLoader.loadClass("com.github.catvod.spider.Init");
-                    if (classInit != null) {
-                        Method method = classInit.getMethod("init", Context.class);
-                        method.invoke(null, App.instance);
-                        System.out.println("自定义爬虫代码加载成功!");
-                        success = true;
-                        try {
-                            Class proxy = classLoader.loadClass("com.github.catvod.spider.Proxy");
-                            Method mth = proxy.getMethod("proxy", Map.class);
-                            proxyFun = mth;
-                        } catch (Throwable th) {
-
-                        }
-                        break;
-                    }
-                    Thread.sleep(200);
-                } catch (Throwable th) {
-                    th.printStackTrace();
-                }
-                count++;
-            } while (count < 5);
+            // int count = 0;
+            // do {
+            //     try {
+            //         Class classInit = classLoader.loadClass("com.github.catvod.spider.Init");
+            //         if (classInit != null) {
+            //             Method method = classInit.getMethod("init", Context.class);
+            //             method.invoke(null, App.instance);
+            //             System.out.println("自定义爬虫代码加载成功!");
+            //             success = true;
+            //             try {
+            //                 Class proxy = classLoader.loadClass("com.github.catvod.spider.Proxy");
+            //                 Method mth = proxy.getMethod("proxy", Map.class);
+            //                 proxyFun = mth;
+            //             } catch (Throwable th) {
+            //
+            //             }
+            //             break;
+            //         }
+            //         Thread.sleep(200);
+            //     } catch (Throwable th) {
+            //         th.printStackTrace();
+            //     }
+            //     count++;
+            // } while (count < 5);
         } catch (Throwable th) {
             th.printStackTrace();
         }

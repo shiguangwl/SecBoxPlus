@@ -3,7 +3,8 @@ package com.xxhoz.constant
 import androidx.annotation.StringDef
 
 @StringDef(
-    Key.BASE_API
+    Key.BASE_API,
+    Key.SourceKey
 )
 @Retention(AnnotationRetention.SOURCE)
 annotation class Key {
@@ -15,5 +16,10 @@ annotation class Key {
 //        const val ACCOUNT_XXX = "account_xxx"
 
         const val BASE_API = "account_base_api"
+
+        /**
+         * 源
+         */
+        const val SourceKey = "account_source_key"
     }
 }

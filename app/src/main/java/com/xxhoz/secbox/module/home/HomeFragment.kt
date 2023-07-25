@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.xxhoz.constant.BaseConfig
+import com.xxhoz.constant.Key
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.base.BaseFragment
@@ -19,6 +20,8 @@ import com.xxhoz.secbox.constant.EventName
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeBinding
 import com.xxhoz.secbox.eventbus.XEventBus
+import com.xxhoz.secbox.parserCore.bean.SourceBean
+import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.widget.GridItemDecoration
 import kotlinx.coroutines.Dispatchers
@@ -39,26 +42,25 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView()
         initData()
+        initView()
     }
 
     private fun initData() {
-        val sourceBeanList = SourceManger.getSourceBeanList()
-        LogUtils.i("获取站源数量:${sourceBeanList.size}")
-
-
-            lifecycleScope.launch(Dispatchers.IO){
-                sourceBeanList.forEach {
-                    LogUtils.e("================${it.name} Start=================")
-                    val source = SourceManger.getSource(it.key)
-                    LogUtils.e("站源:${it.key},homeVideoList:${source.homeVideoList()},categoryInfo:${source.categoryInfo()}")
-                    LogUtils.e("================${it.name} End=================")
-                }
-            }
-
-
-
+//        val sourceBeanList = SourceManger.getSourceBeanList()
+//        LogUtils.i("获取站源数量:${sourceBeanList.size}")
+//
+//        sourceBeanList.forEach {
+//            lifecycleScope.launch(Dispatchers.IO) {
+//                val source = SourceManger.getSource(it.key)!!
+//                try {
+//                    LogUtils.e("站源数据:${it.key}====homeVideoList:${source.homeVideoList()}===categoryInfo:${source.categoryInfo()}")
+//                }catch (e:Exception){
+//                    LogUtils.e("站源数据异常:${it.key},${e}")
+//                }
+//
+//            }
+//        }
 
     }
 

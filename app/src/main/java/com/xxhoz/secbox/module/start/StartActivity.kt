@@ -8,16 +8,21 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.JsonObject
 import com.gyf.immersionbar.ktx.immersionBar
+import com.umeng.commonsdk.UMConfigure
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.network.fastHttp.OkHttpUtils
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.secbox.App
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
+import com.xxhoz.secbox.bean.callback.Rdata
+import com.xxhoz.secbox.bean.callback.Rresult
+import com.xxhoz.secbox.bean.callback.Rstate
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.ActivityStartBinding
 import com.xxhoz.secbox.module.main.MainActivity
 import com.xxhoz.secbox.util.LogUtils
+import com.xxhoz.secbox.util.NetworkHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -41,14 +46,20 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
     }
 
     private fun initData() {
-        // 初始化友盟
-        youmengInit()
-        // 加载配置
+        if (!NetworkHelper.isNetworkConnect()) {
+            Toast.makeText(App.instance, "请检查网络连接", Toast.LENGTH_SHORT).show()
+            return
+        }
 
+        // 初始化友盟
+        umengInit()
+
+
+        // 加载配置
         configInit {
-            if (it.length>0) {
-                // 加载配置文件失败,或有更新
-                Toast.makeText(App.instance, it, Toast.LENGTH_SHORT).show()
+            if (it.RState != Rstate.SUCCESS) {
+                // 加载配置文件失败,或有更新 TODO
+                Toast.makeText(App.instance, it.msg, Toast.LENGTH_SHORT).show()
             }else{
                 val intent = Intent(this,MainActivity::class.java)
                 startActivity(intent)
@@ -60,13 +71,13 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
     /**
      * 加载配置文件
      */
-    private fun configInit(callback: (String) -> Unit) {
+    private fun configInit(callback: (Rdata) -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) {
             val jsonObject =
                 OkHttpUtils.get("https://shiguang.cachefly.net/config.json", JsonObject::class.java)
 
             if (jsonObject == null) {
-                callback.invoke("加载配置信息失败")
+                callback.invoke(Rresult.fail("加载配置信息失败"))
                 return@launch
             }
 
@@ -85,11 +96,11 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             // 检测更新状态
             val checkUpdate = checkUpdate(version, downUrl)
             if (checkUpdate){
-                callback.invoke("有新版本发布");
+                callback.invoke(Rresult.fail("有新版本发布"))
                 return@launch
             }
 
-            callback.invoke("")
+            callback.invoke(Rresult.oK())
         }
     }
 
@@ -113,8 +124,8 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
     /**
      * 初始化友盟配置
      */
-    private fun youmengInit() {
-
+    private fun umengInit() {
+        UMConfigure.init(this, BaseConfig.UmengKey, BaseConfig.UmengChannel, UMConfigure.DEVICE_TYPE_PHONE, "")
     }
 
     @PageName

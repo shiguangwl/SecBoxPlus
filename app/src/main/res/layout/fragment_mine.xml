@@ -79,11 +79,28 @@
             app:setting_item_title="@string/setting_item_subscribe" />
 
         <com.xxhoz.secbox.widget.SettingItemView
-            android:id="@+id/item_setting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:setting_item_icon="@drawable/icon_setting"
-            app:setting_item_title="@string/setting_item_setting" />
+                android:id="@+id/item_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:setting_item_icon="@drawable/icon_setting"
+                app:setting_item_title="@string/setting_item_setting" />
+
+
+
+        <com.xxhoz.secbox.widget.SettingItemView
+                android:id="@+id/item_clearCache"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:setting_item_icon="@drawable/icon_clearcache"
+                app:setting_item_title="@string/setting_item_clearCache" />
+
+
+        <com.xxhoz.secbox.widget.SettingItemView
+                android:id="@+id/item_about"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:setting_item_icon="@drawable/icon_about"
+                app:setting_item_title="@string/setting_item_about" />
 
     </LinearLayout>
 
