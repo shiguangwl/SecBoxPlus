@@ -37,6 +37,7 @@ versions.swipebacklayout = "1.1.0"
 versions.ptr = "1.0.11"
 versions.banner = "2.2.2"
 versions.jsoup = "1.15.3"
+versions.exoplayer = "2.12.1"
 ext.versions = versions
 
 /**

@@ -39,6 +39,10 @@
                 android:name="com.xxhoz.secbox.module.about.AboutActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/ActivityTheme" />
+        <activity
+            android:name="com.xxhoz.secbox.module.player.AGVideoActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/ActivityTheme" />
     </application>
 
 </manifest>

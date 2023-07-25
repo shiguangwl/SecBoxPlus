@@ -1,2 +1,3 @@
 rootProject.name = "SecBoxPlus"
 include ':app'
+include ':JZVideo'

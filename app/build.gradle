@@ -77,6 +77,9 @@ kapt {
 }
 
 dependencies {
+    implementation project(path: ':JZVideo')
+    implementation ("com.google.android.exoplayer:exoplayer:${versions.exoplayer}")
+
     implementation ("org.jsoup:jsoup:${versions.jsoup}")
     // 测试
     testImplementation("junit:junit:${versions.junit}")
