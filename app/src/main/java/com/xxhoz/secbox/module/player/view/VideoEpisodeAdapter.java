@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player;
+package com.xxhoz.secbox.module.player.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

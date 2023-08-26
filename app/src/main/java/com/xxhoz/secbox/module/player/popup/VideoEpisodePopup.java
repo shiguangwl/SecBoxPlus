@@ -19,8 +19,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.xxhoz.secbox.R;
-import com.xxhoz.secbox.module.player.AGEpsodeEntity;
-import com.xxhoz.secbox.module.player.VideoEpisodeAdapter;
+import com.xxhoz.secbox.module.player.view.AGEpsodeEntity;
+import com.xxhoz.secbox.module.player.view.VideoEpisodeAdapter;
 import com.xxhoz.secbox.util.DipAndPx;
 
 

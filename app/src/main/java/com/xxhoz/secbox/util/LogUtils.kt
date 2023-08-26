@@ -22,8 +22,8 @@ object LogUtils {
 
     private fun createLog(log: String): String {
         val buffer = StringBuffer()
-        buffer.append(methodName)
-        buffer.append("(").append(className).append(":").append(lineNumber).append(")")
+//        buffer.append(methodName)
+        buffer.append("(").append(className).append(":").append(lineNumber).append(")-")
         buffer.append(log)
         return buffer.toString()
     }

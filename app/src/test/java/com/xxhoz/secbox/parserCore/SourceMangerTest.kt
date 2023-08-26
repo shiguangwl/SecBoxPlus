@@ -1,10 +1,5 @@
 package com.xxhoz.secbox.parserCore
 
-import com.alibaba.fastjson.JSON
-import com.xxhoz.network.fastHttp.OkHttpUtils
-import com.xxhoz.parserCore.SourceManger
-import com.xxhoz.secbox.parserCore.bean.ConfigBeanList
-import com.xxhoz.secbox.util.LogUtils
 import org.junit.Test
 
 internal class SourceMangerTest {

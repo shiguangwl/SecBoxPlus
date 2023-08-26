@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player;
+package com.xxhoz.secbox.module.player.view;
 
 import android.content.res.Resources;
 import android.util.TypedValue;

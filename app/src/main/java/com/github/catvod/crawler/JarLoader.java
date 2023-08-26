@@ -33,7 +33,7 @@ public class JarLoader {
     public boolean load(String cache) {
         spiders.clear();
         proxyFun = null;
-        boolean success = false;
+        boolean success = true;
         try {
             File cacheDir = new File(App.instance.getCacheDir().getAbsolutePath() + "/catvod_csp");
             if (!cacheDir.exists()) {
@@ -66,6 +66,7 @@ public class JarLoader {
             //     count++;
             // } while (count < 5);
         } catch (Throwable th) {
+            success = false;
             th.printStackTrace();
         }
         return success;

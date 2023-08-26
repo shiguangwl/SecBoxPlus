@@ -9,7 +9,7 @@
     <ImageView
             android:layout_width="104dp"
             android:layout_height="108dp"
-            app:srcCompat="@drawable/g"
+            app:srcCompat="@mipmap/logo"
             android:id="@+id/imageView2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

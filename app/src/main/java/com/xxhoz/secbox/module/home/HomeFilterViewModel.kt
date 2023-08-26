@@ -19,7 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class HomeViewModel : BaseRecyclerViewModel() {
+class HomeFilterViewModel : BaseRecyclerViewModel() {
 
     override fun loadData(isLoadMore: Boolean, isReLoad: Boolean, page: Int) {
         viewModelScope.launch(Dispatchers.IO) {

@@ -12,9 +12,9 @@ import com.xxhoz.secbox.constant.TabId
 import com.xxhoz.secbox.databinding.ActivityMainBinding
 import com.xxhoz.secbox.module.acgn.AcgnFragment
 import com.xxhoz.secbox.module.discovery.DiscoveryFragment
-import com.xxhoz.secbox.module.home.HomeFragment
+import com.xxhoz.secbox.module.gold.GoldFragment
+import com.xxhoz.secbox.module.home.TabHomeFragment
 import com.xxhoz.secbox.module.mine.MineFragment
-import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.widget.NavigationView
 import com.xxhoz.secbox.widget.TabIndicatorView
 
@@ -63,11 +63,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
      */
     private fun initTabs() {
         val tabs = listOf(
-            Tab(TabId.HOME, getString(R.string.page_home), R.drawable.selector_btn_home, HomeFragment::class),
+            Tab(TabId.HOME, getString(R.string.page_home), R.drawable.selector_btn_home, TabHomeFragment::class),
             Tab(TabId.ACGN, getString(R.string.page_acgn), R.drawable.selector_btn_acgn, AcgnFragment::class),
-            // Tab(TabId.SMALL_VIDEO, getString(R.string.page_small_video), R.drawable.selector_btn_small_video, SmallVideoFragment::class),
-            // Tab(TabId.GOLD, getString(R.string.page_gold), R.drawable.selector_btn_gold, GoldFragment::class),
-            Tab(TabId.DISCOVERY, getString(R.string.page_discovery), R.drawable.selector_btn_discovery, DiscoveryFragment::class),
+//          Tab(TabId.SMALL_VIDEO, getString(R.string.page_small_video), R.drawable.selector_btn_small_video, SmallVideoFragment::class),
+          Tab(TabId.GOLD, getString(R.string.page_gold), R.drawable.selector_btn_gold, GoldFragment::class),
+          Tab(TabId.DISCOVERY, getString(R.string.page_discovery), R.drawable.selector_btn_discovery, DiscoveryFragment::class),
             Tab(TabId.MINE, getString(R.string.page_mine), R.drawable.selector_btn_mine, MineFragment::class)
         )
 

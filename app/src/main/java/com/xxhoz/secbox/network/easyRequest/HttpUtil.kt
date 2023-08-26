@@ -2,12 +2,13 @@ package com.xxhoz.network.fastHttp
 
 
 import com.google.gson.Gson
+import com.hjq.gson.factory.GsonFactory
 import okhttp3.*
 import java.io.IOException
 
-object OkHttpUtils {
+object HttpUtil {
     private val client = OkHttpClient()
-    private val gson = Gson()
+    private val gson = GsonFactory.getSingletonGson()
 
 
     fun getBytes(url: String): ByteArray? {

@@ -5,7 +5,8 @@ import com.github.catvod.crawler.JarLoader
 import com.github.catvod.crawler.JsLoader
 import com.github.catvod.crawler.Spider
 import com.google.gson.JsonObject
-import com.xxhoz.network.fastHttp.OkHttpUtils
+import com.hjq.toast.Toaster
+import com.xxhoz.network.fastHttp.HttpUtil
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.parserCore.parserImpl.SpiderSource
 import com.xxhoz.secbox.App
@@ -46,12 +47,12 @@ object SourceManger {
         sourceList = HashMap()
 
         if (!loadConfig(baseUrl)) {
-            LogUtils.e("加载配置文件失败")
+            Toaster.showLong("加载配置文件失败")
             return false
         }
 
         if (!loadJar()) {
-            LogUtils.e("加载JAR包失败")
+            Toaster.showLong("加载JAR包失败")
             return false
         }
         return true
@@ -64,7 +65,7 @@ object SourceManger {
      */
     private fun loadConfig(url: String): Boolean {
 
-        val infoJson = OkHttpUtils.get(url, JsonObject::class.java)
+        val infoJson = HttpUtil.get(url, JsonObject::class.java)
 
         if (infoJson == null) {
             return false
@@ -119,10 +120,11 @@ object SourceManger {
         val md5 = split?.get(1)
 
         if (url == null) {
+            LogUtils.i("配置文件中Jar路径为空")
             return false
         }
 
-        val cacheFile: File = File(App.instance.getFilesDir(), "/csp.jar")
+        val cacheFile: File = File(App.instance.cacheDir, "/csp.jar")
         if (md5!!.isEmpty() || !cacheFile.exists() || !(getFileMd5(cacheFile).equals(md5.toLowerCase()))) {
             // md5不存在,或文件不存在,或md5不匹配则 下载最新文件
             downloadJar(url, cacheFile)
@@ -133,12 +135,9 @@ object SourceManger {
 
 
     private fun downloadJar(url: String, cache: File) {
-        val inputStream = OkHttpUtils.getBytes(url)
-        val fileOutputStream: FileOutputStream =
-            App.instance.openFileOutput(cache.name, Context.MODE_PRIVATE)
-
+        val inputStream = HttpUtil.getBytes(url)
+        val fileOutputStream: FileOutputStream = App.instance.openFileOutput(cache.name, Context.MODE_PRIVATE)
         fileOutputStream.write(inputStream)
-
         fileOutputStream.close()
     }
 

@@ -24,7 +24,7 @@
                 android:id="@+id/iv_user_icon"
                 android:layout_width="66dp"
                 android:layout_height="66dp"
-                android:src="@drawable/icon_user"
+                android:src="@mipmap/logo"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
-                android:text="用户名"
+                android:text="但幕影视 v2.0"
                 android:textColor="#1C2C2A"
                 android:textSize="24sp"
                 app:layout_constraintBottom_toTopOf="@id/tv_user_phone"
@@ -44,6 +44,7 @@
                 app:layout_constraintVertical_chainStyle="packed" />
 
             <TextView
+                    android:visibility="invisible"
                 android:id="@+id/tv_user_phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

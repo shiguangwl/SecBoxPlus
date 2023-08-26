@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player;
+package com.xxhoz.secbox.module.player.view;
 
 public class AGEpsodeEntity {
     private String videoUrl;

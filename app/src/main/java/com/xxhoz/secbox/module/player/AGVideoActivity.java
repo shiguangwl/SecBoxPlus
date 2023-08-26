@@ -1,16 +1,24 @@
 package com.xxhoz.secbox.module.player;
 
+import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.material.tabs.TabLayout;
+import com.xxhoz.secbox.App;
 import com.xxhoz.secbox.R;
+import com.xxhoz.secbox.module.main.MainActivity;
 import com.xxhoz.secbox.module.player.mediaplayer.MediaExo;
 import com.xxhoz.secbox.module.player.popup.VideoEpisodePopup;
 import com.xxhoz.secbox.module.player.popup.VideoSpeedPopup;
+import com.xxhoz.secbox.module.player.view.AGEpsodeEntity;
 import com.xxhoz.secbox.util.ScreenRotateUtils;
 
 
@@ -34,10 +42,15 @@ public class AGVideoActivity extends AppCompatActivity implements AGVideo.JzVide
     private VideoSpeedPopup videoSpeedPopup;
     private VideoEpisodePopup videoEpisodePopup;
 
+    public static void startActivity(Context context) {
+        Intent intent = new Intent(context, AGVideoActivity.class);
+        // intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
+        // getSupportActionBar().hide();
         setContentView(R.layout.activity_agvideo);
         initVideoData();
         initView();
@@ -313,9 +326,8 @@ public class AGVideoActivity extends AppCompatActivity implements AGVideo.JzVide
 
     private void initVideoData() {
         episodeList = new ArrayList<>();
-        // TODO 添加测试数据
-//        for (int i = 0; i < UrlsKt.getLdjVideos().length; i++) {
-//            episodeList.add(new AGEpsodeEntity(""UrlsKt.getLdjVideos()[i]"", "鹿鼎记 第" + (i + 1) + "集"));
-//        }
+       for (int i = 0; i < 10; i++) {
+           episodeList.add(new AGEpsodeEntity("https://sf1-hscdn-tos.pstatp.com/obj/media-fe/xgplayer_doc_video/mp4/xgplayer-demo-360p.mp4", "鹿鼎记 第" + (i + 1) + "集"));
+       }
     }
 }

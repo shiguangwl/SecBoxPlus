@@ -21,7 +21,12 @@ open class BaseViewData<T>(var value: T) {
         return value?.hashCode() ?: 0
     }
 
-    fun isGridViewData(): Boolean {
-       return this is VideoViewData || this is CatagoryViewData || this is GoodsViewData
+    /**
+     * 是否是网格布局的数据
+     */
+    open fun isGridViewData(): Boolean {
+        //this is VideoViewData || this is CatagoryViewData || this is GoodsViewData
+        // 具体子类决定
+       return false
     }
 }

@@ -8,9 +8,10 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.JsonObject
 import com.gyf.immersionbar.ktx.immersionBar
+import com.hjq.toast.Toaster
 import com.umeng.commonsdk.UMConfigure
 import com.xxhoz.constant.BaseConfig
-import com.xxhoz.network.fastHttp.OkHttpUtils
+import com.xxhoz.network.fastHttp.HttpUtil
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.secbox.App
 import com.xxhoz.secbox.R
@@ -42,19 +43,26 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             navigationBarDarkIcon(true)
         }
 
+//        // 休眠2秒
+//        Thread{
+//            Thread.sleep(2000)
+//            val intent = Intent(this,MainActivity::class.java)
+//            startActivity(intent)
+//        }.start()
+
         initData()
     }
 
+    /**
+     * 初始化数据
+     */
     private fun initData() {
         if (!NetworkHelper.isNetworkConnect()) {
             Toast.makeText(App.instance, "请检查网络连接", Toast.LENGTH_SHORT).show()
             return
         }
-
         // 初始化友盟
         umengInit()
-
-
         // 加载配置
         configInit {
             if (it.RState != Rstate.SUCCESS) {
@@ -74,10 +82,10 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
     private fun configInit(callback: (Rdata) -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) {
             val jsonObject =
-                OkHttpUtils.get("https://shiguang.cachefly.net/config.json", JsonObject::class.java)
+                HttpUtil.get("https://shiguang.cachefly.net/config.json", JsonObject::class.java)
 
             if (jsonObject == null) {
-                callback.invoke(Rresult.fail("加载配置信息失败"))
+                callback(Rresult.fail("加载配置信息失败"))
                 return@launch
             }
 
@@ -96,11 +104,10 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             // 检测更新状态
             val checkUpdate = checkUpdate(version, downUrl)
             if (checkUpdate){
-                callback.invoke(Rresult.fail("有新版本发布"))
+                callback(Rresult.fail("有新版本发布"))
                 return@launch
             }
-
-            callback.invoke(Rresult.oK())
+            callback(Rresult.oK())
         }
     }
 

@@ -41,16 +41,19 @@ object BaseConfig {
         }
 
         var sourceKey: String = XKeyValue.getString(Key.SourceKey, DefualtSourceKey)
-        LogUtils.i("当前站源为:${sourceKey}")
+
         var source: IBaseSource? = SourceManger.getSource(sourceKey)
 
         if (source == null){
             LogUtils.i("设置的源未找到,默认使用第一个源")
             var firstSource: SourceBean = sourceBeanList.get(0)
-            source = SourceManger.getSource(firstSource.key)
+            sourceKey = firstSource.key
+            source = SourceManger.getSource(sourceKey)
             // 更新当前源key
             XKeyValue.putString(Key.SourceKey, firstSource.key)
         }
+
+        LogUtils.i("站源数量:${sourceBeanList.size}  当前获取站源为:${sourceKey}")
         return source
     }
 }

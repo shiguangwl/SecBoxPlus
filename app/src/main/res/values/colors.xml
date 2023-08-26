@@ -62,6 +62,6 @@
     <color name="white_70_color">#B3FFFFFF</color>
     <color name="white_80_color">#CCFFFFFF</color>
     <color name="white_90_color">#E6FFFFFF</color>
-    <color name="bg_window">#F1F2F3</color>
-    <color name="bg_image">#E7E7E7</color>
+    <color name="bg_window">#FFFFFFFF</color>
+    <color name="bg_image">#0A000000</color>
 </resources>

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import com.hjq.toast.Toaster
 import com.xxhoz.secbox.base.BaseFragment
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentMineBinding
@@ -56,7 +57,7 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
 
         // 清理缓存
         viewBinding.itemClearCache.setOnClickListener {
-            Toast.makeText(activity, "清理缓存成功", Toast.LENGTH_SHORT).show()
+            Toaster.show("清理缓存成功")
             XKeyValue.clearAccountMMKV()
 
         }
