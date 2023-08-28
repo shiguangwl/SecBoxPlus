@@ -23,7 +23,7 @@ class HomeViewModel : BaseRecyclerViewModel() {
 
     override fun loadData(isLoadMore: Boolean, isReLoad: Boolean, page: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-//            delay(1500L)
+            delay(1500L)
             val viewDataList = mutableListOf<BaseViewData<*>>()
             if (!isLoadMore) {
                 // 第一次加载或刷新

@@ -80,7 +80,12 @@ dependencies {
 
     // 吐司框架
     implementation ("com.github.getActivity:Toaster:${versions.toaster}")
-    // 播放器versions.toaster
+    // 弹幕
+    implementation ("com.github.CarGuo.DanmakuFlameMaster:DanmakuFlameMaster:0.9.25")
+    // 播放器versions
+    implementation 'com.github.CarGuo.GSYVideoPlayer:gsyVideoPlayer-java:v8.4.0-release-jitpack'
+    implementation 'com.github.CarGuo.GSYVideoPlayer:gsyVideoPlayer-armv7a:v8.4.0-release-jitpack'
+
     implementation project(path: ':JZVideo')
     implementation ("com.google.android.exoplayer:exoplayer:${versions.exoplayer}")
     // 数据抓取爬虫

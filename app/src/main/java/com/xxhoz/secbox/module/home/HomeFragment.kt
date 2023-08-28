@@ -17,6 +17,7 @@ import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeBinding
 import com.xxhoz.secbox.eventbus.XEventBus
 import com.xxhoz.secbox.module.player.AGVideoActivity
+import com.xxhoz.secbox.module.player.DetailPlayerActivity
 import com.xxhoz.secbox.widget.GridItemDecoration
 
 /**
@@ -67,7 +68,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 .setOnItemClickListener(object : XRecyclerView.OnItemClickListener {
                     override fun onItemClick(parent: RecyclerView, view: View, viewData: BaseViewData<*>, position: Int, id: Long) {
                         Toast.makeText(context, "条目点击: ${viewData.value}", Toast.LENGTH_SHORT).show()
-                        AGVideoActivity.startActivity(getActivity())
+//                        DetailPlayerActivity.startActivity(context!!)
+                        AGVideoActivity.startActivity(context!!)
 
                     }
                 })

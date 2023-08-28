@@ -2,6 +2,7 @@ package com.xxhoz.secbox.module.player.mediaplayer;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -239,6 +240,7 @@ public class MediaExo extends JZMediaInterface implements Player.EventListener, 
     public void onLoadingChanged(boolean isLoading) {
     }
 
+
     @Override
     public void onPlayerStateChanged(final boolean playWhenReady, final int playbackState) {
         Log.e(TAG, "onPlayerStateChanged" + playbackState + "/ready=" + String.valueOf(playWhenReady));
@@ -249,12 +251,14 @@ public class MediaExo extends JZMediaInterface implements Player.EventListener, 
                 break;
                 case Player.STATE_BUFFERING: {
                     if (jzvd instanceof AGVideo) {
-                        ((AGVideo) jzvd).showProgress();
+                        ((AGVideo) jzvd).startBuffering();
+                        // jzvd.onInfo(MediaPlayer.MEDIA_INFO_BUFFERING_START,666666);
                     }
                     handler.post(callback);
                 }
                 break;
                 case Player.STATE_READY: {
+                    ((AGVideo) jzvd).stopBuffering();
                     if (playWhenReady) {
                         jzvd.state = Jzvd.STATE_PREPARED;
                         jzvd.onStatePlaying();

@@ -58,7 +58,7 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
      */
     private fun initData() {
         if (!NetworkHelper.isNetworkConnect()) {
-            Toast.makeText(App.instance, "请检查网络连接", Toast.LENGTH_SHORT).show()
+            Toaster.show("请检查网络连接")
             return
         }
         // 初始化友盟
@@ -67,7 +67,7 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
         configInit {
             if (it.RState != Rstate.SUCCESS) {
                 // 加载配置文件失败,或有更新 TODO
-                Toast.makeText(App.instance, it.msg, Toast.LENGTH_SHORT).show()
+                Toaster.showLong(it.msg)
             }else{
                 val intent = Intent(this,MainActivity::class.java)
                 startActivity(intent)
@@ -136,7 +136,7 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
     }
 
     @PageName
-    override fun getPageName() = PageName.MAIN
+    override fun getPageName() = PageName.START
 
 
 }

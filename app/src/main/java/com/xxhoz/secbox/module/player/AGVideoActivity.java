@@ -327,7 +327,8 @@ public class AGVideoActivity extends AppCompatActivity implements AGVideo.JzVide
     private void initVideoData() {
         episodeList = new ArrayList<>();
        for (int i = 0; i < 10; i++) {
-           episodeList.add(new AGEpsodeEntity("https://sf1-hscdn-tos.pstatp.com/obj/media-fe/xgplayer_doc_video/mp4/xgplayer-demo-360p.mp4", "鹿鼎记 第" + (i + 1) + "集"));
+           episodeList.add(new AGEpsodeEntity("https://vip.lz-cdn13.com/20230822/16734_2404dc45/index.m3u8", "鹿鼎记 第" + (i + 1) + "集"));
+           // episodeList.add(new AGEpsodeEntity("https://sf1-hscdn-tos.pstatp.com/obj/media-fe/xgplayer_doc_video/mp4/xgplayer-demo-360p.mp4", "鹿鼎记 第" + (i + 1) + "集"));
        }
     }
 }

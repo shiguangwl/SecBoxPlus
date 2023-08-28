@@ -23,26 +23,34 @@
             tools:targetApi="n">
         <activity
                 android:name="com.xxhoz.secbox.module.start.StartActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
                 android:name="com.xxhoz.secbox.module.main.MainActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
                 android:screenOrientation="portrait"
-                android:theme="@style/ActivityTheme">
-        </activity>
+                android:theme="@style/ActivityTheme"/>
         <activity
                 android:name="com.xxhoz.secbox.module.about.AboutActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
                 android:screenOrientation="portrait"
                 android:theme="@style/ActivityTheme" />
         <activity
-            android:name="com.xxhoz.secbox.module.player.AGVideoActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/ActivityTheme" />
+                android:name="com.xxhoz.secbox.module.player.AGVideoActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+                android:screenOrientation="portrait"
+                android:theme="@style/ActivityTheme" />
+
+        <activity
+                android:name=".module.player.DetailPlayerActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+                android:screenOrientation="portrait"
+                android:theme="@style/ActivityTheme" />
     </application>
 
 </manifest>

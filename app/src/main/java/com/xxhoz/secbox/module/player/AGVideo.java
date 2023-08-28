@@ -57,6 +57,8 @@ public class AGVideo extends JzvdStd {
     private DismissNextViewTimerTask mDismissNextViewTimerTask;
     private boolean clickPlayOrPause;
 
+    private boolean isBuffering = false;
+
     public AGVideo(Context context) {
         super(context);
     }
@@ -536,7 +538,7 @@ public class AGVideo extends JzvdStd {
     @Override
     public void updateStartImage() {
         if (state == STATE_PLAYING) {
-            hideProgress();
+            // hideProgress();
             startButton.setVisibility(VISIBLE);
             startButton.setImageResource(R.mipmap.ag_btn_movie_suspend);
             start_bottom.setImageResource(R.mipmap.ag_btn_movie_stop_bottom);
@@ -587,6 +589,9 @@ public class AGVideo extends JzvdStd {
         }
     }
 
+    /**
+     * 正常屏幕UI变化
+     */
     @Override
     public void setScreenNormal() {
         screen = SCREEN_NORMAL;
@@ -601,10 +606,13 @@ public class AGVideo extends JzvdStd {
         tvSpeed.setVisibility(View.GONE);
         tvSelectPart.setVisibility(View.GONE);
         lock.setVisibility(View.GONE);
-        changeUiToPlayingShow();
-        startDismissControlViewTimer();
+        // changeUiToPlayingShow();
+        // startDismissControlViewTimer();
     }
 
+    /**
+     * 进入全屏后UI变化
+     */
     @Override
     public void setScreenFullscreen() {
         super.setScreenFullscreen();
@@ -613,8 +621,8 @@ public class AGVideo extends JzvdStd {
         tvSelectPart.setVisibility(View.VISIBLE);
         fullscreenButton.setVisibility(View.GONE);
         lock.setVisibility(View.VISIBLE);
-        changeUiToPlayingShow();
-        startDismissControlViewTimer();
+        // changeUiToPlayingShow();
+        // startDismissControlViewTimer();
         if (jzDataSource.objects == null) {
             Object[] object = {1};
             jzDataSource.objects = object;
@@ -821,12 +829,24 @@ public class AGVideo extends JzvdStd {
         lp.width = size;
     }
 
+    /**
+     * 设置所有控件的显示状态
+     * @param topCon 顶部布局
+     * @param bottomCon 底部布局
+     * @param startBtn 开始按钮
+     * @param loadingPro 加载圈
+     * @param thumbImg 缩略图
+     * @param bottomPro 底部进度条
+     * @param retryLayout 重试布局
+     */
     @Override
     public void setAllControlsVisiblity(int topCon, int bottomCon, int startBtn, int loadingPro, int thumbImg, int bottomPro, int retryLayout) {
         topContainer.setVisibility(topCon);
         bottomContainer.setVisibility(bottomCon);
         startButton.setVisibility(startBtn);
-        loadingView.setVisibility(loadingPro);
+        // if (!isBuffering){
+        //     loadingView.setVisibility(loadingPro);
+        // }
         posterImageView.setVisibility(thumbImg);
         bottomProgressBar.setVisibility(bottomPro);
         mRetryLayout.setVisibility(retryLayout);
@@ -980,6 +1000,16 @@ public class AGVideo extends JzvdStd {
         } else {
             tvSpeed.setText(speed + "X");
         }
+    }
+
+    public void startBuffering() {
+        isBuffering = true;
+        showProgress();
+    }
+
+    public void stopBuffering() {
+        isBuffering = false;
+        hideProgress();
     }
 
     public interface JzVideoListener {
