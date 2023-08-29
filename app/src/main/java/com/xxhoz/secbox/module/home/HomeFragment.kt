@@ -68,8 +68,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 .setOnItemClickListener(object : XRecyclerView.OnItemClickListener {
                     override fun onItemClick(parent: RecyclerView, view: View, viewData: BaseViewData<*>, position: Int, id: Long) {
                         Toast.makeText(context, "条目点击: ${viewData.value}", Toast.LENGTH_SHORT).show()
-//                        DetailPlayerActivity.startActivity(context!!)
-                        AGVideoActivity.startActivity(context!!)
+                        DetailPlayerActivity.startActivity(context!!)
+//                        AGVideoActivity.startActivity(context!!)
 
                     }
                 })
@@ -81,6 +81,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     }
                 })
         )
+
+        viewModel.loadData()
 
         XEventBus.observe(viewLifecycleOwner, EventName.REFRESH_HOME_LIST) { message: String ->
             viewBinding.rvList.refreshList()

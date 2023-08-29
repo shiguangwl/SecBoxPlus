@@ -18,6 +18,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.xxhoz.secbox.base.BaseFragment
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeTabBinding
+import com.xxhoz.secbox.module.search.SearchActivity
 
 
 /**
@@ -50,48 +51,60 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
 
     private fun initView() {
 
-        val tabs =
-            arrayOf("推荐", "电影", "电视剧", "动漫", "综艺")
-        //禁用预加载
-        viewBinding.viewPager.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
-
-        //Adapter
-        viewBinding.viewPager.adapter =
-            object : FragmentStateAdapter((getActivity()?.getSupportFragmentManager())!!, lifecycle) {
-
-                override fun createFragment(position: Int): Fragment {
-                    //FragmentStateAdapter内部自己会管理已实例化的fragment对象。
-                    // 所以不需要考虑复用的问题
-                    if (position == 0) {
-                        return HomeFragment();
-                    }
-                    return HomeFilterFragment(tabs[position])
-                }
-
-                override fun getItemCount(): Int {
-                    return tabs.size
-                }
-            }
-        //viewPager 页面切换监听监听
-        viewBinding.viewPager.registerOnPageChangeCallback(changeCallback)
-
-        mediator = TabLayoutMediator(
-            viewBinding.tabLayout, viewBinding.viewPager
-        ) { tab, position -> //这里可以自定义TabView
-            val tabView = TextView(getActivity())
-            val states = arrayOfNulls<IntArray>(2)
-            states[0] = intArrayOf(R.attr.state_selected)
-            states[1] = intArrayOf()
-            val colors = intArrayOf(activeColor, normalColor)
-            val colorStateList = ColorStateList(states, colors)
-            tabView.text = tabs[position]
-            tabView.textSize = normalSize.toFloat()
-            tabView.setTextColor(colorStateList)
-            tab.customView = tabView
+        viewBinding.searchBtn.setOnClickListener(){
+            SearchActivity.startActivity(context!!)
         }
-        //要执行这一句才是真正将两者绑定起来
-        //要执行这一句才是真正将两者绑定起来
-        mediator!!.attach()
+
+
+        viewBinding.promptView.showLoading()
+
+        Thread{
+            Thread.sleep(1500)
+            getActivity()?.runOnUiThread(){
+                val tabs =
+                    arrayOf("推荐", "电影", "电视剧", "动漫", "综艺")
+                //禁用预加载
+                viewBinding.viewPager.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
+                //Adapter
+                viewBinding.viewPager.adapter =
+                    object : FragmentStateAdapter((getActivity()?.getSupportFragmentManager())!!, lifecycle) {
+                        override fun createFragment(position: Int): Fragment {
+                            //FragmentStateAdapter内部自己会管理已实例化的fragment对象。
+                            // 所以不需要考虑复用的问题
+                            if (position == 0) {
+                                return HomeFragment();
+                            }
+                            return HomeFilterFragment(tabs[position])
+                        }
+
+                        override fun getItemCount(): Int {
+                            return tabs.size
+                        }
+                    }
+                //viewPager 页面切换监听监听
+                viewBinding.viewPager.registerOnPageChangeCallback(changeCallback)
+
+                mediator = TabLayoutMediator(
+                    viewBinding.tabLayout, viewBinding.viewPager
+                ) { tab, position -> //这里可以自定义TabView
+                    val tabView = TextView(getActivity())
+                    val states = arrayOfNulls<IntArray>(2)
+                    states[0] = intArrayOf(R.attr.state_selected)
+                    states[1] = intArrayOf()
+                    val colors = intArrayOf(activeColor, normalColor)
+                    val colorStateList = ColorStateList(states, colors)
+                    tabView.text = tabs[position]
+                    tabView.textSize = normalSize.toFloat()
+                    tabView.setTextColor(colorStateList)
+                    tab.customView = tabView
+                }
+                //要执行这一句才是真正将两者绑定起来
+                //要执行这一句才是真正将两者绑定起来
+                mediator!!.attach()
+
+                viewBinding.promptView.hide()
+            }
+        }.start()
     }
 
 

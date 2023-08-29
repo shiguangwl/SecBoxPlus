@@ -15,6 +15,16 @@
             app:layout_constraintTop_toTopOf="parent" />
 
 
-
+    <Button
+            android:id="@+id/next_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:text="下一集"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="32dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

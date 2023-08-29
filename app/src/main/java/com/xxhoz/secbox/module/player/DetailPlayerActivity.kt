@@ -26,7 +26,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>() {
     private var isPlay = false
     private var isPause = false
     private var isDestory = false
-
+    private var lastClidkTime:Long = -1;
     private var orientationUtils: OrientationUtils? = null
 
     override fun getPageName() = PageName.DETAIL_PLAYER
@@ -53,7 +53,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>() {
         //String url = "https://res.exexm.com/cw_145225549855002";
 
         //String url = "https://res.exexm.com/cw_145225549855002";
-        val url = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
+        val url = "https://vip.lz-cdn13.com/20230822/16734_2404dc45/index.m3u8"
         //String url = "https://res.exexm.com/cw_145225549855002";
         //String url = "https://res.exexm.com/cw_145225549855002";
         viewBinding.danmakuPlayer.setUp(url, true, null, "测试视频")
@@ -91,6 +91,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>() {
             viewBinding.danmakuPlayer.startWindowFullscreen(this, true, true)
         })
 
+        viewBinding.danmakuPlayer.currentState
         viewBinding.danmakuPlayer.setVideoAllCallBack(object : GSYSampleCallBack() {
             override fun onPrepared(url: String, vararg objects: Any) {
                 super.onPrepared(url, *objects)
@@ -124,7 +125,22 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>() {
 
         viewBinding.danmakuPlayer.startPlayLogic()
 
+        viewBinding.nextBottom.setOnClickListener(View.OnClickListener {
+
+            // 判断当前时间和上次点击间隔是否超过300ms
+            if (System.currentTimeMillis() - lastClidkTime < 1000) {
+                return@OnClickListener
+            }
+            lastClidkTime = System.currentTimeMillis()
+//            viewBinding.danmakuPlayer.release()
+//            viewBinding.danmakuPlayer.danmakuView.release()
+            viewBinding.danmakuPlayer.setUp("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4", true, null, "测试视频11")
+            viewBinding.danmakuPlayer.startPlayLogic()
+        })
+
     }
+
+
 
     /**
      * 状态栏导航栏初始化
