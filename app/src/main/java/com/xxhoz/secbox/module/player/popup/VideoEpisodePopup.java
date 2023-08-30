@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.xxhoz.secbox.R;
-import com.xxhoz.secbox.module.player.view.AGEpsodeEntity;
+import com.xxhoz.secbox.module.player.view.EpsodeEntity;
 import com.xxhoz.secbox.module.player.view.VideoEpisodeAdapter;
 import com.xxhoz.secbox.util.DipAndPx;
 
@@ -33,7 +33,7 @@ public class VideoEpisodePopup extends PopupWindow {
     private View contentView;
     private RecyclerView episodeRecycler;
     private VideoEpisodeAdapter episodeAdapter;
-    private List<AGEpsodeEntity> episodeList;
+    private List<EpsodeEntity> episodeList;
     private EpisodeClickListener episondeClickListener;
     /**
      * 当前正在播放的集数
@@ -50,7 +50,7 @@ public class VideoEpisodePopup extends PopupWindow {
         }
     };
 
-    public VideoEpisodePopup(Context context, List<AGEpsodeEntity> entities) {
+    public VideoEpisodePopup(Context context, List<EpsodeEntity> entities) {
         super(context);
         this.mC = context;
         mC = context;
@@ -159,7 +159,7 @@ public class VideoEpisodePopup extends PopupWindow {
          * @param entity
          * @param position
          */
-        void onEpisodeClickListener(AGEpsodeEntity entity, int position);
+        void onEpisodeClickListener(EpsodeEntity entity, int position);
     }
 
     public class DismissTimerTask extends TimerTask {

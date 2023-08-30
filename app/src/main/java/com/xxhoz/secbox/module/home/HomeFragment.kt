@@ -1,6 +1,5 @@
 package com.xxhoz.secbox.module.home
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +15,6 @@ import com.xxhoz.secbox.constant.EventName
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeBinding
 import com.xxhoz.secbox.eventbus.XEventBus
-import com.xxhoz.secbox.module.player.AGVideoActivity
 import com.xxhoz.secbox.module.player.DetailPlayerActivity
 import com.xxhoz.secbox.widget.GridItemDecoration
 

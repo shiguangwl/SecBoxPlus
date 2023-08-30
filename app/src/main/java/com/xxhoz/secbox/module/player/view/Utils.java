@@ -5,6 +5,6 @@ import android.util.TypedValue;
 
 public class Utils {
     public static float dp2px(float paramFloat) {
-        return TypedValue.applyDimension(1, paramFloat, Resources.getSystem().getDisplayMetrics());
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, paramFloat, Resources.getSystem().getDisplayMetrics());
     }
 }

@@ -45,11 +45,6 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/ActivityTheme" />
         <activity
-                android:name=".module.player.AGVideoActivity"
-                android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
-                android:screenOrientation="portrait"
-                android:theme="@style/ActivityTheme" />
-        <activity
                 android:name=".module.player.DetailPlayerActivity"
                 android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
                 android:screenOrientation="portrait"

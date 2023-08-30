@@ -13,6 +13,10 @@ import com.hjq.toast.Toaster
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.GlobalActivityManager
 import com.xxhoz.secbox.util.LogUtils
+import xyz.doikki.videoplayer.exo.ExoMediaPlayerFactory
+import xyz.doikki.videoplayer.player.AndroidMediaPlayerFactory
+import xyz.doikki.videoplayer.player.VideoViewConfig
+import xyz.doikki.videoplayer.player.VideoViewManager
 
 
 /**
@@ -32,6 +36,12 @@ class App : Application() {
             Toaster.init(this);
             Toaster.setGravity(BOTTOM, 0, 200);
             Toaster.setView(R.layout.toast_custom_view)
+            // 初始化播放器内核
+            VideoViewManager.setConfig(
+                VideoViewConfig.newBuilder()
+                //使用MediaPlayer解码
+                .setPlayerFactory(ExoMediaPlayerFactory.create())
+                .build());
             // 设置 Json 解析容错监听
             GsonFactory.setJsonCallback { typeToken, fieldName, jsonToken ->
                 // 上报到 Bugly 错误列表中

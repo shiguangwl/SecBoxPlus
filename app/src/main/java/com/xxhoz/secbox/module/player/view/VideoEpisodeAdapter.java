@@ -17,10 +17,10 @@ import java.util.List;
 
 public class VideoEpisodeAdapter extends RecyclerView.Adapter<VideoEpisodeAdapter.ViewHolder> {
     private Context mC;
-    private List<AGEpsodeEntity> entities;
+    private List<EpsodeEntity> entities;
     private OnItemClickListener mOnItemClickListener;
 
-    public VideoEpisodeAdapter(Context context, List<AGEpsodeEntity> entities) {
+    public VideoEpisodeAdapter(Context context, List<EpsodeEntity> entities) {
         this.mC = context;
         this.entities = entities;
     }

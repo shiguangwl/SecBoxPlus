@@ -10,7 +10,6 @@ import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.ActivitySearchBinding
-import com.xxhoz.secbox.module.player.AGVideoActivity
 import com.xxhoz.secbox.module.start.StartViewModel
 
 class SearchActivity : BaseActivity<ActivitySearchBinding>() {
