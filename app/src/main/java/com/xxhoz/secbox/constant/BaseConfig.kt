@@ -28,7 +28,7 @@ object BaseConfig {
     /**
      * 友盟配置
      */
-    var UmengKey = "6394544aba6a5259c4cb5211"
+    var UmengKey = "64f55fd25488fe7b3a04dfc8"
     val UmengChannel = "官方"
 
     /**

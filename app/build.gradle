@@ -62,18 +62,19 @@ android {
         }
     }
 
-    lintOptions {
-        disable 'RestrictedApi'
-    }
 
     buildFeatures {
         viewBinding true
+    }
+
+    namespace 'com.xxhoz.secbox'
+    lint {
+        disable 'RestrictedApi'
     }
 }
 
 kapt {
     arguments {
-        arg("room.schemaLocation", paths.room_schema)
     }
 }
 
@@ -123,10 +124,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-process:${versions.androidx_lifecycle}")
     implementation("androidx.activity:activity-ktx:${versions.androidx_activity_ktx}")
     implementation("androidx.fragment:fragment-ktx:${versions.androidx_fragment_ktx}")
-    implementation("androidx.room:room-runtime:${versions.androidx_room}")
-    implementation("androidx.room:room-rxjava2:${versions.androidx_room}")
-    implementation("androidx.room:room-ktx:${versions.androidx_room}")
-    kapt("androidx.room:room-compiler:${versions.androidx_room}")
     implementation("androidx.work:work-runtime:${versions.androidx_work_manager}")
     implementation("androidx.work:work-runtime-ktx:${versions.androidx_work_manager}")
 
@@ -140,11 +137,6 @@ dependencies {
     implementation("com.google.code.gson:gson:${versions.gson}")
     // Gson 解析容错
     implementation ("com.github.getActivity:GsonFactory:${versions.gson_factory}")
-    // Retrofit2
-    implementation("com.squareup.retrofit2:retrofit:${versions.retrofit2}")
-    implementation("com.squareup.retrofit2:adapter-rxjava2:${versions.retrofit2}")
-    implementation("com.squareup.retrofit2:converter-gson:${versions.retrofit2}")
-    implementation("com.squareup.retrofit2:converter-scalars:${versions.retrofit2}")
 
     // OkIO
     implementation("com.squareup.okio:okio:${versions.okio}")
@@ -153,9 +145,6 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:${versions.okhttp3}")
     implementation("com.squareup.okhttp3:logging-interceptor:${versions.okhttp3}")
 
-    // RxJava
-    implementation("io.reactivex.rxjava2:rxjava:${versions.rxjava2}")
-    implementation("io.reactivex.rxjava2:rxandroid:${versions.rxandroid2}")
 
     // 微信分享SDK
     implementation("com.tencent.mm.opensdk:wechat-sdk-android-without-mta:${versions.wechat_sdk}")
@@ -190,4 +179,5 @@ dependencies {
     // 友盟统计SDK
     implementation  'com.umeng.umsdk:common:9.6.3'// 必选
     implementation  'com.umeng.umsdk:asms:1.8.0'// 必选
+    implementation 'com.umeng.umsdk:apm:1.5.2' // U-APM包依赖(必选)
 }

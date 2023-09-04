@@ -3,7 +3,6 @@ package com.xxhoz.secbox.module.start
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.JsonObject
@@ -13,7 +12,6 @@ import com.umeng.commonsdk.UMConfigure
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.network.fastHttp.HttpUtil
 import com.xxhoz.parserCore.SourceManger
-import com.xxhoz.secbox.App
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.bean.callback.Rdata
@@ -26,7 +24,6 @@ import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.NetworkHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class StartActivity : BaseActivity<ActivityStartBinding>() {
 
@@ -126,6 +123,7 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
      * 初始化友盟配置
      */
     private fun umengInit() {
+        UMConfigure.preInit(this, BaseConfig.UmengKey, BaseConfig.UmengChannel)
         UMConfigure.init(this, BaseConfig.UmengKey, BaseConfig.UmengChannel, UMConfigure.DEVICE_TYPE_PHONE, "")
     }
 

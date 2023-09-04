@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import me.imid.swipebacklayout.lib.app.SwipeBackActivity
 
 /**
@@ -15,7 +13,6 @@ abstract class BaseActivity<T : ViewBinding> : SwipeBackActivity(), IGetPageName
 
     protected lateinit var viewBinding: T
     protected abstract val inflater: (inflater: LayoutInflater) -> T
-    private val compositeDisposable = CompositeDisposable()
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +36,6 @@ abstract class BaseActivity<T : ViewBinding> : SwipeBackActivity(), IGetPageName
 
     @CallSuper
     override fun onDestroy() {
-        compositeDisposable.dispose()
         super.onDestroy()
     }
 
@@ -48,10 +44,6 @@ abstract class BaseActivity<T : ViewBinding> : SwipeBackActivity(), IGetPageName
      */
     protected open fun swipeBackEnable() = true
 
-    /**
-     * 添加Disposable
-     */
-    protected fun addDisposable(disposable: Disposable) {
-        compositeDisposable.add(disposable)
-    }
+
+
 }

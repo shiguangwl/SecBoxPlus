@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.xxhoz.secbox.base.BaseViewModel
 import com.xxhoz.secbox.bean.VideoBean
 import com.xxhoz.secbox.constant.PageName
-import com.xxhoz.secbox.network.NetworkApi
 import kotlinx.coroutines.launch
 
 class SmallVideoViewModel : BaseViewModel() {
@@ -14,8 +13,8 @@ class SmallVideoViewModel : BaseViewModel() {
 
     fun requestVideoDetail(id: String) {
         viewModelScope.launch {
-            val result = NetworkApi.requestVideoDetail(id)
-            helloWorldLiveData.value = result
+//            val result = NetworkApi.requestVideoDetail(id)
+//            helloWorldLiveData.value = "result"
         }
     }
 

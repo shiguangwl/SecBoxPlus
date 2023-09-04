@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Looper;
 
 import com.hjq.toast.Toaster;
+import com.umeng.commonsdk.internal.crash.UMCrashManager;
 import com.xxhoz.secbox.util.LogUtils;
 
 public class CrashManager {
@@ -43,6 +44,8 @@ public class CrashManager {
      */
     private void handleFileException(Throwable e) {
         Toaster.showLong("未知错误:" + e.toString());
+        // 异常上报
+        UMCrashManager.reportCrash(App.instance,e);
         e.printStackTrace();
     }
 
