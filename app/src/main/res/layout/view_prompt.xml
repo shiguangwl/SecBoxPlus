@@ -42,30 +42,31 @@
         app:layout_constraintTop_toBottomOf="@id/tv_error" />
 
     <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/view_loading"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
-        android:visibility="gone"
-        app:lottie_loop="true"
-        app:layout_constraintBottom_toTopOf="@id/tv_loading"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        app:lottie_rawRes="@raw/loop_yellow" />
+            android:id="@+id/view_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:lottie_loop="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:lottie_rawRes="@raw/loading"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     <TextView
-        android:id="@+id/tv_loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/page_state_loading"
-        android:textColor="#40000000"
-        android:textSize="16sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view_loading" />
+            android:id="@+id/tv_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/page_state_loading"
+            android:textColor="#40000000"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintBottom_toBottomOf="@+id/view_loading"
+            app:layout_constraintTop_toTopOf="@+id/view_loading"
+            android:layout_marginTop="130dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

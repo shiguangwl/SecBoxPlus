@@ -42,8 +42,8 @@ public class CrashManager {
      * @param e
      */
     private void handleFileException(Throwable e) {
-        e.printStackTrace();
         Toaster.showLong("未知错误:" + e.toString());
+        e.printStackTrace();
     }
 
     private void handleMainThread(Throwable e) {

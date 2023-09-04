@@ -24,6 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
         <ProgressBar
+                android:layout_gravity="center_horizontal"
                 android:layout_width="@dimen/dkplayer_play_btn_size"
                 android:layout_height="@dimen/dkplayer_play_btn_size"
                 android:indeterminateDrawable="@drawable/dkplayer_progress_loading"
@@ -31,13 +32,14 @@
                 tools:visibility="visible" />
         <!--TODO 待优化-->
         <TextView
-                android:visibility="gone"
+                android:layout_gravity="center_horizontal"
+                android:textAlignment="center"
                 android:id="@+id/load_speed"
-                android:text="123kb/s"
-                android:textColor="@color/theme_color"
+                android:text="0kb/s"
+                android:textColor="@color/white"
                 android:textStyle="bold"
                 android:paddingTop="5dp"
-                android:layout_width="wrap_content"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"/>
     </LinearLayout>
 

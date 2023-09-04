@@ -12,7 +12,7 @@ object BaseConfig {
     /**
      * 加载配置API
      */
-    var BASE_API = "https://jihulab.com/clear1/yingmi/-/raw/main/xh.txt"
+    var BASE_API = ""
 
     /**
      * 默认源

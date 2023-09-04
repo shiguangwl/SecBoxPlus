@@ -7,17 +7,26 @@
         tools:context=".module.search.SearchActivity">
 
 
+    <androidx.constraintlayout.widget.Guideline
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/guideline4"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="25dp" />
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline4"
             app:layout_constraintEnd_toEndOf="parent"
             android:id="@+id/constraintLayout">
 
 
         <ImageView
-                android:src="@drawable/icon_setting"
+                android:padding="3dp"
+                android:src="@drawable/back_icon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -28,14 +37,18 @@
 
 
         <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchView"
                 android:layout_width="0dp"
                 android:layout_height="35dp"
-                app:layout_constraintStart_toEndOf="@+id/imageView"
+                android:layoutDirection="rtl"
+                app:layout_constraintStart_toEndOf="@+id/filter_source"
+                app:layout_constraintEnd_toStartOf="@+id/imageView"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/filter_source" />
+                app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+                android:padding="5dp"
+                android:src="@drawable/filter_icon"
                 android:id="@+id/filter_source"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
@@ -46,7 +59,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+    <!--历史记录视图-->
     <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/history_layout"
             android:layout_width="match_parent"
@@ -58,23 +71,44 @@
             tools:visibility="visible">
 
 
-        <View
-                android:layout_width="0dp"
-                android:layout_height="200dp"
-                android:background="@color/black_65_color"
-                app:layout_constraintEnd_toEndOf="parent"
+        <TextView
+                android:id="@+id/recent_search"
+                android:text="最近搜索:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="16dp"
+                android:layout_marginStart="8dp" />
+
+
+        <TextView
+                android:id="@+id/clear_text"
+                android:text="清空"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/recent_search"
+                app:layout_constraintBottom_toBottomOf="@+id/recent_search"
+                android:layout_marginEnd="16dp" />
+
+
+        <com.google.android.flexbox.FlexboxLayout
+                app:flexWrap="wrap"
+                android:id="@+id/history_box"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/recent_search"
+                android:layout_marginTop="5dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp" />
 
-        .
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+    <!--搜索结果视图-->
     <androidx.constraintlayout.widget.ConstraintLayout
+            android:visibility="invisible"
             android:id="@+id/result_layout"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -85,7 +119,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/result_source_list"
-                android:layout_width="150dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

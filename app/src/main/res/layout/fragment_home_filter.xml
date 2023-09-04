@@ -5,14 +5,30 @@
     android:layout_height="match_parent">
 
 
-    <TextView
-            android:id="@+id/testStr"
-            android:layout_width="wrap_content"
+    <com.xxhoz.secbox.widget.ConditionTabView
+            android:id="@+id/condition_view"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="我是内容"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+
+    <com.xxhoz.secbox.base.list.XRecyclerView
+            android:id="@+id/item_list_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/condition_view" />
+
+    <com.xxhoz.secbox.widget.PromptView
+            android:id="@+id/load_promptView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/condition_view"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

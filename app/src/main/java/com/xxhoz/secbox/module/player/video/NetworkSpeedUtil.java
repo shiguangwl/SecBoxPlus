@@ -48,7 +48,7 @@ public class NetworkSpeedUtil {
                 }
             }
 
-            handler.postDelayed(this, 1000); // 每秒更新一次
+            handler.postDelayed(this, 800); // 每秒更新一次
         }
     };
 

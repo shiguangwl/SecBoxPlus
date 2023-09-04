@@ -77,7 +77,7 @@ public class StandardVideoController extends GestureVideoController implements V
         mLoadingView = findViewById(R.id.loading);
         loadSpeed = findViewById(R.id.load_speed);
 
-        // startShowBufferSpeed();
+        startShowBufferSpeed();
     }
 
 
@@ -229,39 +229,35 @@ public class StandardVideoController extends GestureVideoController implements V
         return super.onBackPressed();
     }
 
-    // @Override
-    // public void startProgress() {
-    //     super.startProgress();
-    //     startShowBufferSpeed();
-    // }
-    //
-    // @Override
-    // public void stopProgress() {
-    //     super.stopProgress();
-    //     stopShowBufferSpeed();
-    // }
-    //
-    // Handler handler = new Handler(Looper.getMainLooper());
-    // private ScheduledExecutorService scheduler;
-    // private void startShowBufferSpeed() {
-    //     if (scheduler != null) {
-    //         // 先关闭旧的scheduler
-    //         scheduler.shutdown();
-    //     }
-    //     scheduler = Executors.newSingleThreadScheduledExecutor();
-    //     Runnable task = new Runnable() {
-    //         public void run() {
-    //             handler.post(()->{
-    //                 loadSpeed.setText(mControlWrapper.getBufferedPercentage()+"%");
-    //             });
-    //         }
-    //     };
-    //     scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.SECONDS);
-    // }
-    //
-    // private void stopShowBufferSpeed() {
-    //     if (scheduler != null){
-    //         scheduler.shutdown();
-    //     }
-    // }
+    @Override
+    public void startProgress() {
+        super.startProgress();
+        startShowBufferSpeed();
+    }
+
+    @Override
+    public void stopProgress() {
+        super.stopProgress();
+        stopShowBufferSpeed();
+    }
+
+    Handler handler = new Handler(Looper.getMainLooper());
+    private NetworkSpeedUtil networkSpeedUtil;
+    private void startShowBufferSpeed() {
+        if (networkSpeedUtil == null) {
+            networkSpeedUtil = new NetworkSpeedUtil(getContext(),speedInBytesPerSecond->{
+                handler.post(()->{
+                    loadSpeed.setText((speedInBytesPerSecond ) + "kb/s");
+                });
+            });
+        }
+        networkSpeedUtil.stopMonitoring();
+        networkSpeedUtil.startMonitoring();
+    }
+
+    private void stopShowBufferSpeed() {
+        if (networkSpeedUtil != null){
+            networkSpeedUtil.stopMonitoring();
+        }
+    }
 }

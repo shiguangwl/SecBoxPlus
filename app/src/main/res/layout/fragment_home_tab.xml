@@ -9,26 +9,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/guideline2"
-            app:layout_constraintGuide_begin="25dp"
-            android:orientation="horizontal" />
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="26dp" />
 
+
+    <View
+            android:background="@drawable/ic_title_bg"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/tab_layout"
+            app:layout_constraintTop_toTopOf="parent" />
     <TextView
             android:id="@+id/current_source_text"
             android:layout_width="wrap_content"
-            android:layout_height="25dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:textSize="18sp"
+            android:textSize="21sp"
             android:textStyle="bold"
-            android:text="🎉但幕影视资源"
+            android:text="🎉但幕影视资源  ▼"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/search_btn"
             app:layout_constraintTop_toTopOf="@+id/search_btn" />
 
     <ImageView
             android:id="@+id/search_btn"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:src="@drawable/icon_setting"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="5dp"
+            android:src="@drawable/search_icon"
             android:scaleType="fitXY"
             app:layout_constraintEnd_toStartOf="@+id/history_btn"
             app:layout_constraintTop_toTopOf="@+id/history_btn"
@@ -37,21 +47,16 @@
 
     <ImageView
             android:id="@+id/history_btn"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:src="@drawable/icon_history"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="2dp"
+            android:src="@drawable/history_icon"
             android:scaleType="fitXY"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline2" />
+            app:layout_constraintTop_toTopOf="@+id/guideline2"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp" />
 
-    <com.xxhoz.secbox.widget.PromptView
-            android:id="@+id/prompt_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tab_layout" />
 
     <com.google.android.material.tabs.TabLayout
             android:background="@android:color/transparent"
@@ -61,6 +66,7 @@
             android:layout_height="40dp"
             app:tabGravity="center"
             app:tabIndicatorFullWidth="false"
+            app:tabIndicatorHeight="0dp"
             app:tabMode="scrollable"
             app:tabSelectedTextColor="#ff678f"
             app:tabTextColor="#333333"
@@ -79,4 +85,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+    <com.xxhoz.secbox.widget.PromptView
+            android:id="@+id/prompt_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tab_layout" />
 </androidx.constraintlayout.widget.ConstraintLayout>

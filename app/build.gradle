@@ -27,6 +27,7 @@ android {
             jniDebuggable true
             minifyEnabled false
             shrinkResources false
+            applicationIdSuffix ".dev"
             manifestPlaceholders = [
                     networkSecurityConfig: "@xml/network_security_config_test"
             ]
@@ -81,8 +82,11 @@ dependencies {
     // 吐司框架
     implementation ("com.github.getActivity:Toaster:${versions.toaster}")
 
+    //  Flex布局
+    implementation 'com.google.android:flexbox:1.0.0'
+
     // 弹幕
-    implementation ("com.github.CarGuo.DanmakuFlameMaster:DanmakuFlameMaster:0.9.25")
+    implementation ("com.github.ctiao:DanmakuFlameMaster:0.9.25")
     // 播放器
     implementation 'xyz.doikki.android.dkplayer:dkplayer-java:3.3.7'
     implementation 'xyz.doikki.android.dkplayer:dkplayer-ui:3.3.7'

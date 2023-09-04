@@ -81,12 +81,6 @@ class HomeViewModel : BaseRecyclerViewModel() {
     }
 
 
-    fun loadHomeDataList(){
-
-    }
-
-
-
     @PageName
     override fun getPageName() = PageName.HOME
 }

@@ -26,6 +26,7 @@ import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.NetworkHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class StartActivity : BaseActivity<ActivityStartBinding>() {
 
@@ -42,14 +43,6 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             navigationBarColor(R.color.white)
             navigationBarDarkIcon(true)
         }
-
-//        // 休眠2秒
-//        Thread{
-//            Thread.sleep(2000)
-//            val intent = Intent(this,MainActivity::class.java)
-//            startActivity(intent)
-//        }.start()
-
         initData()
     }
 
@@ -61,8 +54,6 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             Toaster.show("请检查网络连接")
             return
         }
-        // 初始化友盟
-        umengInit()
         // 加载配置
         configInit {
             if (it.RState != Rstate.SUCCESS) {
@@ -81,6 +72,9 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
      */
     private fun configInit(callback: (Rdata) -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) {
+            // 初始化友盟
+            umengInit()
+            // 配置加载
             val jsonObject =
                 HttpUtil.get("https://shiguang.cachefly.net/config.json", JsonObject::class.java)
 

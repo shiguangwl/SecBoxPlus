@@ -10,14 +10,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
 import com.xxhoz.secbox.base.BaseFragment
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeTabBinding
+import com.xxhoz.secbox.module.home.view.BottomSheetSource
 import com.xxhoz.secbox.module.search.SearchActivity
 
 
@@ -29,12 +28,12 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
     private val activeColor = Color.parseColor("#ff678f")
     private val normalColor = Color.parseColor("#666666")
 
-    private val activeSize = 20
+    private val activeSize = 18
     private val normalSize = 14
 
     private var mediator: TabLayoutMediator? = null
 
-    private val viewModel: HomeViewModel by viewModels()
+//    private val viewModel: HomeViewModel by viewModels()
 
     override val inflater: (LayoutInflater, container: ViewGroup?, attachToRoot: Boolean) -> FragmentHomeTabBinding
         get() = FragmentHomeTabBinding::inflate
@@ -52,9 +51,13 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
     private fun initView() {
 
         viewBinding.searchBtn.setOnClickListener(){
-            SearchActivity.startActivity(context!!)
+            SearchActivity.startActivity(requireContext())
         }
 
+        viewBinding.currentSourceText.setOnClickListener(){
+            val bottomSheetFragment = BottomSheetSource(viewBinding.searchBtn)
+            bottomSheetFragment.show(requireActivity().getSupportFragmentManager(), bottomSheetFragment.getTag())
+        }
 
         viewBinding.promptView.showLoading()
 
@@ -64,7 +67,9 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
                 val tabs =
                     arrayOf("推荐", "电影", "电视剧", "动漫", "综艺")
                 //禁用预加载
-                viewBinding.viewPager.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
+//                viewBinding.viewPager.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
+                viewBinding.viewPager.offscreenPageLimit = 10
+
                 //Adapter
                 viewBinding.viewPager.adapter =
                     object : FragmentStateAdapter((getActivity()?.getSupportFragmentManager())!!, lifecycle) {
@@ -98,7 +103,6 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
                     tabView.setTextColor(colorStateList)
                     tab.customView = tabView
                 }
-                //要执行这一句才是真正将两者绑定起来
                 //要执行这一句才是真正将两者绑定起来
                 mediator!!.attach()
 

@@ -13,7 +13,8 @@ import androidx.annotation.StringDef
     PageName.ABOUT,
     PageName.DISCOVERY,
     PageName.DETAIL_PLAYER,
-    PageName.SEARCH
+    PageName.SEARCH,
+    PageName.FILTER
 )
 @Retention(AnnotationRetention.SOURCE)
 annotation class PageName {
@@ -29,5 +30,6 @@ annotation class PageName {
         const val DISCOVERY = "discovery"
         const val DETAIL_PLAYER = "detail_player"
         const val SEARCH = "search"
+        const val FILTER = "filter"
     }
 }

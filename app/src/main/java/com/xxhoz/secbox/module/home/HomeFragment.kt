@@ -59,6 +59,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         viewBinding.rvList.init(
             XRecyclerView.Config()
                 .setViewModel(viewModel)
+                .setShowScrollBar(false)
                 .setPullRefreshEnable(false)
                 .setPullUploadMoreEnable(true)
                 .setLayoutManager(GridLayoutManager(activity, HOME_SPAN_COUNT))
