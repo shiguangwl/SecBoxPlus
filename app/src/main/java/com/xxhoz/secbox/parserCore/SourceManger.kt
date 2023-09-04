@@ -6,7 +6,7 @@ import com.github.catvod.crawler.JsLoader
 import com.github.catvod.crawler.Spider
 import com.google.gson.JsonObject
 import com.hjq.toast.Toaster
-import com.xxhoz.network.fastHttp.HttpUtil
+import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.parserCore.parserImpl.SpiderSource
 import com.xxhoz.secbox.App

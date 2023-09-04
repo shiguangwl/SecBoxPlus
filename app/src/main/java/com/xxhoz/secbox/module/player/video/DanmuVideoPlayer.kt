@@ -3,8 +3,10 @@ package com.xxhoz.secbox.module.player.video;
 import android.content.Context
 import android.util.AttributeSet
 import com.hjq.toast.Toaster
+import com.xxhoz.secbox.module.player.popup.view.EpsodeEntity
 import com.xxhoz.secbox.module.player.video.view.BottomControlView
-import com.xxhoz.secbox.module.player.view.EpsodeEntity
+import com.xxhoz.secbox.module.player.video.view.danma.SecDanmakuView
+
 import xyz.doikki.videocontroller.component.CompleteView
 import xyz.doikki.videocontroller.component.ErrorView
 import xyz.doikki.videocontroller.component.GestureView
@@ -19,6 +21,7 @@ class DanmuVideoPlayer : VideoView {
 
     lateinit var topTitleView: TopTitleView
     lateinit private var vDanmakuView : SecDanmakuView
+    lateinit var standardVideoController: StandardVideoController
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
@@ -80,6 +83,8 @@ class DanmuVideoPlayer : VideoView {
         // 设置控制器
         setVideoController(controller)
         //        setScreenScaleType(SCREEN_SCALE_DEFAULT)
+
+        standardVideoController = controller
     }
 
 
@@ -87,19 +92,24 @@ class DanmuVideoPlayer : VideoView {
      * 设置播放数据
      */
     fun setUp(epsodeEntity: EpsodeEntity) {
+        standardVideoController.stopShowBufferSpeed()
         release()
         topTitleView.setTitle(epsodeEntity.videoName)
         setUrl(epsodeEntity.videoUrl)
-        start()
+        startPlay()
+        standardVideoController.startShowBufferSpeed()
     }
 
-
-//    fun setUp(epsodeEntity: EpsodeEntity,isChangeUrl: Boolean) {
-//        release()
-//        topTitleView.setTitle(epsodeEntity.videoName)
-//        setUrl(epsodeEntity.videoUrl)
-//        start()
-//    }
+    /**
+     * 显示loading信息
+     */
+    fun setLoadingMsg(msg:String){
+        standardVideoController.stopShowBufferSpeed()
+        if (currentPlayerState != STATE_IDLE){
+            release()
+        }
+        standardVideoController.setLoadingMsg(msg)
+    }
 
     /**
      * 加载弹幕数据

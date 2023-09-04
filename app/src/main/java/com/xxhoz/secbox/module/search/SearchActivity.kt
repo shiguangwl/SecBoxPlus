@@ -13,14 +13,18 @@ import androidx.activity.viewModels
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewbinding.ViewBinding
 import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.toast.Toaster
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
+import com.xxhoz.secbox.bean.VideoInfoItem
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.ActivitySearchBinding
+import com.xxhoz.secbox.databinding.ItemSearchMovieResultListBinding
 import com.xxhoz.secbox.module.start.StartViewModel
 import com.xxhoz.secbox.util.UniversalAdapter
+import com.xxhoz.secbox.util.setImageUrl
 
 
 class SearchActivity : BaseActivity<ActivitySearchBinding>() {
@@ -75,12 +79,46 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
 
 
-        var dataList = listOf("11111","22222","333333","333333","333333","333333","333333","333333","333333","333333","333333","333333","666666","777777")
+        // 左边
+        var dataList = listOf(
+            "收到就",
+            "收到就",
+            "收到就",
+            "收到就",
+            "收到就",
+            "收到就",
+            "收到就",
+            "收到就",
+            "收到就",
+            "收到就",
+            "收到就",
+            "收到就",
+            "收到就",
+            "收到就")
         viewBinding.resultSourceList.layoutManager =LinearLayoutManager(this)
-        viewBinding.resultSourceList.adapter = UniversalAdapter(dataList,R.layout.search_result_source_layout,object: UniversalAdapter.DataViewBind<String> {
+        viewBinding.resultSourceList.adapter = UniversalAdapter(dataList,R.layout.item_search_result_source,object: UniversalAdapter.DataViewBind<String> {
             override fun exec(data: String, view: View?) {
                 val sourceText = view?.findViewById<TextView>(R.id.source_text)
                 sourceText?.text = data
+            }
+        })
+
+        var resultItem = listOf(
+            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
+            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
+            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
+            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
+            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
+            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
+            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
+            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
+            )
+        viewBinding.resultVideoList.layoutManager = LinearLayoutManager(this)
+        viewBinding.resultVideoList.adapter = UniversalAdapter(resultItem,R.layout.item_search_movie_result_list,object: UniversalAdapter.DataViewBind<VideoInfoItem> {
+            override fun exec(data: VideoInfoItem, view: View?) {
+                val bind = ItemSearchMovieResultListBinding.bind(view!!)
+                bind.picMovie.setImageUrl(data.image)
+                bind.titleMovie.text = data.title
             }
         })
     }

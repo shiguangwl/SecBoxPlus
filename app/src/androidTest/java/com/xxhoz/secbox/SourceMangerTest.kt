@@ -1,7 +1,7 @@
 package com.xxhoz.secbox
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.xxhoz.network.fastHttp.HttpUtil
+import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.secbox.util.LogUtils
 import org.junit.Test

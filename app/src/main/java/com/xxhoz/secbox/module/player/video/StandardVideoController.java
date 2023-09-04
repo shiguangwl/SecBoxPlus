@@ -19,10 +19,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.xxhoz.secbox.R;
+import com.xxhoz.secbox.module.player.video.view.NetworkSpeedUtil;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import xyz.doikki.videocontroller.component.CompleteView;
 import xyz.doikki.videocontroller.component.ErrorView;
@@ -76,8 +74,6 @@ public class StandardVideoController extends GestureVideoController implements V
         mLockButton.setOnClickListener(this);
         mLoadingView = findViewById(R.id.loading);
         loadSpeed = findViewById(R.id.load_speed);
-
-        startShowBufferSpeed();
     }
 
 
@@ -243,7 +239,7 @@ public class StandardVideoController extends GestureVideoController implements V
 
     Handler handler = new Handler(Looper.getMainLooper());
     private NetworkSpeedUtil networkSpeedUtil;
-    private void startShowBufferSpeed() {
+    public void startShowBufferSpeed() {
         if (networkSpeedUtil == null) {
             networkSpeedUtil = new NetworkSpeedUtil(getContext(),speedInBytesPerSecond->{
                 handler.post(()->{
@@ -255,9 +251,16 @@ public class StandardVideoController extends GestureVideoController implements V
         networkSpeedUtil.startMonitoring();
     }
 
-    private void stopShowBufferSpeed() {
+    public void stopShowBufferSpeed() {
         if (networkSpeedUtil != null){
             networkSpeedUtil.stopMonitoring();
         }
+    }
+
+
+    public void setLoadingMsg(String msg){
+        mLoadingView.setVisibility(VISIBLE);
+        stopShowBufferSpeed();
+        loadSpeed.setText(msg);
     }
 }

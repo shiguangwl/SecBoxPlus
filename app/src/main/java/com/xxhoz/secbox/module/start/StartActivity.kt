@@ -10,7 +10,7 @@ import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.toast.Toaster
 import com.umeng.commonsdk.UMConfigure
 import com.xxhoz.constant.BaseConfig
-import com.xxhoz.network.fastHttp.HttpUtil
+import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
@@ -41,6 +41,11 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             navigationBarDarkIcon(true)
         }
         initData()
+
+        // 初始化友盟  调试版不做记录
+        if (!getPackageName().contains(".dev")) {
+            umengInit()
+        }
     }
 
     /**
@@ -69,8 +74,6 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
      */
     private fun configInit(callback: (Rdata) -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) {
-            // 初始化友盟
-            umengInit()
             // 配置加载
             val jsonObject =
                 HttpUtil.get("https://shiguang.cachefly.net/config.json", JsonObject::class.java)

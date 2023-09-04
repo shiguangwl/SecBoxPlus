@@ -7,8 +7,8 @@
         android:layout_height="wrap_content">
 
     <Button
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
             android:id="@+id/source_text"
             android:textAlignment="center"
             android:text="我源"

@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player.video;
+package com.xxhoz.secbox.module.player.video.view.danma;
 
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;

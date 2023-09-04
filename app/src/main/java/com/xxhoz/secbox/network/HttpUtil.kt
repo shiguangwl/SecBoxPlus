@@ -1,10 +1,10 @@
-package com.xxhoz.network.fastHttp
+package com.xxhoz.secbox.network
 
 
-import com.google.gson.Gson
 import com.hjq.gson.factory.GsonFactory
 import okhttp3.*
 import java.io.IOException
+import java.util.Objects
 
 object HttpUtil {
     private val client = OkHttpClient()

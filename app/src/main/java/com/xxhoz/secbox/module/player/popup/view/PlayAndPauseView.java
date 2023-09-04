@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player.view;
+package com.xxhoz.secbox.module.player.popup.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;

@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player.video;
+package com.xxhoz.secbox.module.player.video.view.danma;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.xxhoz.secbox.R;
+
 import xyz.doikki.videoplayer.BuildConfig;
 import xyz.doikki.videoplayer.controller.ControlWrapper;
 import xyz.doikki.videoplayer.controller.IControlComponent;
