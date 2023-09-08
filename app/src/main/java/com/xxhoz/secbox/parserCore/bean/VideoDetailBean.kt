@@ -38,7 +38,7 @@ data class VideoDetailBean(
     }
 
     data class ChannelEpisodes(
-        val channel: String,
+        val channelFlag: String,
         val episodes: List<Value>
     )
 

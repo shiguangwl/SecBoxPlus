@@ -30,16 +30,15 @@
                 android:indeterminateDrawable="@drawable/dkplayer_progress_loading"
                 android:indeterminateDuration="2000"
                 tools:visibility="visible" />
-        <!--TODO 待优化-->
+
         <TextView
                 android:layout_gravity="center_horizontal"
                 android:textAlignment="center"
                 android:id="@+id/load_speed"
-                android:text="0kb/s"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:paddingTop="5dp"
-                android:layout_width="80dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
     </LinearLayout>
 

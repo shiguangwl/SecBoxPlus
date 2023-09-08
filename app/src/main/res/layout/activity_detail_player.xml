@@ -13,7 +13,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:id="@+id/view2" />
+            android:id="@+id/controller_view" />
 
     <com.xxhoz.secbox.module.player.video.DanmuVideoPlayer
             android:id="@+id/danmaku_player"
@@ -21,7 +21,184 @@
             android:layout_height="220dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view2" />
+            app:layout_constraintTop_toBottomOf="@+id/controller_view" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/controller_view"
+            android:layout_marginTop="220dp">
+
+
+        <LinearLayout
+                android:background="@color/line_color"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/linearLayout">
+
+            <TextView
+                    android:text="斗破苍穹"
+                    android:layout_weight="10"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:id="@+id/title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            <TextView
+                    android:textAlignment="center"
+                    android:text="🌈┃彩虹┃4K  ▼"
+                    android:layout_weight="2"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:id="@+id/current_source_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+
+        </LinearLayout>
+
+
+        <com.google.android.flexbox.FlexboxLayout
+                android:layout_marginEnd="10dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toStartOf="@+id/roundAngleImageView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/roundAngleImageView"
+                android:layout_marginStart="8dp"
+                android:id="@+id/flexboxLayout">
+
+
+            <androidx.cardview.widget.CardView
+                    android:layout_marginEnd="10dp"
+                    android:id="@+id/card_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#2196F3"
+                    app:cardElevation="4dp"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                <TextView
+                        android:id="@+id/text_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="11sp"
+                        android:text="完美世界"
+                        android:textColor="#FFFFFF"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp" />
+            </androidx.cardview.widget.CardView>
+
+
+            <androidx.cardview.widget.CardView
+                    android:layout_marginEnd="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#2196F3"
+                    app:cardElevation="4dp"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                <TextView
+                        android:layout_marginEnd="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="11sp"
+                        android:text="完美世界"
+                        android:textColor="#FFFFFF"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp" />
+            </androidx.cardview.widget.CardView>
+
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+
+        <TextView
+                android:id="@+id/desc_text"
+                android:textColor="#696969"
+                android:text="我是束带结发了搭建开发了就考虑到三房扣篮大赛抗力撒电饭锅电饭锅娇看了...... 展开详情"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toStartOf="@+id/roundAngleImageView"
+                app:layout_constraintTop_toBottomOf="@+id/flexboxLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp" />
+
+        <com.xxhoz.secbox.widget.RoundAngleImageView
+                android:src="@drawable/loading_mask"
+                android:layout_width="65dp"
+                android:layout_height="90dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+                android:layout_marginEnd="24dp"
+                android:layout_marginTop="8dp"
+                android:id="@+id/roundAngleImageView" />
+
+
+        <com.google.android.material.tabs.TabLayout
+                app:tabMinWidth="8dp"
+                app:tabUnboundedRipple="false"
+                app:tabPadding="5dp"
+                app:tabMode="scrollable"
+                app:tabGravity="start"
+                app:tabSelectedTextColor="#ff678f"
+                app:tabTextColor="#333333"
+                app:tabIndicatorColor="#ff678f"
+                android:layout_gravity="left"
+                android:id="@+id/channel_tab"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                app:layout_constraintTop_toBottomOf="@+id/roundAngleImageView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp" />
+
+
+        <com.google.android.material.tabs.TabLayout
+                app:tabIndicatorFullWidth="false"
+                app:tabGravity="start"
+                app:tabRippleColor="@color/transparent"
+                app:tabPaddingBottom="-1dp"
+                app:tabPaddingEnd="-1dp"
+                app:tabPaddingStart="-1dp"
+                app:tabPaddingTop="-1dp"
+                app:tabMode="scrollable"
+                app:tabIndicatorHeight="0dp"
+                android:id="@+id/episode_tab"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                app:layout_constraintTop_toBottomOf="@+id/channel_tab"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="10dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <com.xxhoz.secbox.widget.PromptView
@@ -31,21 +208,19 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view2"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintVertical_bias="0.633"
+            app:layout_constraintTop_toBottomOf="@+id/controller_view"
             android:layout_marginTop="220dp" />
 
-    <Button
-            android:id="@+id/next_bottom"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:text="下一集"
-            android:textColor="@color/black"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="32dp" />
 
+
+    <Button
+            android:text="Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@color/ThemeColor" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,8 +8,10 @@ import com.xxhoz.secbox.util.LogUtils
 
 object BaseConfig {
 
+    val CONFIG_JSON: String = "https://shiguang.cachefly.net/config.json"
+
     /**
-     * 加载配置API
+     * 加载爬虫配置URL
      */
     var SOURCE_BASE_API = ""
 

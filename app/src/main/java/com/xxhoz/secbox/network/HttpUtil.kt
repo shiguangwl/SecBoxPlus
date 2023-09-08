@@ -58,6 +58,7 @@ object HttpUtil {
                 if (clazz == String::class.java){
                     return responseBody as T
                 }
+                LogUtils.d("网络请求URL:" + url+ "  响应内容: "+ responseBody )
                 return gson.fromJson(responseBody, clazz)
             }
         } catch (e: Exception) {

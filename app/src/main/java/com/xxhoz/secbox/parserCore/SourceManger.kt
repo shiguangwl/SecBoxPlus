@@ -40,7 +40,7 @@ object SourceManger {
     /**
      * 初始化资源
      */
-    fun initData(baseUrl: String) {
+    fun loadSourceConfig(baseUrl: String) {
         parseBeanList = ArrayList()
         sourceBeanList = HashMap()
         sourceList = HashMap()
@@ -209,6 +209,12 @@ object SourceManger {
         } else md5
     }
 
+    /**
+     * 获取解析接口列表
+     */
+    fun getParseBeanList(): List<ParseBean> {
+        return parseBeanList
+    }
 
     /**
      * 获取所有soureBean列表

@@ -22,7 +22,6 @@ import com.xxhoz.secbox.util.NetworkHelper
 import com.xxhoz.secbox.util.getActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class StartActivity : BaseActivity<ActivityStartBinding>() {
 
@@ -42,35 +41,11 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             initData()
-/*//            val sourceBeanList = SourceManger.getSourceBeanList()
-//            LogUtils.i("获取站源数量:${sourceBeanList.size}")
-//
-//            if (sourceBeanList.size == 0){
-//                Toaster.showLong("获取Source数量为0")
-//                return@launch
-//            }
-//            sourceBeanList.forEach {
-//                lifecycleScope.launch(Dispatchers.IO) {
-//                    val source = SourceManger.getSpiderSource(it.key)!!
-//                    try {
-//                        LogUtils.e("站源数据:${it.name}==categoryInfo:${source.categoryInfo()}")
-//                    }catch (e:Exception){
-////                        LogUtils.e("站源数据异常:${it.name},${e.message}")
-//                        e.printStackTrace()
-//                    }
-//                }
-//            }*/
-
-            withContext(Dispatchers.Main){
-                // 初始化友盟  调试版不做记录
-                if (!getPackageName().contains(".dev")) {
-                    umengInit()
-                }
-                MainActivity.startActivity(getActivity()!!)
-                finish();
+            // 初始化友盟  调试版不做记录
+            if (!getPackageName().contains(".dev")) {
+                umengInit()
             }
         }
-
     }
 
     /**
@@ -83,6 +58,8 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
         }
         try {
             configInit()
+            MainActivity.startActivity(getActivity()!!)
+            finish();
         }catch (e:Exception){
             Toaster.showLong(e.message)
             e.printStackTrace()
@@ -96,9 +73,9 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
         // 配置加载
 
         val configBean = try {
-            HttpUtil.get("https://shiguang.cachefly.net/config.json", ConfigBean::class.java)
+            HttpUtil.get(BaseConfig.CONFIG_JSON, ConfigBean::class.java)
         } catch (e: Exception) {
-            throw GlobalException.of("加载配置失败")
+            throw GlobalException.of("加载配置失败"+e.message)
         }
 
         LogUtils.i("加载配置成功: $configBean")
@@ -108,7 +85,7 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
         BaseConfig.NOTION = configBean.notice
 
         // 加载数据源配置
-        SourceManger.initData(BaseConfig.SOURCE_BASE_API)
+        SourceManger.loadSourceConfig(BaseConfig.SOURCE_BASE_API)
     }
 
 

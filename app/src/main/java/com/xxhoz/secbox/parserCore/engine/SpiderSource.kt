@@ -61,9 +61,12 @@ class SpiderSource(override var sourceBean: SourceBean, var spider: Spider)  :
     /**
      * 获取影视详情
      */
-    override fun videoDetail(ids:List<String>): VideoDetailBean {
+    override fun videoDetail(ids:List<String>): VideoDetailBean? {
         val videoDetail: String =  spider.detailContent(ids)
         LogUtils.d(sourceBean.name +"影视详情数据String:${videoDetail}")
+        if (videoDetail.length == 0){
+            return null;
+        }
         val fromJson = gson.fromJson(videoDetail, JSONObject::class.java)
         val jsonArray = fromJson.getJSONArray("list")
         var videoDetailBean: VideoDetailBean = gson.fromJson(jsonArray.getJSONObject(0).toString(),

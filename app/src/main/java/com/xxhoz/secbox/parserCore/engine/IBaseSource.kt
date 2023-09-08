@@ -34,7 +34,7 @@ interface IBaseSource {
      * 获取影视详情
      */
     @Throws(Exception::class)
-    fun videoDetail(ids: List<String>): VideoDetailBean
+    fun videoDetail(ids: List<String>): VideoDetailBean?
 
     /**
      * 获取播放链接

@@ -1,8 +1,8 @@
 package com.xxhoz.secbox
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.parserCore.SourceManger
+import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.secbox.util.LogUtils
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +26,7 @@ class SourceMangerTest {
 
     @Test
     fun SourceTest(){
-        SourceManger.initData("https://jihulab.com/clear1/yingmi/-/raw/main/xh.txt")
+        SourceManger.loadSourceConfig("https://jihulab.com/clear1/yingmi/-/raw/main/xh.txt")
 
 
         val sourceBeanList = SourceManger.getSourceBeanList()
