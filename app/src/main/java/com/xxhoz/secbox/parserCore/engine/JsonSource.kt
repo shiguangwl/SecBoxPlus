@@ -1,15 +1,19 @@
 package com.xxhoz.parserCore.parserImpl
 
 import com.github.catvod.crawler.Spider
+import com.xxhoz.secbox.parserCore.bean.CategoryBean
+import com.xxhoz.secbox.parserCore.bean.PlayLinkBean
 import com.xxhoz.secbox.parserCore.bean.SourceBean
+import com.xxhoz.secbox.parserCore.bean.VideoBean
+import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
 
-class JsonSource(var source: SourceBean, var spider: Spider)  :
+class JsonSource(override var sourceBean: SourceBean, var spider: Spider)  :
     IBaseSource {
-    override fun homeVideoList(): String {
+    override fun homeVideoList(): List<VideoBean> {
         TODO("Not yet implemented")
     }
 
-    override fun categoryInfo(): String {
+    override fun categoryInfo(): CategoryBean {
         TODO("Not yet implemented")
     }
 
@@ -17,19 +21,19 @@ class JsonSource(var source: SourceBean, var spider: Spider)  :
         tid: String,
         page: String,
         extend: HashMap<String, String>
-    ): String {
+    ): CategoryBean {
         TODO("Not yet implemented")
     }
 
-    override fun videoDetail(ids: List<String>): String {
+    override fun videoDetail(ids: List<String>): VideoDetailBean {
         TODO("Not yet implemented")
     }
 
-    override fun playInfo(flag: String, id: String): String {
+    override fun playInfo(flag: String, id: String): PlayLinkBean {
         TODO("Not yet implemented")
     }
 
-    override fun searchVideo(kw: String): String {
+    override fun searchVideo(kw: String): List<VideoBean> {
         TODO("Not yet implemented")
     }
 }

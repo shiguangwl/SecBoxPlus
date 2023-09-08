@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/bg_video_item"
-    android:translationZ="@dimen/item_translation_z">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_video_item"
+        android:translationZ="@dimen/item_translation_z">
 
     <com.xxhoz.secbox.widget.RoundAngleImageView
         android:id="@+id/iv_cover"
         android:layout_width="0dp"
-        android:layout_height="170dp"
+        android:layout_height="150dp"
         android:scaleType="centerCrop"
         android:src="@drawable/bg_video_item_cover"
         app:img_left_top_radius="@dimen/item_radius"
@@ -21,7 +20,7 @@
 
     <View
             android:layout_width="0dp"
-            android:layout_height="28dp"
+            android:layout_height="90dp"
             android:background="@drawable/fg_video_item_cover"
             app:layout_constraintBottom_toBottomOf="@id/iv_cover"
             app:layout_constraintEnd_toEndOf="@id/iv_cover"
@@ -32,20 +31,28 @@
     <TextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="25dp"
             android:ellipsize="end"
-            android:paddingLeft="5dp"
             android:gravity="center_vertical"
             android:lines="2"
-            android:text="我是视频标题我是视频标题我是视频标题"
+            android:text="是视频标题"
             android:textColor="@color/white"
-            android:textSize="14sp"
+            android:textSize="13sp"
             app:layout_constraintStart_toStartOf="@+id/view"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/view"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintVertical_bias="0.0" />
+            android:layout_marginStart="5dp" />
+
+    <TextView
+            android:text="remark_Text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/remark_text"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_title"
+            app:layout_constraintStart_toStartOf="@+id/tv_title" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

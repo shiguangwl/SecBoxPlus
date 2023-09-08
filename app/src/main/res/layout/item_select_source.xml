@@ -2,21 +2,19 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/cardView"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="2dp"
-        app:cardElevation="1dp">
-
+        android:layout_margin="5dp"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="4dp">
     <TextView
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:id="@+id/source_text"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:id="@+id/source_item_text"
             android:textSize="15sp"
             android:textStyle="bold"
             android:textAlignment="center"
             android:text="我是标签"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"/>
 </androidx.cardview.widget.CardView>

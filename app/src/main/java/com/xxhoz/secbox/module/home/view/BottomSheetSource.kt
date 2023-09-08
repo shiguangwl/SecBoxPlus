@@ -1,55 +1,64 @@
-package com.xxhoz.secbox.module.home.view
 
-import android.app.Activity
-import android.graphics.Rect
-import android.os.Bundle
-import android.view.LayoutInflater
+import android.content.Context
 import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
-import androidx.constraintlayout.widget.ConstraintLayout
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.lxj.xpopup.core.BottomPopupView
+import com.lxj.xpopup.util.XPopupUtils
+import com.xxhoz.constant.BaseConfig
+import com.xxhoz.constant.Key
+import com.xxhoz.parserCore.SourceManger
+import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.R
-import com.xxhoz.secbox.util.DipAndPx
-import com.xxhoz.secbox.util.GlobalActivityManager.getTopActivity
+import com.xxhoz.secbox.constant.EventName
+import com.xxhoz.secbox.databinding.ItemSelectSourceBinding
+import com.xxhoz.secbox.eventbus.XEventBus
+import com.xxhoz.secbox.parserCore.bean.SourceBean
+import com.xxhoz.secbox.persistence.XKeyValue
+import com.xxhoz.secbox.util.UniversalAdapter
 
-class BottomSheetSource : BottomSheetDialogFragment {
-    private var view: View? = null
 
-    constructor(view: View?) {
-        this.view = view
+class BottomSheetSource(context: Context) : BottomPopupView(context) {
+    override fun getImplLayoutId(): Int {
+        return R.layout.sheet_bottom_sourace_layout
     }
 
-    constructor()
+    override fun onCreate() {
+        super.onCreate()
+        val recyclerViewChooseSource = findViewById<RecyclerView>(R.id.recyclerView_choose_source)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val inflate = inflater.inflate(R.layout.sheet_bottom_sourace_layout, container, false)
-        view.let {
-            val layoutParams = ConstraintLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                DipAndPx.px2dip(getTopActivity()!!,getDistanceToBottom(getTopActivity()!!, view!!).toFloat())
-            )
-            inflate.rootView.layoutParams = layoutParams
-        }
-        return inflate
+        val sourceBeanList: List<SourceBean> = SourceManger.getSourceBeanList()
+        val currentSource: IBaseSource? = BaseConfig.getCurrentSource()
+        recyclerViewChooseSource.layoutManager = GridLayoutManager(context, 2)
+        recyclerViewChooseSource.adapter = UniversalAdapter(
+            sourceBeanList,
+            R.layout.item_select_source,
+            object : UniversalAdapter.DataViewBind<SourceBean> {
+                override fun exec(data: SourceBean, view: View) {
+                    val bind = ItemSelectSourceBinding.bind(view)
+//                    if (currentSource != null && data.key.equals(currentSource.sourceBean.key)) {
+//                        bind.root.setBackgroundColor(ContextCompat.getColor(context,R.color.theme_color))
+//                    }
+                    bind.sourceItemText.text = data.name
+                    view.setOnClickListener(){
+                        selectItem(data)
+                    }
+                }
+            })
     }
 
-    private fun getDistanceToBottom(context: Activity, view: View): Int {
-        val rootView = context.findViewById<ViewGroup>(android.R.id.content)
-        val rect = Rect()
-        rootView.getWindowVisibleDisplayFrame(rect)
-        val screenHeight = rootView.height
-        val viewBottom = getViewBottomOnScreen(view)
-        return screenHeight - viewBottom
+
+    /**
+     * 选择源
+     */
+    private fun selectItem(data: SourceBean) {
+        XKeyValue.putString(Key.CURRENT_SOURCE_KEY, data.key)
+        dismiss()
+        XEventBus.post(EventName.SOURCE_CHANGE, "源切换: ${data.name}")
     }
 
-    private fun getViewBottomOnScreen(view: View): Int {
-        val location = IntArray(2)
-        view.getLocationOnScreen(location)
-        return location[1] + view.height
+    // 最大高度为Window的0.85
+    override fun getMaxHeight(): Int {
+        return (XPopupUtils.getAppHeight(context) * .8f).toInt()
     }
 }

@@ -28,7 +28,7 @@ class SmallVideoFragment : BaseFragment<FragmentSmallVideoBinding>() {
         viewModel.helloWorldLiveData.observe(viewLifecycleOwner) {
             val video = it.getOrNull()
             if (null != video) {
-                viewBinding.tvHello.text = "${video.id}-${video.title}"
+                viewBinding.tvHello.text = "${video.vod_id}-${video.vod_name}"
             } else {
                 viewBinding.tvHello.text = resources.getString(R.string.page_state_network_error)
             }

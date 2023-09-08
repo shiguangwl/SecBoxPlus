@@ -33,7 +33,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginStart="8dp"
-                android:id="@+id/imageView" />
+                android:id="@+id/return_image" />
 
 
         <androidx.appcompat.widget.SearchView
@@ -42,7 +42,7 @@
                 android:layout_height="35dp"
                 android:layoutDirection="rtl"
                 app:layout_constraintStart_toEndOf="@+id/filter_source"
-                app:layout_constraintEnd_toStartOf="@+id/imageView"
+                app:layout_constraintEnd_toStartOf="@+id/return_image"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -58,6 +58,7 @@
                 android:layout_marginEnd="8dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <!--历史记录视图-->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -119,7 +120,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/result_source_list"
-                android:layout_width="100dp"
+                android:layout_width="130dp"
                 android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -138,6 +139,13 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+    <com.xxhoz.secbox.widget.PromptView
+            android:id="@+id/prompt_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

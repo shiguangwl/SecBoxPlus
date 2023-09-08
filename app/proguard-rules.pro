@@ -20,19 +20,31 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+
 -keep class com.hjq.gson.factory.** {*;}
 
+# 友盟
 -keep class com.umeng.** {*;}
-
 -keep class org.repackage.** {*;}
-
 -keep class com.uyumao.** { *; }
-
 -keepclassmembers class * {
    public <init> (org.json.JSONObject);
 }
-
 -keepclassmembers enum * {
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
+
+
+-keep class xyz.doikki.videoplayer.** { *; }
+-dontwarn xyz.doikki.videoplayer.**
+# IjkPlayer
+-keep class tv.danmaku.ijk.** { *; }
+-dontwarn tv.danmaku.ijk.**
+# ExoPlayer
+-keep class com.google.android.exoplayer2.** { *; }
+-dontwarn com.google.android.exoplayer2.**
+
+# 弹窗
+-dontwarn com.lxj.xpopup.widget.**
+-keep class com.lxj.xpopup.widget.**{*;}

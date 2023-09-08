@@ -12,19 +12,36 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.viewbinding.ViewBinding
+import com.google.gson.reflect.TypeToken
 import com.gyf.immersionbar.ktx.immersionBar
+import com.hjq.gson.factory.GsonFactory
 import com.hjq.toast.Toaster
+import com.xxhoz.constant.BaseConfig
+import com.xxhoz.constant.Key
+import com.xxhoz.parserCore.SourceManger
+import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
-import com.xxhoz.secbox.bean.VideoInfoItem
+import com.xxhoz.secbox.bean.PlayInfoBean
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.ActivitySearchBinding
 import com.xxhoz.secbox.databinding.ItemSearchMovieResultListBinding
+import com.xxhoz.secbox.databinding.ItemSearchResultSourceBinding
+import com.xxhoz.secbox.module.player.DetailPlayerActivity
 import com.xxhoz.secbox.module.start.StartViewModel
+import com.xxhoz.secbox.parserCore.bean.VideoBean
+import com.xxhoz.secbox.persistence.XKeyValue
+import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.UniversalAdapter
+import com.xxhoz.secbox.util.getActivity
 import com.xxhoz.secbox.util.setImageUrl
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class SearchActivity : BaseActivity<ActivitySearchBinding>() {
@@ -34,6 +51,17 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     override val inflater: (inflater: LayoutInflater) -> ActivitySearchBinding
         get() = ActivitySearchBinding::inflate
 
+    private lateinit var sourceAdapter: UniversalAdapter<String>
+    private lateinit var resultAdapter: UniversalAdapter<VideoBean>
+    private var sourceList = ArrayList<String>()
+    private var resultItemList = ArrayList<VideoBean>()
+    // 所有搜索结果
+    private var allResultItemList = HashMap<String, List<VideoBean>>()
+    private var searchJobs: ArrayList<Job> = ArrayList()
+
+    // 选中的source
+    private var ALL_DATA = "全部显示"
+    private var selectSourceKey = "全部显示"
     companion object{
         fun startActivity(context: Context){
             val intent = Intent(context, SearchActivity::class.java)
@@ -49,23 +77,49 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             navigationBarColor(R.color.white)
             navigationBarDarkIcon(true)
         }
+        initView()
+    }
+
+    override fun onBackPressed() {
+        searchJobs.forEach {
+            it.cancel()
+        }
+        searchJobs.clear()
+        if (viewBinding.searchView.query.length == 0){
+            super.onBackPressed()
+        }else{
+            viewBinding.searchView.setQuery("",false)
+        }
+    }
+
+    private fun initView() {
         // 加载历史记录
         loadSearchHistory()
-
+        viewBinding.promptView.hide()
+        // 返回
+        viewBinding.returnImage.setOnClickListener(){
+            onBackPressed();
+        }
+        // 搜索逻辑
         viewBinding.searchView.setIconified(false);
         viewBinding.searchView.queryHint = "输入搜索关键词"
 
         viewBinding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                Toaster.show("开始搜索")
+                if (viewBinding.promptView.isShowing()) {
+                    return true
+                }
+                viewBinding.promptView.showLoading()
+                startSearch(query)
+
                 viewBinding.historyLayout.visibility = View.INVISIBLE
                 viewBinding.resultLayout.visibility = View.VISIBLE
+
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                Toaster.show("内容改变${newText}")
-                if (newText.length == 0){
+                if (newText.length == 0) {
                     viewBinding.historyLayout.visibility = View.VISIBLE
                     viewBinding.resultLayout.visibility = View.INVISIBLE
                 }
@@ -73,59 +127,154 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             }
         })
 
-        viewBinding.clearText.setOnClickListener(){
-            // 清空历史记录
-            viewBinding.historyBox.removeAllViews()
+        // 清空历史记录
+        viewBinding.clearText.setOnClickListener() {
+            clearSearchHistory()
         }
 
+        // 左边 搜索源
+        viewBinding.resultSourceList.layoutManager = LinearLayoutManager(this)
+        sourceAdapter = UniversalAdapter(
+            sourceList,
+            R.layout.item_search_result_source,
+            object : UniversalAdapter.DataViewBind<String> {
+                override fun exec(data: String, view: View) {
+                    val bind = ItemSearchResultSourceBinding.bind(view!!)
+                    bind.sourceText.text = data
+                    if (data.equals(selectSourceKey)){
+                        bind.sourceText.background = AppCompatResources.getDrawable(getActivity()!!, R.color.theme_color)
+                    }
+                    bind.sourceText.setOnClickListener() {
+                        onClickSource(data)
+                    }
+                }
+            })
+        viewBinding.resultSourceList.adapter = sourceAdapter
 
-        // 左边
-        var dataList = listOf(
-            "收到就",
-            "收到就",
-            "收到就",
-            "收到就",
-            "收到就",
-            "收到就",
-            "收到就",
-            "收到就",
-            "收到就",
-            "收到就",
-            "收到就",
-            "收到就",
-            "收到就",
-            "收到就")
-        viewBinding.resultSourceList.layoutManager =LinearLayoutManager(this)
-        viewBinding.resultSourceList.adapter = UniversalAdapter(dataList,R.layout.item_search_result_source,object: UniversalAdapter.DataViewBind<String> {
-            override fun exec(data: String, view: View?) {
-                val sourceText = view?.findViewById<TextView>(R.id.source_text)
-                sourceText?.text = data
-            }
-        })
-
-        var resultItem = listOf(
-            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
-            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
-            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
-            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
-            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
-            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
-            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
-            VideoInfoItem("https://img9.doubanio.com/view/photo/m_ratio_poster/public/p2677963424.jpg","水电费水电费"),
-            )
+        // 右边 搜索结果
         viewBinding.resultVideoList.layoutManager = LinearLayoutManager(this)
-        viewBinding.resultVideoList.adapter = UniversalAdapter(resultItem,R.layout.item_search_movie_result_list,object: UniversalAdapter.DataViewBind<VideoInfoItem> {
-            override fun exec(data: VideoInfoItem, view: View?) {
-                val bind = ItemSearchMovieResultListBinding.bind(view!!)
-                bind.picMovie.setImageUrl(data.image)
-                bind.titleMovie.text = data.title
+        resultAdapter = UniversalAdapter(
+            resultItemList,
+            R.layout.item_search_movie_result_list,
+            object : UniversalAdapter.DataViewBind<VideoBean> {
+                override fun exec(data: VideoBean, view: View) {
+                    val bind = ItemSearchMovieResultListBinding.bind(view!!)
+                    bind.picMovie.setImageUrl(data.vod_pic)
+                    bind.titleMovie.text = data.vod_name
+                    bind.sourceText.text = data.vod_remarks
+                    bind.root.setOnClickListener() {
+                        onClickResultItem(data)
+                    }
+                }
+            })
+        viewBinding.resultVideoList.adapter = resultAdapter
+    }
+
+    /**
+     * 搜索
+     */
+    private fun startSearch(query: String) {
+        Toaster.show("开始搜索: ${query}")
+        sourceList.clear()
+        resultItemList.clear()
+        allResultItemList.clear()
+        addSearchHistory(query)
+
+        sourceList.add(ALL_DATA)
+        sourceAdapter.notifyDataSetChanged()
+
+        searchJobs.add(lifecycleScope.launch(Dispatchers.IO){
+//            val searchAbleList: List<IBaseSource> = SourceManger.getSearchAbleList()
+            val sourceBeanList = SourceManger.getSourceBeanList()
+            for (sourceBean in sourceBeanList) {
+                val source = SourceManger.getSpiderSource(sourceBean.key)!!
+                // 多线程提高搜索速度
+                async {
+                    asyncSearch(source, query)
+                }
             }
         })
     }
 
+    private suspend fun asyncSearch(iBaseSource: IBaseSource, query: String) {
+
+        val searchVideo: List<VideoBean>? = try {
+            iBaseSource.searchVideo(query)
+        } catch (e: Exception) {
+            LogUtils.e("${iBaseSource.sourceBean.name}=>搜索失败:" + iBaseSource.sourceBean)
+            e.printStackTrace()
+            return
+        }
+
+        if (searchVideo == null || searchVideo.isEmpty()) {
+            return
+        }
+
+        withContext(Dispatchers.Main) {
+            // 源列表添加
+            sourceList.add(iBaseSource.sourceBean.name)
+            sourceAdapter.notifyDataSetChanged()
+
+            // 添加结果
+            resultItemList.addAll(searchVideo)
+            resultAdapter.notifyDataSetChanged()
+
+            allResultItemList.put(iBaseSource.sourceBean.name, searchVideo)
+            if (viewBinding.promptView.isShowing()) {
+                viewBinding.promptView.hide()
+            }
+        }
+    }
+
+
+    /**
+     * 点击源列表
+     */
+    private fun onClickSource(data: String) {
+        Toaster.show("点击了源${data}")
+        selectSourceKey = data
+        sourceAdapter.notifyDataSetChanged()
+
+        resultItemList.clear()
+        if (selectSourceKey.equals(ALL_DATA)){
+            allResultItemList.forEach(){
+                resultItemList.addAll(it.value)
+            }
+        }else{
+            resultItemList.addAll(allResultItemList.get(selectSourceKey)!!)
+        }
+        resultAdapter.notifyDataSetChanged()
+    }
+
+
+    /**
+     * 点击搜索结果
+     */
+    private fun onClickResultItem(data: VideoBean) {
+        val playInfoBean: PlayInfoBean = PlayInfoBean(
+            XKeyValue.getString(Key.CURRENT_SOURCE_KEY, BaseConfig.DefualtSourceKey),
+            data,
+            1
+        )
+        LogUtils.i("条目点击: ${playInfoBean}")
+        DetailPlayerActivity.startActivity(this, playInfoBean)
+    }
+
+    val gson = GsonFactory.getSingletonGson()
+
+
+    /**
+     * 清空历史搜索记录
+     */
+    private fun clearSearchHistory() {
+        viewBinding.historyBox.removeAllViews()
+        XKeyValue.putString(Key.SEARCH_HISTORY, "[]")
+    }
 
     private fun loadSearchHistory() {
-        for (i in 0..10) {
+        val searchHistoryList: ArrayList<String> = getHistoryList()
+
+        for (query: String in searchHistoryList) {
             val textView = TextView(this)
             val layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -134,13 +283,38 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             layoutParams.setMargins(5, 5, 5, 5)
             textView.setPadding(10, 10, 10, 10)
             textView.layoutParams = layoutParams
-            textView.text = "你好生活"
+            textView.text = query
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
             textView.setTextColor(Color.parseColor("#3f3e3e"))
             textView.background = AppCompatResources.getDrawable(this, R.drawable.history_tag_bg)
+            textView.setOnClickListener(){
+                // 点击历史记录回调
+                viewBinding.searchView.setQuery(query,true)
+            }
             viewBinding.historyBox.addView(textView)
         }
+
     }
 
+    /**
+     * 添加历史记录
+     */
+    private fun addSearchHistory(query: String) {
+        val searchHistoryList: ArrayList<String> = getHistoryList()
+        if (searchHistoryList.contains(query)){
+            return
+        }
+        searchHistoryList.add(query)
+        val json: String = gson.toJson(searchHistoryList)
+        clearSearchHistory()
+        XKeyValue.putString(Key.SEARCH_HISTORY, json)
+        loadSearchHistory()
+    }
+
+    private fun getHistoryList(): ArrayList<String> {
+        val json: String = XKeyValue.getString(Key.SEARCH_HISTORY, "[]")
+        val arrayListType = object : TypeToken<ArrayList<String>>() {}.type
+        return gson.fromJson(json, arrayListType)
+    }
 
 }

@@ -43,11 +43,11 @@ class UniversalAdapter<T>(
     }
 
     interface DataViewBind<T> {
-        fun exec(data: T, view: View?)
+        fun exec(data: T, view: View)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var view: View? = null
+        lateinit var view: View
 
         init {
             view = itemView

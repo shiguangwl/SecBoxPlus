@@ -1,5 +1,7 @@
 package com.xxhoz.secbox.module.home
 
+//import com.xxhoz.secbox.module.home.view.BottomSheetSource
+import BottomSheetSource
 import android.R
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -10,14 +12,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
+import com.hjq.toast.Toaster
+import com.lxj.xpopup.XPopup
+import com.xxhoz.constant.BaseConfig
+import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.base.BaseFragment
+import com.xxhoz.secbox.constant.EventName
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeTabBinding
-import com.xxhoz.secbox.module.home.view.BottomSheetSource
+import com.xxhoz.secbox.eventbus.XEventBus
 import com.xxhoz.secbox.module.search.SearchActivity
+import com.xxhoz.secbox.parserCore.bean.CategoryBean
+import com.xxhoz.secbox.parserCore.bean.VideoBean
+import com.xxhoz.secbox.util.LogUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 /**
@@ -33,6 +47,9 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
 
     private var mediator: TabLayoutMediator? = null
 
+    private lateinit var categoryInfo:CategoryBean
+    private lateinit var homeVideoList: List<VideoBean>
+
 //    private val viewModel: HomeViewModel by viewModels()
 
     override val inflater: (LayoutInflater, container: ViewGroup?, attachToRoot: Boolean) -> FragmentHomeTabBinding
@@ -44,73 +61,114 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // 基本事件监听
         initView()
+        // 数据加载
+        initData()
+        // 监听数据源的变化
+        XEventBus.observe(viewLifecycleOwner, EventName.SOURCE_CHANGE) { message: String ->
+            LogUtils.i("监听到数据变化: " + message)
+            initView()
+            initData()
+        }
+    }
+
+    private fun initData() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                viewBinding.promptView.showLoading()
+            }
+
+            val currentSource: IBaseSource? = BaseConfig.getCurrentSource()
+            currentSource?.run {
+                try {
+                    homeVideoList = homeVideoList()
+                    categoryInfo = categoryInfo()
+                }catch (e:Exception){
+                    e.printStackTrace()
+                    Toaster.show("数据源异常,请切换源")
+                    withContext(Dispatchers.Main) {
+                        viewBinding.promptView.showNetworkError({
+                            initData()
+                        })
+                    }
+                    return@launch
+                }
+            }
+
+            withContext(Dispatchers.Main) {
+                initViewFragments()
+                viewBinding.promptView.hide()
+            }
+        }
     }
 
 
     private fun initView() {
-
+        // 搜索按钮
         viewBinding.searchBtn.setOnClickListener(){
             SearchActivity.startActivity(requireContext())
         }
+        // 设置源显示
+        val sourceName: String? = BaseConfig.getCurrentSource()?.sourceBean?.name
+        viewBinding.currentSourceText.text = (sourceName + "  ▼") ?: "> 选择推荐源 <"
 
+        // 源选择
         viewBinding.currentSourceText.setOnClickListener(){
-            val bottomSheetFragment = BottomSheetSource(viewBinding.searchBtn)
-            bottomSheetFragment.show(requireActivity().getSupportFragmentManager(), bottomSheetFragment.getTag())
+            XPopup.Builder(context)
+                .atView(viewBinding.tabLayout)
+                .hasShadowBg(false)
+                .asCustom(BottomSheetSource(requireContext()))
+                .show()
         }
 
-        viewBinding.promptView.showLoading()
-
-        Thread{
-            Thread.sleep(1500)
-            getActivity()?.runOnUiThread(){
-                val tabs =
-                    arrayOf("推荐", "电影", "电视剧", "动漫", "综艺")
-                //禁用预加载
-//                viewBinding.viewPager.offscreenPageLimit = ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
-                viewBinding.viewPager.offscreenPageLimit = 10
-
-                //Adapter
-                viewBinding.viewPager.adapter =
-                    object : FragmentStateAdapter((getActivity()?.getSupportFragmentManager())!!, lifecycle) {
-                        override fun createFragment(position: Int): Fragment {
-                            //FragmentStateAdapter内部自己会管理已实例化的fragment对象。
-                            // 所以不需要考虑复用的问题
-                            if (position == 0) {
-                                return HomeFragment();
-                            }
-                            return HomeFilterFragment(tabs[position])
-                        }
-
-                        override fun getItemCount(): Int {
-                            return tabs.size
-                        }
-                    }
-                //viewPager 页面切换监听监听
-                viewBinding.viewPager.registerOnPageChangeCallback(changeCallback)
-
-                mediator = TabLayoutMediator(
-                    viewBinding.tabLayout, viewBinding.viewPager
-                ) { tab, position -> //这里可以自定义TabView
-                    val tabView = TextView(getActivity())
-                    val states = arrayOfNulls<IntArray>(2)
-                    states[0] = intArrayOf(R.attr.state_selected)
-                    states[1] = intArrayOf()
-                    val colors = intArrayOf(activeColor, normalColor)
-                    val colorStateList = ColorStateList(states, colors)
-                    tabView.text = tabs[position]
-                    tabView.textSize = normalSize.toFloat()
-                    tabView.setTextColor(colorStateList)
-                    tab.customView = tabView
-                }
-                //要执行这一句才是真正将两者绑定起来
-                mediator!!.attach()
-
-                viewBinding.promptView.hide()
-            }
-        }.start()
     }
 
+    private fun initViewFragments() {
+        //Adapter
+        viewBinding.viewPager.adapter =
+            object :
+                FragmentStateAdapter((getActivity()?.getSupportFragmentManager())!!, lifecycle) {
+                override fun createFragment(position: Int): Fragment {
+                    if (position == 0) {
+                        // 首页推荐
+                        return HomeFragment(homeVideoList);
+                    }
+                    // 分类页
+                    return HomeFilterFragment(position - 1, categoryInfo)
+                }
+
+                override fun getItemCount(): Int {
+                    return categoryInfo.`class`.size + 1
+                }
+            }
+        //viewPager 页面切换监听监听
+        viewBinding.viewPager.registerOnPageChangeCallback(changeCallback)
+        // tab样式
+        mediator = TabLayoutMediator(
+            viewBinding.tabLayout, viewBinding.viewPager
+        ) { tab, position -> //这里可以自定义TabView
+            val tabView = TextView(getActivity())
+            val states = arrayOfNulls<IntArray>(2)
+            states[0] = intArrayOf(R.attr.state_selected)
+            states[1] = intArrayOf()
+            val colors = intArrayOf(activeColor, normalColor)
+            val colorStateList = ColorStateList(states, colors)
+            tabView.text = getCateGoryNameById(position)
+            tabView.textSize = normalSize.toFloat()
+            tabView.setTextColor(colorStateList)
+            tab.customView = tabView
+        }
+        //要执行这一句才是真正将两者绑定起来
+        mediator!!.attach()
+    }
+
+    private fun getCateGoryNameById(position: Int): String {
+        if (position == 0){
+            return "首页"
+        }
+        return categoryInfo.`class`.get(position - 1).type_name
+    }
 
     private val changeCallback: OnPageChangeCallback = object : OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {

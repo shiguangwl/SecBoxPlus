@@ -6,5 +6,5 @@ import com.xxhoz.secbox.constant.PageName
 class SearchViewModel : BaseViewModel() {
 
     @PageName
-    override fun getPageName() = PageName.HOME
+    override fun getPageName() = PageName.SEARCH
 }

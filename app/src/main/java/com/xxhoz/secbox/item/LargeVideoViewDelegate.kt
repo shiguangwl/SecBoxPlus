@@ -14,7 +14,7 @@ class LargeVideoViewDelegate : BaseItemViewDelegate<LargeVideoViewData, LargeVid
     }
 
     override fun onBindViewHolder(holder: ViewHolder, item: LargeVideoViewData) {
-        holder.viewBinding.tvTitle.setText(item.value.title)
+        holder.viewBinding.tvTitle.setText(item.value.vod_name)
         super.onBindViewHolder(holder, item)
     }
 

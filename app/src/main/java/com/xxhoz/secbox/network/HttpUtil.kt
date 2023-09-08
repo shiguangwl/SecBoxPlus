@@ -2,9 +2,14 @@ package com.xxhoz.secbox.network
 
 
 import com.hjq.gson.factory.GsonFactory
-import okhttp3.*
+import com.xxhoz.secbox.util.LogUtils
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.Response
 import java.io.IOException
-import java.util.Objects
 
 object HttpUtil {
     private val client = OkHttpClient()
@@ -38,21 +43,27 @@ object HttpUtil {
         }
     }
 
-    fun <T> get(url: String, clazz: Class<T>): T? {
+    fun <T> get(url: String, clazz: Class<T>): T {
         val request = Request.Builder()
             .url(url)
             .build()
 
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                throw IOException("Unexpected code $response")
-            }
+        try {
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    throw IOException("Unexpected code $response")
+                }
 
-            val responseBody = response.body?.string()
-            if (clazz == String::class.java){
-                return responseBody as T
+                val responseBody = response.body?.string()
+                if (clazz == String::class.java){
+                    return responseBody as T
+                }
+                return gson.fromJson(responseBody, clazz)
             }
-            return gson.fromJson(responseBody, clazz)
+        } catch (e: Exception) {
+            LogUtils.e("网络请求错误URL:" + url)
+            e.printStackTrace()
+            throw e;
         }
     }
 

@@ -5,7 +5,6 @@ import android.os.Looper;
 
 import com.hjq.toast.Toaster;
 import com.umeng.commonsdk.internal.crash.UMCrashManager;
-import com.xxhoz.secbox.util.LogUtils;
 
 public class CrashManager {
 
@@ -29,7 +28,7 @@ public class CrashManager {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                LogUtils.INSTANCE.e("uncaughtException-->" + e.toString());
+                // LogUtils.INSTANCE.e("uncaughtException-->" + e.toString());
                 handleFileException(e);
                 if (t == Looper.getMainLooper().getThread()) {
                     handleMainThread(e);

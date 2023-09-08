@@ -1,9 +1,8 @@
 package com.github.catvod.crawler;
 
-import android.content.Context;
-
-
 import com.xxhoz.secbox.App;
+import com.xxhoz.secbox.bean.exception.GlobalException;
+import com.xxhoz.secbox.util.LogUtils;
 
 import org.json.JSONObject;
 
@@ -28,18 +27,23 @@ public class JarLoader {
     /**
      * 不要在主线程调用我
      *
-     * @param cache
+     * @param filePath
      */
-    public boolean load(String cache) {
+    public boolean load(String filePath) {
         spiders.clear();
         proxyFun = null;
         boolean success = true;
         try {
+            // dex释放缓存位置
             File cacheDir = new File(App.instance.getCacheDir().getAbsolutePath() + "/catvod_csp");
             if (!cacheDir.exists()) {
                 cacheDir.mkdirs();
             }
-            classLoader = new DexClassLoader(cache, cacheDir.getAbsolutePath(), null, App.instance.getClassLoader());
+            // 判断文件是否存在
+            if (!new File(filePath).exists()) {
+                throw GlobalException.Companion.of("Jar包不存在...");
+            }
+            classLoader = new DexClassLoader(filePath, cacheDir.getAbsolutePath(), null, App.instance.getClassLoader());
             // make force wait here, some device async dex load
             // int count = 0;
             // do {
@@ -92,6 +96,7 @@ public class JarLoader {
             spiders.put(key, sp);
             return sp;
         } catch (Throwable th) {
+            LogUtils.INSTANCE.e("获取Spider["+key+"]错误:" + th.getMessage());
             th.printStackTrace();
         }
         return new SpiderNull();

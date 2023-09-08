@@ -52,7 +52,7 @@
 
     <TextView
             android:textSize="11sp"
-            android:text="来源: 快看影视"
+            android:text="快看影视"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/source_text"
@@ -62,15 +62,4 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="3dp" />
 
-    <TextView
-            android:text="9.0"
-            android:textColor="@color/ThemeColor"
-            android:textSize="18sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/score_movie"
-            app:layout_constraintBottom_toBottomOf="@+id/pic_movie"
-            app:layout_constraintEnd_toEndOf="@+id/pic_movie"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

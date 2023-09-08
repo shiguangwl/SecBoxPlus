@@ -1,20 +1,19 @@
 package com.xxhoz.parserCore
 
+
 import android.content.Context
 import com.github.catvod.crawler.JarLoader
 import com.github.catvod.crawler.JsLoader
 import com.github.catvod.crawler.Spider
 import com.google.gson.JsonObject
-import com.hjq.toast.Toaster
-import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.parserCore.parserImpl.SpiderSource
 import com.xxhoz.secbox.App
+import com.xxhoz.secbox.bean.exception.GlobalException
+import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.util.LogUtils
-
-
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -41,21 +40,15 @@ object SourceManger {
     /**
      * 初始化资源
      */
-    fun initData(baseUrl: String): Boolean {
+    fun initData(baseUrl: String) {
         parseBeanList = ArrayList()
         sourceBeanList = HashMap()
         sourceList = HashMap()
 
-        if (!loadConfig(baseUrl)) {
-            Toaster.showLong("加载配置文件失败")
-            return false
-        }
-
-        if (!loadJar()) {
-            Toaster.showLong("加载JAR包失败")
-            return false
-        }
-        return true
+        // 加载站源配置
+        loadConfig(baseUrl)
+        // 加载Jar包
+        loadJar()
     }
 
 
@@ -63,75 +56,87 @@ object SourceManger {
      * 加载配置文件
      * @param url 配置文件链接
      */
-    private fun loadConfig(url: String): Boolean {
-
-        val infoJson = HttpUtil.get(url, JsonObject::class.java)
-
-        if (infoJson == null) {
-            return false
-        }
-
-        // spider
-        spider = safeJsonString(infoJson, "spider", "")
-
-        // 远端站点源
-        for (opt in infoJson.get("sites").getAsJsonArray()) {
-            val obj = opt as JsonObject
-            val sb = SourceBean()
-            val siteKey = obj["key"].asString.trim()
-            sb.key = siteKey
-            sb.name = obj["name"].asString.trim()
-            sb.type = obj["type"].asInt
-            sb.api = obj["api"].asString.trim()
-            sb.setSearchable(safeJsonInt(obj, "searchable", 1))
-            sb.setQuickSearch(safeJsonInt(obj, "quickSearch", 1))
-            sb.filterable = safeJsonInt(obj, "filterable", 1)
-            sb.playerUrl = safeJsonString(obj, "playUrl", "")
-            sb.ext = safeJsonString(obj, "ext", "")
-            sb.categories = safeJsonStringList(obj, "categories")
-            sourceBeanList[siteKey] = sb
-        }
-
-        // 设置解析flag
-        val vipParseFlags = safeJsonStringList(infoJson, "flags")
-        sourceBeanList.values.forEach() {
-            it.flags = vipParseFlags
+    private fun loadConfig(url: String) {
+        val infoJson = try {
+            HttpUtil.get(url, JsonObject::class.java)
+        } catch (e: Exception) {
+            throw GlobalException.of("加载站源配置失败")
         }
 
 
-        // 解析地址
-        for (opt in infoJson["parses"].asJsonArray) {
-            val obj = opt as JsonObject
-            val pb = ParseBean()
-            pb.name = obj["name"].asString.trim()
-            pb.url = obj["url"].asString.trim()
-            val ext = if (obj.has("ext")) obj["ext"].asJsonObject.toString() else ""
-            pb.ext = ext
-            pb.type = safeJsonInt(obj, "type", 0)
-            parseBeanList.add(pb)
+        try {// spider
+            spider = safeJsonString(infoJson, "spider", "")
+
+            // 远端站点源
+            for (opt in infoJson.get("sites").getAsJsonArray()) {
+                val obj = opt as JsonObject
+                val sb = SourceBean()
+                val siteKey = obj["key"].asString.trim()
+                sb.key = siteKey
+                sb.name = obj["name"].asString.trim()
+                sb.type = obj["type"].asInt
+                sb.api = obj["api"].asString.trim()
+                sb.setSearchable(safeJsonInt(obj, "searchable", 1))
+                sb.setQuickSearch(safeJsonInt(obj, "quickSearch", 1))
+                sb.filterable = safeJsonInt(obj, "filterable", 1)
+                sb.playerUrl = safeJsonString(obj, "playUrl", "")
+                sb.ext = safeJsonString(obj, "ext", "")
+                sb.categories = safeJsonStringList(obj, "categories")
+                sourceBeanList[siteKey] = sb
+            }
+
+            // 设置解析flag
+            val vipParseFlags = safeJsonStringList(infoJson, "flags")
+            sourceBeanList.values.forEach() {
+                it.flags = vipParseFlags
+            }
+
+
+            // 解析地址
+            for (opt in infoJson["parses"].asJsonArray) {
+                val obj = opt as JsonObject
+                val pb = ParseBean()
+                pb.name = obj["name"].asString.trim()
+                pb.url = obj["url"].asString.trim()
+                val ext = if (obj.has("ext")) obj["ext"].asJsonObject.toString() else ""
+                pb.ext = ext
+                pb.type = safeJsonInt(obj, "type", 0)
+                parseBeanList.add(pb)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw GlobalException.of("解析站源配置失败")
         }
 
-        return true
     }
 
-    private fun loadJar(): Boolean {
+    private fun loadJar() {
         val split = spider?.split(";md5;")
         val url = split?.get(0)
         val md5 = split?.get(1)
 
         if (url == null) {
             LogUtils.i("配置文件中Jar路径为空")
-            return false
+            throw GlobalException.of("配置文件中Jar路径为空")
         }
 
-        val cacheFile: File = File(App.instance.cacheDir, "/csp.jar")
-        if (md5!!.isEmpty() || !cacheFile.exists() || !(getFileMd5(cacheFile).equals(md5.toLowerCase()))) {
-            // md5不存在,或文件不存在,或md5不匹配则 下载最新文件
-            downloadJar(url, cacheFile)
-        }
-        return jarLoader.load(cacheFile.absolutePath)
+        val jarFile = File(App.instance.filesDir, "/csp.jar")
+        // md5不存在,或文件不存在,或md5不匹配则 下载最新文件
 
+        if (isDownLoadJar(md5, jarFile)) {
+            LogUtils.i("开始下载Jar包......")
+            downloadJar(url, jarFile)
+        }else{
+            LogUtils.i("使用缓存Jar包......")
+        }
+        val load = jarLoader.load(jarFile.absolutePath)
+        if (!load){
+            throw GlobalException.of("加载Jar包失败")
+        }
     }
+
+    private fun isDownLoadJar(md5: String?, jarFile: File) =
+        md5!!.isEmpty() || !jarFile.exists() || !(getFileMd5(jarFile).equals(md5.toLowerCase()))
 
 
     private fun downloadJar(url: String, cache: File) {
@@ -197,7 +202,11 @@ object SourceManger {
             return ""
         }
         val bigInt = BigInteger(1, digest.digest())
-        return bigInt.toString(16)
+        val md5 = bigInt.toString(16)
+        // 如果md5不满32位开头补0
+        return if (md5.length < 32) {
+            String.format("%0${32 - md5.length}d", 0) + md5
+        } else md5
     }
 
 
@@ -211,7 +220,7 @@ object SourceManger {
     /**
      * 获取指定key的源,未找到则返回为null
      */
-    fun getSource(key: String): IBaseSource? {
+    fun getSpiderSource(key: String): IBaseSource? {
         // sourceList 获取指定key的value不存在则创建新的设置进并返回
         return sourceList.getOrPut(key) {
             val sourceBean = sourceBeanList.get(key)
@@ -236,8 +245,8 @@ object SourceManger {
     fun getSearchAbleList(): List<IBaseSource> {
         val list: MutableList<IBaseSource> = ArrayList()
         sourceBeanList.values.forEach() {
-            if (it.isSearchable || it.isSearchable) {
-                val source = getSource(it.key)
+            if (it.isSearchable) {
+                val source = getSpiderSource(it.key)
                 source?.let {
                     list.add(source)
                 }

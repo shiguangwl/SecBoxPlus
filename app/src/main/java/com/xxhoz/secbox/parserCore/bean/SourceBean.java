@@ -114,4 +114,21 @@ public class SourceBean {
     public void setCategories(ArrayList<String> categories) {
         this.categories = categories;
     }
+
+    @Override
+    public String toString() {
+        return "SourceBean{" +
+                "key='" + key + '\'' +
+                ", name='" + name + '\'' +
+                ", api='" + api + '\'' +
+                ", type=" + type +
+                ", searchable=" + searchable +
+                ", quickSearch=" + quickSearch +
+                ", filterable=" + filterable +
+                ", playerUrl='" + playerUrl + '\'' +
+                ", ext='" + ext + '\'' +
+                ", categories=" + categories +
+                ", flags=" + flags +
+                '}';
+    }
 }

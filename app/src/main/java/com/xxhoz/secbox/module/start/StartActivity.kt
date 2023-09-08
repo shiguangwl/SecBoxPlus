@@ -1,29 +1,28 @@
 package com.xxhoz.secbox.module.start
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.google.gson.JsonObject
 import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.toast.Toaster
 import com.umeng.commonsdk.UMConfigure
 import com.xxhoz.constant.BaseConfig
-import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
-import com.xxhoz.secbox.bean.callback.Rdata
-import com.xxhoz.secbox.bean.callback.Rresult
-import com.xxhoz.secbox.bean.callback.Rstate
+import com.xxhoz.secbox.bean.ConfigBean
+import com.xxhoz.secbox.bean.exception.GlobalException
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.ActivityStartBinding
 import com.xxhoz.secbox.module.main.MainActivity
+import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.NetworkHelper
+import com.xxhoz.secbox.util.getActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class StartActivity : BaseActivity<ActivityStartBinding>() {
 
@@ -40,12 +39,38 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             navigationBarColor(R.color.white)
             navigationBarDarkIcon(true)
         }
-        initData()
 
-        // 初始化友盟  调试版不做记录
-        if (!getPackageName().contains(".dev")) {
-            umengInit()
+        lifecycleScope.launch(Dispatchers.IO) {
+            initData()
+/*//            val sourceBeanList = SourceManger.getSourceBeanList()
+//            LogUtils.i("获取站源数量:${sourceBeanList.size}")
+//
+//            if (sourceBeanList.size == 0){
+//                Toaster.showLong("获取Source数量为0")
+//                return@launch
+//            }
+//            sourceBeanList.forEach {
+//                lifecycleScope.launch(Dispatchers.IO) {
+//                    val source = SourceManger.getSpiderSource(it.key)!!
+//                    try {
+//                        LogUtils.e("站源数据:${it.name}==categoryInfo:${source.categoryInfo()}")
+//                    }catch (e:Exception){
+////                        LogUtils.e("站源数据异常:${it.name},${e.message}")
+//                        e.printStackTrace()
+//                    }
+//                }
+//            }*/
+
+            withContext(Dispatchers.Main){
+                // 初始化友盟  调试版不做记录
+                if (!getPackageName().contains(".dev")) {
+                    umengInit()
+                }
+                MainActivity.startActivity(getActivity()!!)
+                finish();
+            }
         }
+
     }
 
     /**
@@ -56,53 +81,34 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             Toaster.show("请检查网络连接")
             return
         }
-        // 加载配置
-        configInit {
-            if (it.RState != Rstate.SUCCESS) {
-                // 加载配置文件失败,或有更新 TODO
-                Toaster.showLong(it.msg)
-            }else{
-                val intent = Intent(this,MainActivity::class.java)
-                startActivity(intent)
-            }
+        try {
+            configInit()
+        }catch (e:Exception){
+            Toaster.showLong(e.message)
+            e.printStackTrace()
         }
-
     }
 
     /**
      * 加载配置文件
      */
-    private fun configInit(callback: (Rdata) -> Unit) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            // 配置加载
-            val jsonObject =
-                HttpUtil.get("https://shiguang.cachefly.net/config.json", JsonObject::class.java)
+    private fun configInit() {
+        // 配置加载
 
-            if (jsonObject == null) {
-                callback(Rresult.fail("加载配置信息失败"))
-                return@launch
-            }
-
-            LogUtils.i("加载配置信息成功: $jsonObject")
-            val version = jsonObject["version"].asString
-            val downUrl = jsonObject["downloadUrl"].asString
-            val notice = jsonObject["notice"].asString
-            val baseApi = jsonObject["configJsonUrl"].asString
-
-            // 设置基本配置信息
-            BaseConfig.BASE_API = baseApi
-            BaseConfig.NOTION = notice
-
-            // 加载数据源配置
-            SourceManger.initData(BaseConfig.BASE_API)
-            // 检测更新状态
-            val checkUpdate = checkUpdate(version, downUrl)
-            if (checkUpdate){
-                callback(Rresult.fail("有新版本发布"))
-                return@launch
-            }
-            callback(Rresult.oK())
+        val configBean = try {
+            HttpUtil.get("https://shiguang.cachefly.net/config.json", ConfigBean::class.java)
+        } catch (e: Exception) {
+            throw GlobalException.of("加载配置失败")
         }
+
+        LogUtils.i("加载配置成功: $configBean")
+
+        // 设置基本配置信息
+        BaseConfig.SOURCE_BASE_API = configBean.configJsonUrl
+        BaseConfig.NOTION = configBean.notice
+
+        // 加载数据源配置
+        SourceManger.initData(BaseConfig.SOURCE_BASE_API)
     }
 
 

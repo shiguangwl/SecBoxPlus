@@ -74,11 +74,17 @@ android {
 }
 
 kapt {
+    useBuildCache = true
+    javacOptions {
+        option("-Xmaxerrs", 500)
+    }
     arguments {
     }
 }
 
 dependencies {
+    // XPopup
+    implementation 'com.github.li-xiaojun:XPopup:2.9.19'
 
     // 吐司框架
     implementation ("com.github.getActivity:Toaster:${versions.toaster}")
@@ -103,7 +109,6 @@ dependencies {
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${build_versions.kotlin}")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${build_versions.kotlin}")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${build_versions.kotlin}")
     // 协程
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.kotlin_coroutines}")

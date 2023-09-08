@@ -1,41 +1,36 @@
 package com.xxhoz.secbox.module.home
 
-import android.graphics.PostProcessor
-import androidx.lifecycle.viewModelScope
-import com.xxhoz.constant.BaseConfig
-import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.base.list.base.BaseRecyclerViewModel
 import com.xxhoz.secbox.base.list.base.BaseViewData
 import com.xxhoz.secbox.bean.BannerBean
-import com.xxhoz.secbox.bean.VideoBean
 import com.xxhoz.secbox.constant.PageName
-import com.xxhoz.secbox.constant.VideoType
 import com.xxhoz.secbox.item.BannerViewData
-import com.xxhoz.secbox.item.LargeVideoViewData
 import com.xxhoz.secbox.item.VideoViewData
-import com.xxhoz.secbox.persistence.XKeyValue
-import com.xxhoz.secbox.util.LogUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.xxhoz.secbox.parserCore.bean.VideoBean
 
 class HomeViewModel : BaseRecyclerViewModel() {
 
-    fun loadData(){
+
+    fun loadData(homeVideoList: List<VideoBean>){
         val viewDataList = mutableListOf<BaseViewData<*>>()
-        val bannerBean = BannerBean(listOf("https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2656327176.webp","https://img2.doubanio.com/view/photo/s_ratio_poster/public/p2885057891.webp"))
+
+        val bannerBean = BannerBean(listOf("https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2656327176.webp"))
         viewDataList.add(BannerViewData(bannerBean))
-        val videoBean = VideoBean("1", "我是标题", "https://img2.doubanio.com/view/photo/s_ratio_poster/public/p2885057891.webp", "aaa", "up", 10000L, VideoType.NORMAL)
-        for (i in 0..19) {
+
+        for (videoBean in homeVideoList) {
             viewDataList.add(VideoViewData(videoBean))
         }
+
         postData(false, viewDataList)
     }
 
     override fun loadData(isLoadMore: Boolean, isReLoad: Boolean, page: Int) {
+        val viewDataList = mutableListOf<BaseViewData<*>>()
+        postData(isLoadMore, viewDataList)
+
 //        viewModelScope.launch(Dispatchers.IO) {
-//            delay(1500L)
 //            val viewDataList = mutableListOf<BaseViewData<*>>()
+//            postData(isLoadMore, viewDataList)
 //            if (!isLoadMore) {
 //                // 第一次加载或刷新
 //                val currentSource: IBaseSource? = BaseConfig.getCurrentSource()
@@ -43,17 +38,11 @@ class HomeViewModel : BaseRecyclerViewModel() {
 //                    // 首页banner
 //                    val bannerBean = BannerBean(listOf("https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2656327176.webp","https://img2.doubanio.com/view/photo/s_ratio_poster/public/p2885057891.webp"))
 //                    viewDataList.add(BannerViewData(bannerBean))
-////                    val homeVideoList = it.homeVideoList()
-//                    val videoBean = VideoBean("1", "我是标题", "https://img2.doubanio.com/view/photo/s_ratio_poster/public/p2885057891.webp", "aaa", "up", 10000L, VideoType.NORMAL)
-//                    viewDataList.add(VideoViewData(videoBean))
-//                    viewDataList.add(VideoViewData(videoBean))
-//                    viewDataList.add(VideoViewData(videoBean))
-//                    viewDataList.add(VideoViewData(videoBean))
-//                    viewDataList.add(VideoViewData(videoBean))
-//                    viewDataList.add(VideoViewData(videoBean))
-//                    viewDataList.add(VideoViewData(videoBean))
-//                    viewDataList.add(VideoViewData(videoBean))
-//                    viewDataList.add(VideoViewData(videoBean))
+//
+//                    var homeVideoList: List<VideoBean> = it.homeVideoList()
+//                    for (videoBean in homeVideoList) {
+//                        viewDataList.add(VideoViewData(videoBean))
+//                    }
 //                }
 //
 ////                viewDataList.add(BannerViewData(BannerBean(listOf("https://img1.baidu.com/it/u=2148838167,3055147248&fm=26&fmt=auto", "https://img1.baidu.com/it/u=2758621636,2239499009&fm=26&fmt=auto", "https://img2.baidu.com/it/u=669799662,2628491047&fm=26&fmt=auto"))))

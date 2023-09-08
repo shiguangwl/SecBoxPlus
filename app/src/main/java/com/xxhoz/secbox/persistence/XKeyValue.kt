@@ -2,6 +2,7 @@ package com.xxhoz.secbox.persistence
 
 import android.app.Application
 import android.os.Parcelable
+import com.hjq.gson.factory.GsonFactory
 import com.tencent.mmkv.MMKV
 import com.xxhoz.constant.Key
 
@@ -115,5 +116,21 @@ object XKeyValue {
 
     inline fun <reified T : Parcelable> getParcelable(@Key key: String): T? {
         return from(key).decodeParcelable(key, T::class.java)
+    }
+
+    /**
+     * 存储对象
+     */
+    fun <T> putObject(@Key key: String, value: T) {
+        val json = GsonFactory.getSingletonGson().toJson(value)
+        from(key).encode(key, json)
+    }
+
+    /**
+     * 获取对象
+     */
+    inline fun <reified T> getObject(@Key key: String): T? {
+        val json = from(key).decodeString(key, null)
+        return GsonFactory.getSingletonGson().fromJson(json, T::class.java)
     }
 }

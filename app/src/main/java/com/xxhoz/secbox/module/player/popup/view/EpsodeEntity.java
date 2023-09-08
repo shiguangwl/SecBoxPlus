@@ -8,7 +8,7 @@ public class EpsodeEntity {
      */
     private boolean isPlay = false;
 
-    public EpsodeEntity(String videoUrl, String videoName) {
+    public EpsodeEntity(String videoName, String videoUrl) {
         this.videoUrl = videoUrl;
         this.videoName = videoName;
     }

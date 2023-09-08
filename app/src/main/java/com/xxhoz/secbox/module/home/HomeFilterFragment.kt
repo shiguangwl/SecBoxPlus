@@ -16,7 +16,7 @@ import com.xxhoz.secbox.base.list.XRecyclerView
 import com.xxhoz.secbox.base.list.base.BaseViewData
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeFilterBinding
-import com.xxhoz.secbox.module.player.DetailPlayerActivity
+import com.xxhoz.secbox.parserCore.bean.CategoryBean
 import com.xxhoz.secbox.widget.ConditionTabView
 import com.xxhoz.secbox.widget.GridItemDecoration
 import kotlinx.coroutines.Dispatchers
@@ -27,8 +27,7 @@ import kotlinx.coroutines.withContext
 /**
  * 首页
  */
-class HomeFilterFragment(var categorr: String) : BaseFragment<FragmentHomeFilterBinding>() {
-
+class HomeFilterFragment(val index: Int,val categoryBean: CategoryBean) : BaseFragment<FragmentHomeFilterBinding>() {
     lateinit var conditionView: ConditionTabView
     lateinit var itemListView: XRecyclerView
     private val viewModel: HomeFilterViewModel by viewModels()
