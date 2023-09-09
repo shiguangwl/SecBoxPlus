@@ -11,6 +11,8 @@ import com.xxhoz.secbox.constant.PageName
 class StartViewModel : BaseViewModel() {
 
 
+
+
     @PageName
     override fun getPageName() = PageName.START
 }

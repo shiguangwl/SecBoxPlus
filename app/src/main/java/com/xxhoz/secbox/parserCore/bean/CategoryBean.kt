@@ -1,5 +1,6 @@
 package com.xxhoz.secbox.parserCore.bean
 
+
 /**
  * 分类信息
  */

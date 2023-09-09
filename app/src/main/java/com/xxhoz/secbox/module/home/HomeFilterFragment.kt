@@ -9,30 +9,38 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
-import com.hjq.toast.Toaster
+import com.xxhoz.constant.BaseConfig
+import com.xxhoz.constant.Key
 import com.xxhoz.secbox.base.BaseFragment
 import com.xxhoz.secbox.base.list.XRecyclerView
 import com.xxhoz.secbox.base.list.base.BaseViewData
+import com.xxhoz.secbox.bean.PlayInfoBean
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeFilterBinding
+import com.xxhoz.secbox.module.player.DetailPlayerActivity
 import com.xxhoz.secbox.parserCore.bean.CategoryBean
+import com.xxhoz.secbox.parserCore.bean.VideoBean
+import com.xxhoz.secbox.persistence.XKeyValue
+import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.widget.ConditionTabView
 import com.xxhoz.secbox.widget.GridItemDecoration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 /**
  * 首页
  */
-class HomeFilterFragment(val index: Int,val categoryBean: CategoryBean) : BaseFragment<FragmentHomeFilterBinding>() {
-    lateinit var conditionView: ConditionTabView
-    lateinit var itemListView: XRecyclerView
+class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilters: List<CategoryBean.Filter>) : BaseFragment<FragmentHomeFilterBinding>() {
+
+    val conditionView: ConditionTabView by lazy { viewBinding.conditionView }
+
+    val itemListView: XRecyclerView by lazy() { viewBinding.itemListView }
+
     private val viewModel: HomeFilterViewModel by viewModels()
 
     private var isLoading = false
+
     override val inflater: (LayoutInflater, container: ViewGroup?, attachToRoot: Boolean) -> FragmentHomeFilterBinding
         get() = FragmentHomeFilterBinding::inflate
 
@@ -43,9 +51,6 @@ class HomeFilterFragment(val index: Int,val categoryBean: CategoryBean) : BaseFr
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        conditionView = viewBinding.conditionView
-        itemListView = viewBinding.itemListView
-        viewBinding.loadPromptView.showLoading()
     }
 
 
@@ -54,49 +59,55 @@ class HomeFilterFragment(val index: Int,val categoryBean: CategoryBean) : BaseFr
         if (isLoading){
             return
         }
-        lifecycleScope.launch(Dispatchers.IO){
-            initView()
-            isLoading = true
-        }
+        viewBinding.loadPromptView.showLoading()
+        initView()
+        viewBinding.loadPromptView.hide()
+        isLoading = true
     }
 
-    private suspend fun initView() {
-        val conditionMap: Map<String, List<String>> = mapOf(
-            "分类1" to listOf("value1", "value2", "value2", "value2", "value2"),
-            "分类2" to listOf("value3", "value4", "value4", "value4", "value4", "value4", "value4", "value4"),
-            "分类3" to listOf("value3", "value4", "value4", "value4"),
-            "分类4" to listOf("value3", "value4", "value4", "value4", "value4"),
-            "分类4" to listOf("value3", "value4", "value4", "value4", "value4", "value4", "value4"),
-        )
-        withContext(Dispatchers.Main){
-            conditionView.addTabLine(conditionMap){
-                Toaster.showLong("条件变化: " +Gson().toJson(conditionMap))
+    private fun initView() {
+        LogUtils.d("当前分类:${category.type_id} | ${category.type_name}")
+        LogUtils.d("当前Filter:${categoryFilters}")
+
+        viewModel.category = category
+        // 渲染赛选条件
+        conditionView.addTabLine(categoryFilters){
+            viewModel.conditons = it
+//            Toaster.showLong("条件变化: " +Gson().toJson(it))
+            lifecycleScope.launch(Dispatchers.IO){
+                itemListView.refreshList()
             }
-
-            itemListView.init(
-                XRecyclerView.Config()
-                    .setViewModel(viewModel)
-                    .setPullRefreshEnable(false)
-                    .setPullUploadMoreEnable(true)
-                    .setLayoutManager(GridLayoutManager(activity, HomeFilterFragment.HOME_SPAN_COUNT))
-                    .setItemDecoration(GridItemDecoration(activity, HomeFilterFragment.HOME_SPAN_COUNT))
-                    .setOnItemClickListener(object : XRecyclerView.OnItemClickListener {
-                        override fun onItemClick(parent: RecyclerView, view: View, viewData: BaseViewData<*>, position: Int, id: Long) {
-                            Toast.makeText(context, "条目点击: ${viewData.value}", Toast.LENGTH_SHORT).show()
-                        }
-                    })
-                    .setOnItemChildViewClickListener(object : XRecyclerView.OnItemChildViewClickListener {
-                        override fun onItemChildViewClick(parent: RecyclerView, view: View, viewData: BaseViewData<*>, position: Int, id: Long, extra: Any?) {
-                            if (extra is String) {
-                                Toast.makeText(context, "条目子View点击: $extra", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    })
-            )
-
-            viewModel.loadData()
-            viewBinding.loadPromptView.hide()
         }
+        viewModel.conditons = conditionView.conditions
+
+        itemListView.init(
+            XRecyclerView.Config()
+                .setViewModel(viewModel)
+                .setPullRefreshEnable(false)
+                .setPullUploadMoreEnable(true)
+                .setLayoutManager(GridLayoutManager(activity, HomeFilterFragment.HOME_SPAN_COUNT))
+                .setItemDecoration(GridItemDecoration(activity, HomeFilterFragment.HOME_SPAN_COUNT))
+                .setOnItemClickListener(object : XRecyclerView.OnItemClickListener {
+                    override fun onItemClick(parent: RecyclerView, view: View, viewData: BaseViewData<*>, position: Int, id: Long) {
+
+                        val playInfoBean = PlayInfoBean(
+                            XKeyValue.getString(Key.CURRENT_SOURCE_KEY, BaseConfig.DefualtSourceKey),
+                            viewData.value as VideoBean,
+                            1
+                        )
+                        LogUtils.i("条目点击: ${playInfoBean}")
+                        DetailPlayerActivity.startActivity(context!!, playInfoBean)
+                    }
+                })
+                .setOnItemChildViewClickListener(object : XRecyclerView.OnItemChildViewClickListener {
+                    override fun onItemChildViewClick(parent: RecyclerView, view: View, viewData: BaseViewData<*>, position: Int, id: Long, extra: Any?) {
+                        if (extra is String) {
+                            Toast.makeText(context, "条目子View点击: $extra", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                })
+        )
+
     }
 
     @PageName

@@ -6,6 +6,7 @@ data class VideoDetailBean(
     val vod_id: String,
     val vod_name: String,
     val vod_pic: String,
+    val type_name: String,
     val vod_year: String,
     val vod_remarks: String,
     val vod_actor: String,

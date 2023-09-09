@@ -11,17 +11,17 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.xxhoz.secbox.R;
-import com.xxhoz.secbox.module.player.popup.view.EpsodeEntity;
+import com.xxhoz.secbox.bean.EpsodeEntity;
 import com.xxhoz.secbox.module.player.popup.view.VideoEpisodeAdapter;
 import com.xxhoz.secbox.util.DipAndPx;
+
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class VideoEpisodePopup extends PopupWindow {

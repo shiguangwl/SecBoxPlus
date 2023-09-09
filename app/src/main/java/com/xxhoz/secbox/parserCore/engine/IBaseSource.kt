@@ -1,6 +1,7 @@
 package com.xxhoz.parserCore.parserImpl
 
 import com.xxhoz.secbox.parserCore.bean.CategoryBean
+import com.xxhoz.secbox.parserCore.bean.CategoryPageBean
 import com.xxhoz.secbox.parserCore.bean.PlayLinkBean
 import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
@@ -27,7 +28,7 @@ interface IBaseSource {
      * 获取分类数据
      */
     @Throws(Exception::class)
-    fun categoryVideoList(tid: String, page: String, extend: HashMap<String, String>): CategoryBean
+    fun categoryVideoList(tid: String, page: String, extend: HashMap<String, String>): CategoryPageBean
 
 
     /**

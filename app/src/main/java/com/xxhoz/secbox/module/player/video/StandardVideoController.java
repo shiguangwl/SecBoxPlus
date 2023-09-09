@@ -5,7 +5,6 @@ import android.content.pm.ActivityInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -21,14 +20,6 @@ import androidx.annotation.Nullable;
 import com.xxhoz.secbox.R;
 import com.xxhoz.secbox.module.player.video.view.NetworkSpeedUtil;
 
-
-import xyz.doikki.videocontroller.component.CompleteView;
-import xyz.doikki.videocontroller.component.ErrorView;
-import xyz.doikki.videocontroller.component.GestureView;
-import xyz.doikki.videocontroller.component.LiveControlView;
-import xyz.doikki.videocontroller.component.PrepareView;
-import xyz.doikki.videocontroller.component.TitleView;
-import xyz.doikki.videocontroller.component.VodControlView;
 import xyz.doikki.videoplayer.controller.GestureVideoController;
 import xyz.doikki.videoplayer.player.VideoView;
 import xyz.doikki.videoplayer.util.PlayerUtils;
@@ -50,6 +41,7 @@ public class StandardVideoController extends GestureVideoController implements V
     private TextView loadSpeed;
     private boolean isBuffering;
 
+    private View fullscreenView;
     public StandardVideoController(@NonNull Context context) {
         this(context, null);
     }
@@ -67,6 +59,7 @@ public class StandardVideoController extends GestureVideoController implements V
         return R.layout.dkplayer_layout_standard_controller;
     }
 
+    private boolean isLongPress = false;
     @Override
     protected void initView() {
         super.initView();
@@ -74,6 +67,26 @@ public class StandardVideoController extends GestureVideoController implements V
         mLockButton.setOnClickListener(this);
         mLoadingView = findViewById(R.id.loading);
         loadSpeed = findViewById(R.id.load_speed);
+
+        fullscreenView = findViewById(R.id.fullscreenView);
+
+        // fullscreenView.setOnTouchListener((v, event) -> {
+        //     switch (event.getAction()) {
+        //         case MotionEvent.ACTION_DOWN:
+        //             isLongPress = true;
+        //             new Handler(Looper.getMainLooper()).postDelayed(()->{
+        //                 if (isLongPress == true){
+        //                     mControlWrapper.setSpeed(3f);
+        //                 }
+        //             },3000);
+        //             break;
+        //         case MotionEvent.ACTION_UP:
+        //             isLongPress = false;
+        //             Log.d(TAG, "onTouch: ACTION_UP");
+        //             break;
+        //     }
+        //     return false;
+        // });
     }
 
 
@@ -82,22 +95,22 @@ public class StandardVideoController extends GestureVideoController implements V
      * @param title  标题
      * @param isLive 是否为直播
      */
-    public void addDefaultControlComponent(String title, boolean isLive) {
-        CompleteView completeView = new CompleteView(getContext());
-        ErrorView errorView = new ErrorView(getContext());
-        PrepareView prepareView = new PrepareView(getContext());
-        prepareView.setClickStart();
-        TitleView titleView = new TitleView(getContext());
-        titleView.setTitle(title);
-        addControlComponent(completeView, errorView, prepareView, titleView);
-        if (isLive) {
-            addControlComponent(new LiveControlView(getContext()));
-        } else {
-            addControlComponent(new VodControlView(getContext()));
-        }
-        addControlComponent(new GestureView(getContext()));
-        setCanChangePosition(!isLive);
-    }
+    // public void addDefaultControlComponent(String title, boolean isLive) {
+    //     CompleteView completeView = new CompleteView(getContext());
+    //     ErrorView errorView = new ErrorView(getContext());
+    //     PrepareView prepareView = new PrepareView(getContext());
+    //     prepareView.setClickStart();
+    //     TitleView titleView = new TitleView(getContext());
+    //     titleView.setTitle(title);
+    //     addControlComponent(completeView, errorView, prepareView, titleView);
+    //     if (isLive) {
+    //         addControlComponent(new LiveControlView(getContext()));
+    //     } else {
+    //         addControlComponent(new VodControlView(getContext()));
+    //     }
+    //     addControlComponent(new GestureView(getContext()));
+    //     setCanChangePosition(!isLive);
+    // }
 
     @Override
     public void onClick(View v) {

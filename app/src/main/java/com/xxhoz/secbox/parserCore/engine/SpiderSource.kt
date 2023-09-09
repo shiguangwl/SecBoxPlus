@@ -3,6 +3,7 @@ package com.xxhoz.parserCore.parserImpl
 import com.github.catvod.crawler.Spider
 import com.hjq.gson.factory.GsonFactory
 import com.xxhoz.secbox.parserCore.bean.CategoryBean
+import com.xxhoz.secbox.parserCore.bean.CategoryPageBean
 import com.xxhoz.secbox.parserCore.bean.PlayLinkBean
 import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
@@ -47,14 +48,14 @@ class SpiderSource(override var sourceBean: SourceBean, var spider: Spider)  :
     /**
      * 获取分类数据
      */
-    override fun categoryVideoList(tid: String, page: String, extend: HashMap<String, String>): CategoryBean {
+    override fun categoryVideoList(tid: String, page: String, extend: HashMap<String, String>): CategoryPageBean {
         var filter: Boolean = false;
         if (extend.size > 0) {
             filter = true;
         }
         var categoryContent = spider.categoryContent(tid, page, filter, extend)
-        LogUtils.d(sourceBean.name +"分类过滤数据String:${categoryContent}")
-        return gson.fromJson(categoryContent,CategoryBean::class.java)
+        LogUtils.d(sourceBean.name +"分类条件过滤数据String:${categoryContent}")
+        return gson.fromJson(categoryContent,CategoryPageBean::class.java)
     }
 
 
@@ -80,7 +81,7 @@ class SpiderSource(override var sourceBean: SourceBean, var spider: Spider)  :
      */
     override fun playInfo(flag:String, id:String):PlayLinkBean{
         val playerContent: String = spider.playerContent(flag, id, sourceBean.flags)
-        LogUtils.d(sourceBean.name +"播放链接数据String:${playerContent}")
+        LogUtils.d(sourceBean.name +"    播放链接数据String:${playerContent}")
         return gson.fromJson(playerContent, PlayLinkBean::class.java)
     }
 

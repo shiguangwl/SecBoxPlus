@@ -14,21 +14,23 @@ import com.google.android.material.tabs.TabLayout
 import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.gson.factory.GsonFactory
 import com.hjq.toast.Toaster
+import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
+import com.xxhoz.secbox.bean.EpsodeEntity
 import com.xxhoz.secbox.bean.PlayInfoBean
 import com.xxhoz.secbox.bean.exception.GlobalException
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.ActivityDetailPlayerBinding
-import com.xxhoz.secbox.module.player.popup.view.EpsodeEntity
 import com.xxhoz.secbox.module.player.video.DanmuVideoPlayer
 import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.bean.PlayLinkBean
 import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
 import com.xxhoz.secbox.util.LogUtils
+import com.xxhoz.secbox.util.setImageUrl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -36,7 +38,8 @@ import org.json.JSONObject
 import java.net.UnknownHostException
 
 
-class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() {
+class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
+    DanmuVideoPlayer.PlayerCallback {
 
 
     override fun getPageName() = PageName.DETAIL_PLAYER
@@ -121,6 +124,8 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() {
             episodeTab.setScrollPosition(7, 0F, true);
         }
         videoPlayer = viewBinding.danmakuPlayer
+        videoPlayer.setActionCallback(this)
+
         channelTab = viewBinding.channelTab
         episodeTab = viewBinding.episodeTab
 
@@ -146,7 +151,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() {
                 Handler(Looper.getMainLooper()).postDelayed({
                     // FIXME 不加延迟不生效???
                     episodeTab.setScrollPosition(currentEpisode, 0F, true);
-                },300)
+                },400)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {
@@ -162,6 +167,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() {
                 updateTabView(tab, true)
                 tab.setTag(System.currentTimeMillis())
                 epTabItemClick(tab)
+                videoPlayer.videoEpisodePopup.setPlayNum(tab.position + 1)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {
@@ -185,7 +191,6 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() {
      * 剧集列表点击事件
      */
     private fun epTabItemClick(tab: TabLayout.Tab) {
-        Toaster.show("点击了:" + tab.position)
         currentEpisode = tab.position
         videoPlayer.setLoadingMsg("加载数据中...")
 
@@ -206,7 +211,11 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() {
             }
 
             LogUtils.d("最终播放链接:  ${playUrl}")
-            val epsodeEntity: EpsodeEntity = EpsodeEntity(currenSelectEposode.name, playUrl)
+            val epsodeEntity: EpsodeEntity =
+                EpsodeEntity(
+                    currenSelectEposode.name,
+                    playUrl
+                )
             runOnUiThread(){
                 startPlay(epsodeEntity)
             }
@@ -285,12 +294,6 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() {
         // TODO 空指针检测
         spiderSource = SourceManger.getSpiderSource(playInfoBean.sourceKey)!!
 
-        if (spiderSource == null) {
-            Toaster.showLong("未找到播放源")
-            viewBinding.promptView.showEmpty()
-            return
-        }
-
 
         try {
             videoDetailBean = spiderSource.videoDetail(listOf(playInfoBean.videoBean.vod_id))
@@ -316,6 +319,13 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() {
             renderChanelsTab()
             renderEpisodesTab()
 
+            videoDetailBean?.let {
+                viewBinding.titleText.text= it.vod_name
+                viewBinding.roundAngleImageView.setImageUrl(it.vod_pic)
+                viewBinding.descText.text = removeHtmlAndWhitespace(it.vod_content)
+                viewBinding.textView.text = "${it.vod_year?:"-"}  /  ${it.type_name?:"-"}  /  ${it.vod_director?:"-"}"
+            }
+            viewBinding.currentSourceText.text = BaseConfig.getCurrentSource()!!.sourceBean.name
             // 选择channel自动播放
             channelTab.getTabAt(currentEpisode)?.select()
             viewBinding.promptView.hide()
@@ -352,6 +362,13 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() {
             textView.text = episode.name
             episodeTab.addTab(newTab,false)
         }
+
+        // 设置播放器控件选集数据
+        val eposodeList = ArrayList<EpsodeEntity>()
+        channelEpisodes.episodes.forEach {
+            eposodeList.add(EpsodeEntity(it.name,""))
+        }
+        videoPlayer.episodes = eposodeList
     }
 
     private fun showErrorView() {
@@ -392,4 +409,40 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() {
             videoPlayer.setLoadingMsg(msg)
         }
     }
+
+    /**
+     * 点击下一集
+     */
+    override fun nextClick() {
+        if (episodeTab.tabCount > currentEpisode + 1) {
+            episodeTab.getTabAt(currentEpisode + 1)?.select()
+        } else {
+            Toaster.show("已经是最后一集了")
+        }
+    }
+
+    /**
+     * 点击投屏
+     */
+    override fun throwingScreenClick() {
+        Toaster.show("待开发")
+    }
+
+    /**
+     * 选集点击
+     */
+    override fun selectPartsClick(position: Int) {
+        episodeTab.getTabAt(position)?.select()
+    }
+
+    fun removeHtmlAndWhitespace(input: String): String {
+        // 去除HTML标签
+        val noHtmlTags = input.replace(Regex("<[^>]*>"), "")
+        // 去除多个空白字符（包括空格、制表符、换行符等）替换为单个空格
+        val noWhitespace = noHtmlTags.replace(Regex("\\s+"), " ")
+        return noWhitespace.trim() // 去除字符串两端的空格
+    }
+
+
+
 }

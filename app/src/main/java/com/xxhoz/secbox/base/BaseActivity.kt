@@ -3,7 +3,9 @@ package com.xxhoz.secbox.base
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.annotation.CallSuper
+import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
+import kotlinx.coroutines.cancel
 import me.imid.swipebacklayout.lib.app.SwipeBackActivity
 
 /**
@@ -36,6 +38,7 @@ abstract class BaseActivity<T : ViewBinding> : SwipeBackActivity(), IGetPageName
 
     @CallSuper
     override fun onDestroy() {
+        lifecycleScope.cancel()
         super.onDestroy()
     }
 

@@ -2,8 +2,11 @@ package com.xxhoz.secbox.module.player.video;
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
 import com.hjq.toast.Toaster
-import com.xxhoz.secbox.module.player.popup.view.EpsodeEntity
+import com.xxhoz.secbox.bean.EpsodeEntity
+import com.xxhoz.secbox.module.player.popup.VideoEpisodePopup
+import com.xxhoz.secbox.module.player.popup.VideoSpeedPopup
 import com.xxhoz.secbox.module.player.video.view.BottomControlView
 import com.xxhoz.secbox.module.player.video.view.danma.SecDanmakuView
 
@@ -20,9 +23,34 @@ import xyz.doikki.videoplayer.player.VideoView
 class DanmuVideoPlayer : VideoView {
 
     lateinit var topTitleView: TopTitleView
-    lateinit private var vDanmakuView : SecDanmakuView
+    private lateinit var vDanmakuView : SecDanmakuView
     lateinit var standardVideoController: StandardVideoController
+    lateinit var episodes: ArrayList<EpsodeEntity>
 
+    val videoEpisodePopup: VideoEpisodePopup by lazy {
+        val popup = VideoEpisodePopup(getContext(), episodes)
+        popup.setEpisondeClickListener(object : VideoEpisodePopup.EpisodeClickListener {
+            override fun onEpisodeClickListener(entity: EpsodeEntity, position: Int) {
+                actionCallback.selectPartsClick(position)
+            }
+        })
+        popup
+    }
+
+    val videoSpeedPopup by lazy {
+        val popup = VideoSpeedPopup(getContext())
+        popup.setSpeedChangeListener {
+            speed = it
+            Toaster.show("切换播放速度:${it}")
+        }
+        popup
+    }
+
+
+    private lateinit var actionCallback: PlayerCallback
+    fun setActionCallback(actionCallback: PlayerCallback) {
+        this.actionCallback = actionCallback
+    }
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
@@ -61,20 +89,26 @@ class DanmuVideoPlayer : VideoView {
 
                 // 投屏
                 topTitleView.setThrowingScreenListener() {
-                    Toaster.show("投屏")
+                    actionCallback.throwingScreenClick()
                 }
 
                 // 下一集
                 bottomControlView.setNextVodListener() {
-                    Toaster.show("下一集")
+                    actionCallback.nextClick()
                 }
                 // 选集
                 bottomControlView.setChangeEposdeListener() {
-                    Toaster.show("选集")
+                    videoEpisodePopup.showAtLocation(
+                        activity.getWindow().getDecorView(),
+                        Gravity.RIGHT,
+                        0,
+                        0
+                    )
                 }
+
                 // 速度
                 bottomControlView.setChangeSpeedListener() {
-                    Toaster.show("速度")
+                    videoSpeedPopup.showAtLocation(activity.getWindow().getDecorView(), Gravity.RIGHT, 0, 0)
                 }
             }
         }
@@ -120,9 +154,7 @@ class DanmuVideoPlayer : VideoView {
 
     interface PlayerCallback {
         fun nextClick()
-        fun backClick()
         fun throwingScreenClick()
-        fun selectPartsClick()
-        fun speedClick()
+        fun selectPartsClick(position: Int)
     }
 }

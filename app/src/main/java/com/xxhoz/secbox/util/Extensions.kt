@@ -13,6 +13,7 @@ import android.widget.ImageView
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.xxhoz.secbox.R
 
@@ -64,11 +65,12 @@ val Float.radians: Float
 
 fun ImageView.setImageUrl(url: String) {
     val options: RequestOptions = RequestOptions()
-        .placeholder(R.color.bg_image)
+        .placeholder(R.drawable.loading_mask)
         .error(R.color.bg_image)
     Glide.with(context)
         .applyDefaultRequestOptions(options)
         .load(url)
+        .transition(DrawableTransitionOptions.withCrossFade())
         .into(this)
 }
 

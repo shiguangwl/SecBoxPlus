@@ -14,7 +14,6 @@ import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.GlobalActivityManager
 import com.xxhoz.secbox.util.LogUtils
 import xyz.doikki.videoplayer.exo.ExoMediaPlayerFactory
-import xyz.doikki.videoplayer.player.AndroidMediaPlayerFactory
 import xyz.doikki.videoplayer.player.VideoViewConfig
 import xyz.doikki.videoplayer.player.VideoViewManager
 
@@ -46,6 +45,10 @@ class App : Application() {
             GsonFactory.setJsonCallback { typeToken, fieldName, jsonToken ->
                 // 上报到 Bugly 错误列表中
                 LogUtils.e("GsonFactory类型解析异常：$typeToken#$fieldName，后台返回的类型为：$jsonToken")
+            }
+            // 设置 Json 解析容错监听
+            GsonFactory.setJsonCallback { typeToken, fieldName, jsonToken -> // Log.e("GsonFactory", "类型解析异常：" + typeToken + "#" + fieldName + "，后台返回的类型为：" + jsonToken);
+                LogUtils.e("类型解析异常：" + typeToken + "#" + fieldName + "，后台返回的类型为：" + jsonToken)
             }
             // 异常处理
             CrashManager.getInstance(this).init()

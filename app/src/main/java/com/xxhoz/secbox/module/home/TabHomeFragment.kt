@@ -134,8 +134,11 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
                         // 首页推荐
                         return HomeFragment(homeVideoList);
                     }
+
+                    val classType: CategoryBean.ClassType = categoryInfo.`class`.get(position - 1)
+                    val filters: List<CategoryBean.Filter> = categoryInfo.filters.get(classType.type_id)!!
                     // 分类页
-                    return HomeFilterFragment(position - 1, categoryInfo)
+                    return HomeFilterFragment(classType, filters)
                 }
 
                 override fun getItemCount(): Int {

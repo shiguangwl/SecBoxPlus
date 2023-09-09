@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player.popup.view;
+package com.xxhoz.secbox.bean;
 
 public class EpsodeEntity {
     private String videoUrl;

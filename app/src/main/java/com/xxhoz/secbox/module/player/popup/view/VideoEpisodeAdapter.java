@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.xxhoz.secbox.R;
+import com.xxhoz.secbox.bean.EpsodeEntity;
 
 import java.util.List;
 

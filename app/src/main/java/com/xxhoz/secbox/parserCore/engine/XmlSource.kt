@@ -2,6 +2,7 @@ package com.xxhoz.parserCore.parserImpl
 
 import com.github.catvod.crawler.Spider
 import com.xxhoz.secbox.parserCore.bean.CategoryBean
+import com.xxhoz.secbox.parserCore.bean.CategoryPageBean
 import com.xxhoz.secbox.parserCore.bean.PlayLinkBean
 import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
@@ -21,7 +22,7 @@ class XmlSource(override var sourceBean: SourceBean, var spider: Spider)  :
         tid: String,
         page: String,
         extend: HashMap<String, String>
-    ): CategoryBean {
+    ): CategoryPageBean {
         TODO("Not yet implemented")
     }
 
