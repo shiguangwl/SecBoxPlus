@@ -59,7 +59,6 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
         try {
             configInit()
             MainActivity.startActivity(getActivity()!!)
-            finish();
         }catch (e:Exception){
             Toaster.showLong(e.message)
             e.printStackTrace()
@@ -82,6 +81,7 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
 
         // 设置基本配置信息
         BaseConfig.SOURCE_BASE_API = configBean.configJsonUrl
+        BaseConfig.DANMAKU_API = configBean.danmukuApi
         BaseConfig.NOTION = configBean.notice
 
         // 加载数据源配置

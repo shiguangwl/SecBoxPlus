@@ -9,5 +9,6 @@ data class ConfigBean(
     val lru: String,
     val state: String,
     val stateInfo: String,
-    val configJsonUrl: String
+    val configJsonUrl: String,
+    val danmukuApi: String
 )

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -18,7 +19,6 @@ import com.google.gson.reflect.TypeToken
 import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.gson.factory.GsonFactory
 import com.hjq.toast.Toaster
-import com.xxhoz.constant.BaseConfig
 import com.xxhoz.constant.Key
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.parserCore.parserImpl.IBaseSource
@@ -114,6 +114,12 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
 
                 viewBinding.historyLayout.visibility = View.INVISIBLE
                 viewBinding.resultLayout.visibility = View.VISIBLE
+                // 隐藏键盘
+                try {
+                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+                } catch (_: Exception) {
+                }
 
                 return true
             }
@@ -210,6 +216,10 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             return
         }
 
+        searchVideo.forEach {
+            it.sourceBean = iBaseSource.sourceBean
+        }
+
         withContext(Dispatchers.Main) {
             // 源列表添加
             sourceList.add(iBaseSource.sourceBean.name)
@@ -252,7 +262,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
      */
     private fun onClickResultItem(data: VideoBean) {
         val playInfoBean: PlayInfoBean = PlayInfoBean(
-            XKeyValue.getString(Key.CURRENT_SOURCE_KEY, BaseConfig.DefualtSourceKey),
+            data.sourceBean!!.key,
             data,
             1
         )

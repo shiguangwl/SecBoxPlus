@@ -24,7 +24,6 @@
             app:layout_constraintTop_toBottomOf="@+id/condition_view" />
 
     <com.xxhoz.secbox.widget.PromptView
-            android:visibility="invisible"
             android:id="@+id/load_promptView"
             android:layout_width="0dp"
             android:layout_height="0dp"

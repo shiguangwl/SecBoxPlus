@@ -1,4 +1,4 @@
-package xyz.doikki.videocontroller.component
+package com.xxhoz.secbox.module.player.video.view
 
 import android.content.Context
 import android.util.AttributeSet
@@ -7,8 +7,6 @@ import android.view.View
 import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
 import com.xxhoz.secbox.R
 import xyz.doikki.videoplayer.controller.ControlWrapper
 import xyz.doikki.videoplayer.controller.IControlComponent

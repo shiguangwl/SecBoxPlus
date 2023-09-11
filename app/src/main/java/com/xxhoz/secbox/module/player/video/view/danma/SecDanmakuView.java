@@ -19,15 +19,20 @@ import androidx.core.content.ContextCompat;
 
 import com.xxhoz.secbox.R;
 
+import java.io.InputStream;
+import java.util.HashMap;
+
 import master.flame.danmaku.controller.DrawHandler;
+import master.flame.danmaku.danmaku.loader.ILoader;
+import master.flame.danmaku.danmaku.loader.IllegalDataException;
+import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.ui.widget.DanmakuView;
 import xyz.doikki.videoplayer.BuildConfig;
 import xyz.doikki.videoplayer.controller.ControlWrapper;
@@ -38,7 +43,8 @@ import xyz.doikki.videoplayer.util.PlayerUtils;
 public class SecDanmakuView extends DanmakuView implements IControlComponent {
 
     private final DanmakuContext mContext;
-    private final BaseDanmakuParser mParser;
+    private final BaseDanmakuParser mParser = new BiliDanmukuParser();;
+    private ControlWrapper controlWrapper;
 
     public SecDanmakuView(@NonNull Context context) {
         super(context);
@@ -53,29 +59,28 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
     }
 
     {
-        // 设置最大显示行数
-//        HashMap<Integer, Integer> maxLinesPair = new HashMap<>();
-//        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 5); // 滚动弹幕最大显示5行
+        // 设置弹幕的最大显示行数
+        HashMap<Integer, Integer> maxLinesPair = new HashMap<Integer, Integer>();
+        // TYPE_SCROLL_RL 从右至左滚动弹幕
+        // TYPE_SCROLL_LR 从左至右滚动弹幕
+        // TYPE_FIX_TOP 顶端固定弹幕
+        // TYPE_FIX_BOTTOM 底端固定弹幕
+
+        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 6); // 滚动弹幕最大显示行数
+
         // 设置是否禁止重叠
-//        HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<>();
-//        overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
-//        overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
+        HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<Integer, Boolean>();
+        overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_LR, true);
+        overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_BOTTOM, true);
 
         mContext = DanmakuContext.create();
         mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3)
-                .setDuplicateMergingEnabled(false)
-                .setScrollSpeedFactor(1.2f)
-                .setScaleTextSize(1.2f)
-//                .setCacheStuffer(new SpannedCacheStuffer(), null) // 图文混排使用SpannedCacheStuffer
-//                .setCacheStuffer(new BackgroundCacheStuffer(), null)  // 绘制背景使用BackgroundCacheStuffer
-                .setMaximumLines(null)
-                .preventOverlapping(null).setDanmakuMargin(40);
-        mParser = new BaseDanmakuParser() {
-            @Override
-            protected IDanmakus parse() {
-                return new Danmakus();
-            }
-        };
+                .setDuplicateMergingEnabled(false) //是否启用合并重复弹幕
+                .setScrollSpeedFactor(1.6f)//设置弹幕滚动速度系数,只对滚动弹幕有效
+                .setScaleTextSize(0.8f)  // 设置缩放字体大小
+                .setMaximumLines(maxLinesPair) //设置最大显示行数
+                .preventOverlapping(overlappingEnablePair); //设置防弹幕重叠，null为允许重叠
+
         setCallback(new DrawHandler.Callback() {
             @Override
             public void prepared() {
@@ -103,6 +108,7 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
 
     @Override
     public void attach(@NonNull ControlWrapper controlWrapper) {
+        this.controlWrapper = controlWrapper;
     }
 
     @Override
@@ -219,6 +225,26 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
 //        danmaku.borderColor = Color.GREEN;
         addDanmaku(danmaku);
 
+    }
+
+    public void loadDanmuStream(InputStream stream) {
+        ILoader loader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
+        try {
+            loader.load(stream);
+        } catch (IllegalDataException e) {
+            e.printStackTrace();
+        }
+        IDataSource<?> dataSource = loader.getDataSource();
+        mParser.load(dataSource);
+
+        if (isPrepared()) {
+            restart();
+        }
+
+        if (controlWrapper.isPlaying()) {
+            prepare(mParser, mContext);
+            seekTo(controlWrapper.getCurrentPosition());
+        }
     }
 
     private SpannableStringBuilder createSpannable(Drawable drawable) {

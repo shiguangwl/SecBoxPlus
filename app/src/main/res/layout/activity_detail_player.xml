@@ -159,14 +159,14 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginTop="8dp" />
 
-        <com.xxhoz.secbox.widget.RoundAngleImageView
-                app:img_radius="10dp"
+        <ImageView
+                android:scaleType="fitXY"
                 android:src="@drawable/loading_mask"
                 android:layout_width="65dp"
                 android:layout_height="90dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-                android:layout_marginEnd="14dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginTop="8dp"
                 android:id="@+id/roundAngleImageView" />
 

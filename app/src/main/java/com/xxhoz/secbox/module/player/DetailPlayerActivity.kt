@@ -35,27 +35,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.io.InputStream
 import java.net.UnknownHostException
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 
 class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
     DanmuVideoPlayer.PlayerCallback {
-
-
-    override fun getPageName() = PageName.DETAIL_PLAYER
-    override val inflater: (inflater: LayoutInflater) -> ActivityDetailPlayerBinding
-        get() = ActivityDetailPlayerBinding::inflate
-    val gson = GsonFactory.getSingletonGson()
-
-    companion object {
-        fun startActivity(context: Context, playInfoBean: PlayInfoBean) {
-            val intent = Intent(context, DetailPlayerActivity::class.java)
-            val bundle = Bundle()
-            bundle.putSerializable("playInfoBean", playInfoBean)
-            intent.putExtras(bundle)
-            context.startActivity(intent)
-        }
-    }
 
     private lateinit var playInfoBean: PlayInfoBean
     private lateinit var spiderSource: IBaseSource
@@ -80,6 +67,22 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
 
     private lateinit var channelTab: TabLayout
     private lateinit var episodeTab: TabLayout
+
+
+    override fun getPageName() = PageName.DETAIL_PLAYER
+    override val inflater: (inflater: LayoutInflater) -> ActivityDetailPlayerBinding
+        get() = ActivityDetailPlayerBinding::inflate
+    val gson = GsonFactory.getSingletonGson()
+
+    companion object {
+        fun startActivity(context: Context, playInfoBean: PlayInfoBean) {
+            val intent = Intent(context, DetailPlayerActivity::class.java)
+            val bundle = Bundle()
+            bundle.putSerializable("playInfoBean", playInfoBean)
+            intent.putExtras(bundle)
+            context.startActivity(intent)
+        }
+    }
 
     /**
      * 状态栏导航栏初始化
@@ -199,8 +202,30 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
             currentChannelData.episodes.get(currentEpisode)
         lifecycleScope.launch(Dispatchers.IO) {
 
+
+            if(isVideoPlatformURL(currenSelectEposode.urlCode)){
+                onStateVideoPlayerMsg("开始加载弹幕资源...")
+                try {
+                    // TODO 缓存逻辑
+                    val danmus: String = HttpUtil.get(BaseConfig.DANMAKU_API + currenSelectEposode.urlCode)
+//                    LogUtils.d("弹幕结果数据:" + danmus)
+                    setDanmu(danmus.byteInputStream())
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toaster.show("加载弹幕资源失败")
+                }
+            }
+
             val playUrl:String = try {
-                getPlayUrl(currentChannelData.channelFlag, currenSelectEposode, currentParseBean)
+
+
+
+
+                var parseBeanList: List<ParseBean> = SourceManger.getParseBeanList()
+                // 只要嗅探和JSON
+                parseBeanList = parseBeanList.filter { !it.name.equals("莫问前程") && ( it.type == 1 || it.type == 0 )}
+
+                getPlayUrl(currentChannelData.channelFlag, currenSelectEposode, parseBeanList)
             } catch (e: GlobalException) {
                 Toaster.show(e.message)
                 return@launch
@@ -211,15 +236,31 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
             }
 
             LogUtils.d("最终播放链接:  ${playUrl}")
-            val epsodeEntity: EpsodeEntity =
-                EpsodeEntity(
-                    currenSelectEposode.name,
-                    playUrl
-                )
+            val epsodeEntity: EpsodeEntity = EpsodeEntity(
+                currenSelectEposode.name,
+                playUrl
+            )
+
             runOnUiThread(){
                 startPlay(epsodeEntity)
             }
         }
+    }
+
+
+    fun isVideoPlatformURL(url: String?): Boolean {
+        // 定义匹配视频平台网址的正则表达式
+        val regex =
+            "https?://(www\\.)?(mgtv\\.com|bilibili\\.com|v\\.qq\\.com|v\\.youku\\.com|www\\.iqiyi\\.com)/.*"
+
+        // 使用正则表达式匹配 URL
+        val pattern: Pattern = Pattern.compile(regex)
+        val matcher: Matcher = pattern.matcher(url)
+        return matcher.matches()
+    }
+
+    private fun setDanmu(stream: InputStream) {
+        videoPlayer.setDanmuStream(stream)
     }
 
     @MainThread
@@ -237,7 +278,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
     private fun getPlayUrl(
         channelFlag: String,
         currenSelectEposode: VideoDetailBean.Value,
-        parseBean: ParseBean,
+        parseBean: List<ParseBean>,
     ): String {
         val playLinkBean: PlayLinkBean =
             spiderSource.playInfo(channelFlag, currenSelectEposode.urlCode)
@@ -247,20 +288,31 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
             // 解析播放链接
             onStateVideoPlayerMsg("解析数据中...")
 
-            val parseRsult = try {
-                val jsonObject =
-                    HttpUtil.get(parseBean.url + playLinkBean.url, JSONObject::class.java)
-                jsonObject.getString("url")
-            } catch (e: Exception) {
-                e.printStackTrace()
-                throw GlobalException.of("[${parseBean.name}] 解析失败")
+            var parseRsult :String = ""
+            for (parseBean1 in parseBean) {
+                try {
+                    val jsonObject = HttpUtil.get(parseBean1.url + playLinkBean.url, JSONObject::class.java)
+                    parseRsult = jsonObject.getString("url")
+                }catch (e:Exception){
+                    Toaster.show("[${parseBean1.name}] 解析失败,尝试切换解析")
+                    e.printStackTrace()
+                    continue
+                }
+
+                if (parseRsult.isNotEmpty()){
+                    break
+                }
             }
+
+            if (parseRsult.equals("")){
+                throw GlobalException.of("解析失败,请尝试切换播放源")
+            }
+
             playLinkBean.url = parseRsult
 
         } else if (playLinkBean.parse == 0) {
             // TODO 嗅探播放链接
-            onStateVideoPlayerMsg("开始嗅探链接...")
-
+            onStateVideoPlayerMsg("嗅探资源占时无法播放,请切换源")
         }
 
         return playLinkBean.url
@@ -302,7 +354,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
             channelFlagsAndEpisodes = videoDetailBean!!.getChannelFlagsAndEpisodes()
         } catch (e: Exception) {
             showErrorView()
-            LogUtils.d("获取影视详情数据失败: ${e.message}")
+            LogUtils.i("获取影视详情数据失败: ${e.message}")
             e.printStackTrace()
             return
         }
@@ -325,7 +377,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
                 viewBinding.descText.text = removeHtmlAndWhitespace(it.vod_content)
                 viewBinding.textView.text = "${it.vod_year?:"-"}  /  ${it.type_name?:"-"}  /  ${it.vod_director?:"-"}"
             }
-            viewBinding.currentSourceText.text = BaseConfig.getCurrentSource()!!.sourceBean.name
+            viewBinding.currentSourceText.text = spiderSource.sourceBean.name
             // 选择channel自动播放
             channelTab.getTabAt(currentEpisode)?.select()
             viewBinding.promptView.hide()

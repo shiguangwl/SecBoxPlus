@@ -15,6 +15,7 @@ import xyz.doikki.videocontroller.component.ErrorView
 import xyz.doikki.videocontroller.component.GestureView
 import xyz.doikki.videocontroller.component.TopTitleView
 import xyz.doikki.videoplayer.player.VideoView
+import java.io.InputStream
 
 /**
  * 包含弹幕的播放器
@@ -148,8 +149,8 @@ class DanmuVideoPlayer : VideoView {
     /**
      * 加载弹幕数据
      */
-    fun loadDamu(){
-
+    fun setDanmuStream(stream: InputStream){
+        vDanmakuView.loadDanmuStream(stream)
     }
 
     interface PlayerCallback {

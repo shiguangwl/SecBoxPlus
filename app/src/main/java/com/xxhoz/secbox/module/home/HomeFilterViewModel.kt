@@ -24,7 +24,13 @@ class HomeFilterViewModel : BaseRecyclerViewModel() {
             val viewDataList = mutableListOf<BaseViewData<*>>()
 
             val currentSource: IBaseSource = BaseConfig.getCurrentSource()!!
-            val categoryVideoList: CategoryPageBean = currentSource.categoryVideoList(category.type_id, currentPageNum.toString(), conditons)
+            val categoryVideoList: CategoryPageBean = try {
+                currentSource.categoryVideoList(category.type_id, currentPageNum.toString(), conditons)
+            } catch (e: Exception) {
+                LogUtils.d("按条件检索数据失败:" + e.message)
+                e.printStackTrace()
+                return@launch
+            }
             LogUtils.d("按条件检索数据:" + categoryVideoList)
             categoryVideoList.list.forEach {
                 viewDataList.add(VideoViewData(it))

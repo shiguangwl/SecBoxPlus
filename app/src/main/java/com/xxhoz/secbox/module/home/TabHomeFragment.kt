@@ -18,6 +18,7 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
 import com.hjq.toast.Toaster
 import com.lxj.xpopup.XPopup
+import com.lxj.xpopup.enums.PopupAnimation
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.base.BaseFragment
@@ -25,6 +26,7 @@ import com.xxhoz.secbox.constant.EventName
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeTabBinding
 import com.xxhoz.secbox.eventbus.XEventBus
+import com.xxhoz.secbox.module.home.view.NotificationMsgPopup
 import com.xxhoz.secbox.module.search.SearchActivity
 import com.xxhoz.secbox.parserCore.bean.CategoryBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
@@ -164,6 +166,16 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
         }
         //要执行这一句才是真正将两者绑定起来
         mediator!!.attach()
+
+
+        val notificationMsgPopup = NotificationMsgPopup(requireContext())
+        notificationMsgPopup.setMsg(BaseConfig.NOTION)
+
+        XPopup.Builder(context)
+            .isDestroyOnDismiss(true)
+            .popupAnimation(PopupAnimation.TranslateFromTop)
+            .asCustom(notificationMsgPopup)
+            .show()
     }
 
     private fun getCateGoryNameById(position: Int): String {

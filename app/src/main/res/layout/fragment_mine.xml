@@ -44,12 +44,11 @@
                 app:layout_constraintVertical_chainStyle="packed" />
 
             <TextView
-                    android:visibility="invisible"
                 android:id="@+id/tv_user_phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="用户信息"
+                android:text="demo"
                 android:textColor="#801C2C2A"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@id/iv_user_icon"

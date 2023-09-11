@@ -5,14 +5,22 @@ import com.hjq.gson.factory.GsonFactory
 import com.xxhoz.secbox.util.LogUtils
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
+import okhttp3.ResponseBody
+import java.io.ByteArrayInputStream
 import java.io.IOException
+import java.util.zip.Inflater
+import java.util.zip.InflaterInputStream
+
 
 object HttpUtil {
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .addInterceptor(DeflateInterceptor())
+        .build()
     private val gson = GsonFactory.getSingletonGson()
 
 
@@ -122,4 +130,27 @@ object HttpUtil {
             }
         })
     }
+
+    class DeflateInterceptor : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val originalResponse = chain.proceed(chain.request())
+            val originalBody = originalResponse.body
+
+            // 检查响应是否使用 Deflate 压缩
+            if ("deflate".equals(originalResponse.header("Content-Encoding"), true)) {
+                // 解压 Deflate 数据
+                val inflater = Inflater(true)
+                val inflaterInputStream = InflaterInputStream(ByteArrayInputStream(originalBody?.bytes()), inflater)
+                val uncompressedBody = ResponseBody.create(originalBody?.contentType(), inflaterInputStream.readBytes())
+
+                // 创建一个新的响应
+                return originalResponse.newBuilder()
+                    .body(uncompressedBody)
+                    .build()
+            }
+
+            return originalResponse
+        }
+    }
+
 }

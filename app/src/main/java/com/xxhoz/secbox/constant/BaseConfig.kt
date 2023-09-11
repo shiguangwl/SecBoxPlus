@@ -8,8 +8,13 @@ import com.xxhoz.secbox.util.LogUtils
 
 object BaseConfig {
 
-    val CONFIG_JSON: String = "https://shiguang.cachefly.net/config.json"
+    val CONFIG_JSON: String = "https://secbox.xxhoz.com/config.json"
 
+    /**
+     * 弹幕API
+     */
+
+    var DANMAKU_API = ""
     /**
      * 加载爬虫配置URL
      */
@@ -18,7 +23,7 @@ object BaseConfig {
     /**
      * 默认源
      */
-     val DefualtSourceKey = "Kuaikan"
+     val DefualtSourceKey = "AppYs_南瓜"
 
     /**
      * 公告

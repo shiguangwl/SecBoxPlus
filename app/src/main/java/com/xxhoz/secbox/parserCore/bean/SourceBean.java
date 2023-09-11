@@ -1,9 +1,10 @@
 package com.xxhoz.secbox.parserCore.bean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SourceBean {
+public class SourceBean implements Serializable {
     private String key;
     private String name;
     private String api;
