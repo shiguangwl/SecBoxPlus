@@ -194,6 +194,8 @@
 
 
         <com.google.android.material.tabs.TabLayout
+                app:tabMaxWidth="1000dp"
+                app:tabMinWidth="5dp"
                 app:tabIndicatorFullWidth="false"
                 app:tabGravity="start"
                 app:tabRippleColor="@color/transparent"

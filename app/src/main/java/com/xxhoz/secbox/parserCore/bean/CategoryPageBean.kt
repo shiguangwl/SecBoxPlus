@@ -9,5 +9,5 @@ data class CategoryPageBean(
     val pagecount: Int,
     val limit: Int,
     val total: Int,
-    val list: List<VideoBean>
+    val list: List<VideoBean>?
 )

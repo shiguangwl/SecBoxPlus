@@ -10,6 +10,7 @@ import com.xxhoz.secbox.item.VideoViewData
 import com.xxhoz.secbox.parserCore.bean.CategoryBean
 import com.xxhoz.secbox.parserCore.bean.CategoryPageBean
 import com.xxhoz.secbox.util.LogUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class HomeFilterViewModel : BaseRecyclerViewModel() {
@@ -17,26 +18,31 @@ class HomeFilterViewModel : BaseRecyclerViewModel() {
     var currentPageNum = 1
 
     lateinit var category: CategoryBean.ClassType
-    lateinit var conditons: HashMap<String,String>
+    lateinit var conditons: HashMap<String, String>
 
     override fun loadData(isLoadMore: Boolean, isReLoad: Boolean, page: Int) {
-        viewModelScope.launch() {
-            val viewDataList = mutableListOf<BaseViewData<*>>()
-
-            val currentSource: IBaseSource = BaseConfig.getCurrentSource()!!
-            val categoryVideoList: CategoryPageBean = try {
-                currentSource.categoryVideoList(category.type_id, currentPageNum.toString(), conditons)
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val viewDataList = mutableListOf<BaseViewData<*>>()
+                LogUtils.d("type_id:" + category.type_id + "currentPageNum:" + currentPageNum.toString() + "conditons:" + conditons)
+                val currentSource: IBaseSource = BaseConfig.getCurrentSource()!!
+                val categoryVideoList: CategoryPageBean = currentSource.categoryVideoList(
+                    category.type_id,
+                    currentPageNum.toString(),
+                    conditons
+                )
+                LogUtils.d("按条件检索数据:" + categoryVideoList)
+                categoryVideoList.list?.forEach {
+                    viewDataList.add(VideoViewData(it))
+                }
+                postData(isLoadMore, viewDataList)
+                currentPageNum++
             } catch (e: Exception) {
                 LogUtils.d("按条件检索数据失败:" + e.message)
                 e.printStackTrace()
+                postError(isLoadMore)
                 return@launch
             }
-            LogUtils.d("按条件检索数据:" + categoryVideoList)
-            categoryVideoList.list.forEach {
-                viewDataList.add(VideoViewData(it))
-            }
-            postData(isLoadMore, viewDataList)
-            currentPageNum++
         }
     }
 

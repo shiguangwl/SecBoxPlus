@@ -135,10 +135,10 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
                 show();
                 break;
             case VideoView.STATE_PREPARING:
-                if (isPrepared()) {
-                    restart();
-                }
-                prepare(mParser, mContext);
+                // if (isPrepared()) {
+                //     restart();
+                // }
+                // prepare(mParser, mContext);
                 break;
             case VideoView.STATE_PLAYING:
                 if (isPrepared() && isPaused()) {
@@ -238,12 +238,14 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
         mParser.load(dataSource);
 
         if (isPrepared()) {
-            restart();
+            release();
         }
 
-        if (controlWrapper.isPlaying()) {
-            prepare(mParser, mContext);
-            seekTo(controlWrapper.getCurrentPosition());
+        prepare(mParser, mContext);
+        seekTo(controlWrapper.getCurrentPosition());
+
+        if (!controlWrapper.isPlaying()) {
+            pause();
         }
     }
 

@@ -32,10 +32,12 @@ import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
 import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.setImageUrl
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.InputStream
+import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -152,7 +154,6 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
                 }
                 episodeTab.getTabAt(currentEpisode)!!.select()
                 Handler(Looper.getMainLooper()).postDelayed({
-                    // FIXME 不加延迟不生效???
                     episodeTab.setScrollPosition(currentEpisode, 0F, true);
                 },400)
             }
@@ -203,35 +204,27 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
         lifecycleScope.launch(Dispatchers.IO) {
 
 
-            if(isVideoPlatformURL(currenSelectEposode.urlCode)){
-                onStateVideoPlayerMsg("开始加载弹幕资源...")
-                try {
-                    // TODO 缓存逻辑
-                    val danmus: String = HttpUtil.get(BaseConfig.DANMAKU_API + currenSelectEposode.urlCode)
-//                    LogUtils.d("弹幕结果数据:" + danmus)
-                    setDanmu(danmus.byteInputStream())
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Toaster.show("加载弹幕资源失败")
-                }
+            async {
+                loadDanmu(currenSelectEposode)
             }
 
-            val playUrl:String = try {
-
-
-
-
+            var playUrl:String = ""
+            try {
                 var parseBeanList: List<ParseBean> = SourceManger.getParseBeanList()
-                // 只要嗅探和JSON
-                parseBeanList = parseBeanList.filter { !it.name.equals("莫问前程") && ( it.type == 1 || it.type == 0 )}
-
-                getPlayUrl(currentChannelData.channelFlag, currenSelectEposode, parseBeanList)
+                playUrl = getPlayUrl(currentChannelData.channelFlag, currenSelectEposode, parseBeanList)
             } catch (e: GlobalException) {
                 Toaster.show(e.message)
                 return@launch
             } catch (e: Exception) {
                 Toaster.show("获取播放链接失败,未知错误")
                 e.printStackTrace()
+                return@launch
+            }finally {
+                if (playUrl.isEmpty()){
+                    videoPlayer.setLoadingMsg("获取播放链接失败")
+                }
+            }
+            if (playUrl.isEmpty()){
                 return@launch
             }
 
@@ -243,6 +236,26 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
 
             runOnUiThread(){
                 startPlay(epsodeEntity)
+            }
+        }
+    }
+
+    private suspend fun loadDanmu(currenSelectEposode: VideoDetailBean.Value) {
+        if (isVideoPlatformURL(currenSelectEposode.urlCode)) {
+            Toaster.show("后台加载弹幕资源中")
+            try {
+                val danmus: String =
+                    HttpUtil.get(BaseConfig.DANMAKU_API + currenSelectEposode.urlCode)
+                LogUtils.d("弹幕加载内容: " + danmus.substring(0,1000))
+                withContext(Dispatchers.Main){
+                    setDanmu(danmus.byteInputStream())
+                }
+                Toaster.show("装载弹幕成功")
+            } catch (e: SocketTimeoutException) {
+                Toaster.show("加载弹幕超时,请重试")
+            } catch (e: Exception) {
+                Toaster.show("加载弹幕资源失败")
+                e.printStackTrace()
             }
         }
     }
@@ -293,6 +306,9 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
                 try {
                     val jsonObject = HttpUtil.get(parseBean1.url + playLinkBean.url, JSONObject::class.java)
                     parseRsult = jsonObject.getString("url")
+                    if (parseRsult.isEmpty()){
+                        continue
+                    }
                 }catch (e:Exception){
                     Toaster.show("[${parseBean1.name}] 解析失败,尝试切换解析")
                     e.printStackTrace()
@@ -343,9 +359,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
 
     private suspend fun initData() {
         playInfoBean = intent.getSerializableExtra("playInfoBean") as PlayInfoBean
-        // TODO 空指针检测
         spiderSource = SourceManger.getSpiderSource(playInfoBean.sourceKey)!!
-
 
         try {
             videoDetailBean = spiderSource.videoDetail(listOf(playInfoBean.videoBean.vod_id))

@@ -64,4 +64,5 @@
     <color name="white_90_color">#E6FFFFFF</color>
     <color name="bg_window">#FFFFFFFF</color>
     <color name="bg_image">#0A000000</color>
+    <color name="black5">#0D000000</color>
 </resources>

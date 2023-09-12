@@ -51,19 +51,13 @@ class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilte
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        if (isLoading){
-            return
-        }
         viewBinding.loadPromptView.showLoading()
         initView()
         viewBinding.loadPromptView.hide()
         isLoading = true
     }
+
+
 
     private fun initView() {
         LogUtils.d("当前分类:${category.type_id} | ${category.type_name}")

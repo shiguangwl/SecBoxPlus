@@ -19,7 +19,6 @@ import com.xxhoz.secbox.databinding.FragmentHomeBinding
 import com.xxhoz.secbox.module.player.DetailPlayerActivity
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 import com.xxhoz.secbox.persistence.XKeyValue
-import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.widget.GridItemDecoration
 
 /**
@@ -43,6 +42,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding> {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        initData()
     }
 
     private fun initView() {
@@ -56,14 +56,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding> {
                 .setItemDecoration(GridItemDecoration(activity, HOME_SPAN_COUNT))
                 .setOnItemClickListener(object : XRecyclerView.OnItemClickListener {
                     override fun onItemClick(parent: RecyclerView, view: View, viewData: BaseViewData<*>, position: Int, id: Long) {
-                        val playInfoBean: PlayInfoBean = PlayInfoBean(
-                            XKeyValue.getString(Key.CURRENT_SOURCE_KEY, DefualtSourceKey),
-                            viewData.value as VideoBean,
-                            1
-                        )
-                        LogUtils.i("条目点击: ${playInfoBean}")
-                        DetailPlayerActivity.startActivity(context!!, playInfoBean)
-
+                        onVideoItemClick(viewData)
                     }
                 })
                 .setOnItemChildViewClickListener(object : XRecyclerView.OnItemChildViewClickListener {
@@ -75,19 +68,26 @@ class HomeFragment : BaseFragment<FragmentHomeBinding> {
                 })
         )
 
-        // 更新数据
+    }
+
+
+    fun initData() {
+        // 加载推荐数据
         homeVideoList?.let {
             viewModel.loadData(it)
         }
+    }
 
-//        XEventBus.observe(viewLifecycleOwner, EventName.REFRESH_HOME_LIST) { message: String ->
-//            viewBinding.rvList.refreshList()
-//            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-//        }
-//
-//        XEventBus.observe(viewLifecycleOwner, EventName.TEST) { message: String ->
-//            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-//        }
+    /**
+     * 条目点击
+     */
+    private fun onVideoItemClick(viewData: BaseViewData<*>) {
+        val playInfoBean: PlayInfoBean = PlayInfoBean(
+            XKeyValue.getString(Key.CURRENT_SOURCE_KEY, DefualtSourceKey),
+            viewData.value as VideoBean,
+            1
+        )
+        DetailPlayerActivity.startActivity(requireContext(), playInfoBean)
     }
 
     @PageName

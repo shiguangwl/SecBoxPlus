@@ -2,13 +2,15 @@ package com.xxhoz.constant
 
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.parserCore.parserImpl.IBaseSource
+import com.xxhoz.secbox.bean.ConfigBean
 import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.LogUtils
 
 object BaseConfig {
-
     val CONFIG_JSON: String = "https://secbox.xxhoz.com/config.json"
+
+    lateinit var CONFIG_BEAN: ConfigBean
 
     /**
      * 弹幕API
@@ -23,7 +25,7 @@ object BaseConfig {
     /**
      * 默认源
      */
-     val DefualtSourceKey = "AppYs_南瓜"
+     val DefualtSourceKey = "Qtv"
 
     /**
      * 公告
@@ -40,7 +42,7 @@ object BaseConfig {
     /**
      * 获取当前源,如果没有则返回默认源,如果没有默认源则返回null
      */
-    public fun getCurrentSource(): IBaseSource? {
+    fun getCurrentSource(): IBaseSource? {
         val sourceBeanList: List<SourceBean> = SourceManger.getSourceBeanList()
         if (sourceBeanList.size == 0) {
             return null

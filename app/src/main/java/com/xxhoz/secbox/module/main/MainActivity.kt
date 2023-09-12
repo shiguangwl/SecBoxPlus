@@ -81,7 +81,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         )
 
         viewBinding.fragmentTabHost.run {
-            // 调用setup()方法，设置FragmentManager，以及指定用于装载Fragment的布局容器
             setup(this@MainActivity, supportFragmentManager, viewBinding.fragmentContainer.id)
             tabs.forEach {
                 val (id, title, icon, fragmentClz) = it
@@ -113,7 +112,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         this.doubleBackToExitPressedOnce = true
-        Toaster.show("再按一次返回键退出程序")
+        Toaster.show(getString(R.string.press_again_exit_app))
 
         Handler(Looper.getMainLooper()).postDelayed({
             doubleBackToExitPressedOnce = false

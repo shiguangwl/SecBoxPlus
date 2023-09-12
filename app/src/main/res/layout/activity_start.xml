@@ -32,7 +32,7 @@
             android:textColor="#263238" />
 
     <TextView
-            android:text="DEV"
+            android:text="Demo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textView6"

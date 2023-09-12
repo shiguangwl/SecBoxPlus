@@ -63,6 +63,8 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // 首页顶部信息
+        showNotice()
         // 基本事件监听
         initView()
         // 数据加载
@@ -75,6 +77,19 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
         }
     }
 
+    /**
+     * 首页顶部信息,公告
+     */
+    private fun showNotice() {
+        val notificationMsgPopup = NotificationMsgPopup(requireContext())
+        notificationMsgPopup.setMsg(BaseConfig.NOTION)
+        XPopup.Builder(context)
+            .isDestroyOnDismiss(true)
+            .popupAnimation(PopupAnimation.TranslateFromTop)
+            .asCustom(notificationMsgPopup)
+            .show()
+    }
+
     private fun initData() {
         lifecycleScope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
@@ -84,7 +99,9 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
             val currentSource: IBaseSource? = BaseConfig.getCurrentSource()
             currentSource?.run {
                 try {
+                    // 获取首页数据
                     homeVideoList = homeVideoList()
+                    // 获取分类数据
                     categoryInfo = categoryInfo()
                 }catch (e:Exception){
                     e.printStackTrace()
@@ -99,6 +116,7 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
             }
 
             withContext(Dispatchers.Main) {
+                // 初始化tab选项卡
                 initViewFragments()
                 viewBinding.promptView.hide()
             }
@@ -113,12 +131,12 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
         }
         // 设置源显示
         val sourceName: String? = BaseConfig.getCurrentSource()?.sourceBean?.name
-        viewBinding.currentSourceText.text = (sourceName + "  ▼") ?: "> 选择推荐源 <"
+        viewBinding.currentSourceText.text = (sourceName + "  ▼")
 
         // 源选择
         viewBinding.currentSourceText.setOnClickListener(){
             XPopup.Builder(context)
-                .atView(viewBinding.tabLayout)
+                    .atView(viewBinding.tabLayout)
                 .hasShadowBg(false)
                 .asCustom(BottomSheetSource(requireContext()))
                 .show()
@@ -149,6 +167,7 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
             }
         //viewPager 页面切换监听监听
         viewBinding.viewPager.registerOnPageChangeCallback(changeCallback)
+        viewBinding.viewPager.offscreenPageLimit = 20
         // tab样式
         mediator = TabLayoutMediator(
             viewBinding.tabLayout, viewBinding.viewPager
@@ -166,16 +185,6 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
         }
         //要执行这一句才是真正将两者绑定起来
         mediator!!.attach()
-
-
-        val notificationMsgPopup = NotificationMsgPopup(requireContext())
-        notificationMsgPopup.setMsg(BaseConfig.NOTION)
-
-        XPopup.Builder(context)
-            .isDestroyOnDismiss(true)
-            .popupAnimation(PopupAnimation.TranslateFromTop)
-            .asCustom(notificationMsgPopup)
-            .show()
     }
 
     private fun getCateGoryNameById(position: Int): String {

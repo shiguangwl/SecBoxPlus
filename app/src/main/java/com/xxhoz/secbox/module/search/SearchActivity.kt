@@ -146,6 +146,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             object : UniversalAdapter.DataViewBind<String> {
                 override fun exec(data: String, view: View) {
                     val bind = ItemSearchResultSourceBinding.bind(view!!)
+                    bind.sourceText.background = AppCompatResources.getDrawable(getActivity()!!, R.color.white)
                     bind.sourceText.text = data
                     if (data.equals(selectSourceKey)){
                         bind.sourceText.background = AppCompatResources.getDrawable(getActivity()!!, R.color.theme_color)
@@ -225,10 +226,10 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             sourceList.add(iBaseSource.sourceBean.name)
             sourceAdapter.notifyDataSetChanged()
 
-            // 添加结果
-            resultItemList.addAll(searchVideo)
-            resultAdapter.notifyDataSetChanged()
-
+            if (selectSourceKey.equals(ALL_DATA)){
+                resultItemList.addAll(searchVideo)
+                resultAdapter.notifyDataSetChanged()
+            }
             allResultItemList.put(iBaseSource.sourceBean.name, searchVideo)
             if (viewBinding.promptView.isShowing()) {
                 viewBinding.promptView.hide()
@@ -267,6 +268,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             1
         )
         LogUtils.i("条目点击: ${playInfoBean}")
+        searchJobs.forEach {
+            it.cancel()
+        }
         DetailPlayerActivity.startActivity(this, playInfoBean)
     }
 
