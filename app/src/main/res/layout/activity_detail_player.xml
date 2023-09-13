@@ -159,7 +159,11 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginTop="8dp" />
 
-        <ImageView
+        <com.xxhoz.secbox.widget.RoundAngleImageView
+                app:img_left_top_radius="@dimen/item_radius"
+                app:img_right_top_radius="@dimen/item_radius"
+                app:img_left_bottom_radius="@dimen/item_radius"
+                app:img_right_bottom_radius="@dimen/item_radius"
                 android:scaleType="fitXY"
                 android:src="@drawable/loading_mask"
                 android:layout_width="65dp"

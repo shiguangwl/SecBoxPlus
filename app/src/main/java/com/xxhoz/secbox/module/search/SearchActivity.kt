@@ -181,6 +181,11 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
      * 搜索
      */
     private fun startSearch(query: String) {
+        searchJobs.forEach {
+            it.cancel()
+        }
+        searchJobs.clear()
+
         Toaster.show("开始搜索: ${query}")
         sourceList.clear()
         resultItemList.clear()

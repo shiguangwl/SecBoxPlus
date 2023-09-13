@@ -250,7 +250,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
                 withContext(Dispatchers.Main){
                     setDanmu(danmus.byteInputStream())
                 }
-                Toaster.show("装载弹幕成功")
+                Toaster.show("弹幕正在装载")
             } catch (e: SocketTimeoutException) {
                 Toaster.show("加载弹幕超时,请重试")
             } catch (e: Exception) {
@@ -499,6 +499,26 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
      */
     override fun selectPartsClick(position: Int) {
         episodeTab.getTabAt(position)?.select()
+    }
+
+    /**
+     * 播放错误从试按钮
+     */
+    override fun retryClick() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            try {
+                viewBinding.promptView.showLoading()
+                withContext(Dispatchers.IO) {
+                    initData()
+                }
+            } catch (e: UnknownHostException) {
+                Toaster.show("请检查网络连接")
+                showErrorView()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showErrorView()
+            }
+        }
     }
 
     fun removeHtmlAndWhitespace(input: String): String {

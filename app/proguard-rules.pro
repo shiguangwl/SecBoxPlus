@@ -320,6 +320,10 @@
 #列出从apk中删除的代码
 -printusage unused.txt
 
+# 解决AGPBI警告
+-keepattributes Exceptions
+-keepattributes Exceptions,InnerClasses,...
+-keepattributes EnclosingMethod
 
 -dontwarn org.bouncycastle.jsse.BCSSLParameters
 -dontwarn org.bouncycastle.jsse.BCSSLSocket

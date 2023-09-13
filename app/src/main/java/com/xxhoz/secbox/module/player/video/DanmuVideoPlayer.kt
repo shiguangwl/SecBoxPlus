@@ -8,10 +8,10 @@ import com.xxhoz.secbox.bean.EpsodeEntity
 import com.xxhoz.secbox.module.player.popup.VideoEpisodePopup
 import com.xxhoz.secbox.module.player.popup.VideoSpeedPopup
 import com.xxhoz.secbox.module.player.video.view.BottomControlView
+import com.xxhoz.secbox.module.player.video.view.ErrorView
 import com.xxhoz.secbox.module.player.video.view.danma.SecDanmakuView
 
 import xyz.doikki.videocontroller.component.CompleteView
-import xyz.doikki.videocontroller.component.ErrorView
 import xyz.doikki.videocontroller.component.GestureView
 import xyz.doikki.videocontroller.component.TopTitleView
 import xyz.doikki.videoplayer.player.VideoView
@@ -69,9 +69,10 @@ class DanmuVideoPlayer : VideoView {
                 // 播放完成界面
                 val completeView = CompleteView(getContext())
                 // 错误页面
-                val errorView = ErrorView(getContext())
-    //                // 加载UI
-    //                val prepareView = PrepareView(getContext())
+                val errorView: ErrorView = ErrorView(getContext())
+                errorView.setOnRetryListener(){
+                    actionCallback.retryClick()
+                }
                 // 顶部
                 topTitleView = TopTitleView(getContext())
                 // 底部
@@ -157,5 +158,6 @@ class DanmuVideoPlayer : VideoView {
         fun nextClick()
         fun throwingScreenClick()
         fun selectPartsClick(position: Int)
+        fun retryClick()
     }
 }
