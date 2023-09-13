@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class HomeFilterViewModel : BaseRecyclerViewModel() {
 
-    var currentPageNum = 1
+
 
     lateinit var category: CategoryBean.ClassType
     lateinit var conditons: HashMap<String, String>
@@ -24,11 +24,11 @@ class HomeFilterViewModel : BaseRecyclerViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val viewDataList = mutableListOf<BaseViewData<*>>()
-                LogUtils.d("type_id:" + category.type_id + "currentPageNum:" + currentPageNum.toString() + "conditons:" + conditons)
+                LogUtils.d("type_id:" + category.type_id + "currentPageNum:" + page+1 + "conditons:" + conditons)
                 val currentSource: IBaseSource = BaseConfig.getCurrentSource()!!
                 val categoryVideoList: CategoryPageBean = currentSource.categoryVideoList(
                     category.type_id,
-                    currentPageNum.toString(),
+                    (page+1).toString(),
                     conditons
                 )
                 LogUtils.d("按条件检索数据:" + categoryVideoList)
@@ -36,7 +36,6 @@ class HomeFilterViewModel : BaseRecyclerViewModel() {
                     viewDataList.add(VideoViewData(it))
                 }
                 postData(isLoadMore, viewDataList)
-                currentPageNum++
             } catch (e: Exception) {
                 LogUtils.d("按条件检索数据失败:" + e.message)
                 e.printStackTrace()

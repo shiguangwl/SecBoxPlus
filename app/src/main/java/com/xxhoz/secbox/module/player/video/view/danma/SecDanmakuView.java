@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
@@ -17,7 +19,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.xxhoz.constant.BaseConfig;
 import com.xxhoz.secbox.R;
+import com.xxhoz.secbox.util.LogUtils;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -34,7 +38,6 @@ import master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.ui.widget.DanmakuView;
-import xyz.doikki.videoplayer.BuildConfig;
 import xyz.doikki.videoplayer.controller.ControlWrapper;
 import xyz.doikki.videoplayer.controller.IControlComponent;
 import xyz.doikki.videoplayer.player.VideoView;
@@ -45,6 +48,7 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
     private final DanmakuContext mContext;
     private final BaseDanmakuParser mParser = new BiliDanmukuParser();;
     private ControlWrapper controlWrapper;
+    private int playState;
 
     public SecDanmakuView(@NonNull Context context) {
         super(context);
@@ -66,7 +70,7 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
         // TYPE_FIX_TOP 顶端固定弹幕
         // TYPE_FIX_BOTTOM 底端固定弹幕
 
-        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 6); // 滚动弹幕最大显示行数
+        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 7); // 滚动弹幕最大显示行数
 
         // 设置是否禁止重叠
         HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<Integer, Boolean>();
@@ -77,7 +81,7 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
         mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3)
                 .setDuplicateMergingEnabled(false) //是否启用合并重复弹幕
                 .setScrollSpeedFactor(1.6f)//设置弹幕滚动速度系数,只对滚动弹幕有效
-                .setScaleTextSize(0.8f)  // 设置缩放字体大小
+                .setScaleTextSize(0.9f)  // 设置缩放字体大小
                 .setMaximumLines(maxLinesPair) //设置最大显示行数
                 .preventOverlapping(overlappingEnablePair); //设置防弹幕重叠，null为允许重叠
 
@@ -85,6 +89,13 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
             @Override
             public void prepared() {
                 start();
+                new Handler(Looper.getMainLooper()).post(()->{
+                    seekTo(controlWrapper.getCurrentPosition());
+                    LogUtils.INSTANCE.d("playState: " + playState   + "    VideoView.STATE_PLAYING:"+ VideoView.STATE_PLAYING);
+                    if (playState != VideoView.STATE_PLAYING) {
+                        pause();
+                    }
+                });
             }
 
             @Override
@@ -102,7 +113,7 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
 
             }
         });
-        showFPS(BuildConfig.DEBUG);
+        showFPS(BaseConfig.INSTANCE.getDEBUG());
         enableDanmakuDrawingCache(true);
     }
 
@@ -123,6 +134,8 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
 
     @Override
     public void onPlayStateChanged(int playState) {
+
+        this.playState = playState;
         switch (playState) {
             case VideoView.STATE_IDLE:
                 release();
@@ -242,11 +255,6 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
         }
 
         prepare(mParser, mContext);
-        seekTo(controlWrapper.getCurrentPosition());
-
-        if (!controlWrapper.isPlaying()) {
-            pause();
-        }
     }
 
     private SpannableStringBuilder createSpannable(Drawable drawable) {

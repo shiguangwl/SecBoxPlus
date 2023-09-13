@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.MainThread
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.xxhoz.constant.BaseConfig
@@ -24,8 +24,6 @@ import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.widget.ConditionTabView
 import com.xxhoz.secbox.widget.GridItemDecoration
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 /**
@@ -59,6 +57,7 @@ class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilte
 
 
 
+    @MainThread
     private fun initView() {
         LogUtils.d("当前分类:${category.type_id} | ${category.type_name}")
         LogUtils.d("当前Filter:${categoryFilters}")
@@ -67,17 +66,14 @@ class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilte
         // 渲染赛选条件
         conditionView.addTabLine(categoryFilters){
             viewModel.conditons = it
-//            Toaster.showLong("条件变化: " +Gson().toJson(it))
-            lifecycleScope.launch(Dispatchers.IO){
-                itemListView.refreshList()
-            }
+            itemListView.startRefresh()
         }
         viewModel.conditons = conditionView.conditions
 
         itemListView.init(
             XRecyclerView.Config()
                 .setViewModel(viewModel)
-                .setPullRefreshEnable(false)
+                .setPullRefreshEnable(true)
                 .setPullUploadMoreEnable(true)
                 .setLayoutManager(GridLayoutManager(activity, HomeFilterFragment.HOME_SPAN_COUNT))
                 .setItemDecoration(GridItemDecoration(activity, HomeFilterFragment.HOME_SPAN_COUNT))

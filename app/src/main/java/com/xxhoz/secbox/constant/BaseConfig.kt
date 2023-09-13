@@ -5,9 +5,22 @@ import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.bean.ConfigBean
 import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.persistence.XKeyValue
+import com.xxhoz.secbox.util.GlobalActivityManager
 import com.xxhoz.secbox.util.LogUtils
 
 object BaseConfig {
+    /**
+     * 是否为debug版本
+     */
+    val DEBUG: Boolean by lazy {
+        // 判断是否为debug版本
+        val activity = GlobalActivityManager.getTopActivity()!!
+        if (activity.packageName.contains(".dev")) {
+            return@lazy true
+        }
+        false
+    }
+
     val CONFIG_JSON: String = "https://secbox.xxhoz.com/config.json"
 
     lateinit var CONFIG_BEAN: ConfigBean
