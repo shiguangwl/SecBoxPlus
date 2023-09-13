@@ -45,7 +45,7 @@ abstract class BaseActivity<T : ViewBinding> : SwipeBackActivity(), IGetPageName
     /**
      * 默认开启左滑返回,如果需要禁用,请重写此方法
      */
-    protected open fun swipeBackEnable() = true
+    protected open fun swipeBackEnable() = false
 
 
 

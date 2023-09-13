@@ -26,13 +26,13 @@ class DanmuVideoPlayer : VideoView {
     lateinit var topTitleView: TopTitleView
     private lateinit var vDanmakuView : SecDanmakuView
     lateinit var standardVideoController: StandardVideoController
-    lateinit var episodes: ArrayList<EpsodeEntity>
+    var episodes: ArrayList<EpsodeEntity>? = null
 
     val videoEpisodePopup: VideoEpisodePopup by lazy {
         val popup = VideoEpisodePopup(getContext(), episodes)
         popup.setEpisondeClickListener(object : VideoEpisodePopup.EpisodeClickListener {
             override fun onEpisodeClickListener(entity: EpsodeEntity, position: Int) {
-                actionCallback.selectPartsClick(position)
+                actionCallback?.selectPartsClick(position)
             }
         })
         popup
@@ -48,10 +48,8 @@ class DanmuVideoPlayer : VideoView {
     }
 
 
-    private lateinit var actionCallback: PlayerCallback
-    fun setActionCallback(actionCallback: PlayerCallback) {
-        this.actionCallback = actionCallback
-    }
+    var actionCallback: PlayerCallback? = null
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
@@ -71,7 +69,7 @@ class DanmuVideoPlayer : VideoView {
                 // 错误页面
                 val errorView: ErrorView = ErrorView(getContext())
                 errorView.setOnRetryListener(){
-                    actionCallback.retryClick()
+                    actionCallback?.retryClick()
                 }
                 // 顶部
                 topTitleView = TopTitleView(getContext())
@@ -91,21 +89,26 @@ class DanmuVideoPlayer : VideoView {
 
                 // 投屏
                 topTitleView.setThrowingScreenListener() {
-                    actionCallback.throwingScreenClick()
+                    actionCallback?.throwingScreenClick()
                 }
 
                 // 下一集
                 bottomControlView.setNextVodListener() {
-                    actionCallback.nextClick()
+                    actionCallback?.nextClick()
                 }
                 // 选集
                 bottomControlView.setChangeEposdeListener() {
+                    if (episodes == null){
+                        return@setChangeEposdeListener
+                    }
+
                     videoEpisodePopup.showAtLocation(
                         activity.getWindow().getDecorView(),
                         Gravity.RIGHT,
                         0,
                         0
                     )
+
                 }
 
                 // 速度

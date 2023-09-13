@@ -5,6 +5,9 @@ import android.os.Looper;
 
 import com.hjq.toast.Toaster;
 import com.umeng.commonsdk.internal.crash.UMCrashManager;
+import com.xxhoz.constant.BaseConfig;
+import com.xxhoz.secbox.util.GlobalActivityManager;
+import com.xxhoz.secbox.util.LogUtils;
 
 public class CrashManager {
 
@@ -31,7 +34,10 @@ public class CrashManager {
                 // LogUtils.INSTANCE.e("uncaughtException-->" + e.toString());
                 handleFileException(e);
                 if (t == Looper.getMainLooper().getThread()) {
-                    handleMainThread(e);
+                    LogUtils.INSTANCE.e("未知错误,进程终止,错误已上报");
+                    // 主线程异常直接退出
+                    GlobalActivityManager.INSTANCE.finishAll();
+                    // handleMainThread(e);
                 }
             }
         });
@@ -42,7 +48,9 @@ public class CrashManager {
      * @param e
      */
     private void handleFileException(Throwable e) {
-        Toaster.showLong("未知错误:" + e.toString());
+        if (BaseConfig.INSTANCE.getDEBUG()){
+            Toaster.showLong("未知错误:" + e.toString());
+        }
         // 异常上报
         UMCrashManager.reportCrash(App.instance,e);
         e.printStackTrace();

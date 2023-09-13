@@ -14,7 +14,8 @@ import androidx.annotation.StringDef
     PageName.DISCOVERY,
     PageName.DETAIL_PLAYER,
     PageName.SEARCH,
-    PageName.FILTER
+    PageName.FILTER,
+    PageName.SNIFFER
 )
 @Retention(AnnotationRetention.SOURCE)
 annotation class PageName {
@@ -31,5 +32,6 @@ annotation class PageName {
         const val DETAIL_PLAYER = "detail_player"
         const val SEARCH = "search"
         const val FILTER = "filter"
+        const val SNIFFER = "sniffer"
     }
 }

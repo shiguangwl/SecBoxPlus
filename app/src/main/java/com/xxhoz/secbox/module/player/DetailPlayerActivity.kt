@@ -129,7 +129,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
             episodeTab.setScrollPosition(7, 0F, true);
         }
         videoPlayer = viewBinding.danmakuPlayer
-        videoPlayer.setActionCallback(this)
+        videoPlayer.actionCallback = this
 
         channelTab = viewBinding.channelTab
         episodeTab = viewBinding.episodeTab
@@ -240,6 +240,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
         }
     }
 
+    @WorkerThread
     private suspend fun loadDanmu(currenSelectEposode: VideoDetailBean.Value) {
         if (isVideoPlatformURL(currenSelectEposode.urlCode)) {
             Toaster.show("后台加载弹幕资源中")

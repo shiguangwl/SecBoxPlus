@@ -9,6 +9,7 @@ import androidx.annotation.StringDef
     TabId.GOLD,
     TabId.MINE,
     TabId.DISCOVERY,
+    TabId.SNIFFER
 )
 @Retention(AnnotationRetention.SOURCE)
 annotation class TabId {
@@ -18,6 +19,7 @@ annotation class TabId {
         const val SMALL_VIDEO = "small_video"
         const val GOLD = "gold"
         const val MINE = "mine"
+        const val SNIFFER = "sniffer"
         const val DISCOVERY = "discovery"
     }
 }
