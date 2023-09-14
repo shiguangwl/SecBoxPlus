@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player.video.view.danma;
+package com.xxhoz.secbox.module.player.video.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -21,6 +21,8 @@ import androidx.core.content.ContextCompat;
 
 import com.xxhoz.constant.BaseConfig;
 import com.xxhoz.secbox.R;
+import com.xxhoz.secbox.module.player.video.view.danma.BiliDanmukuParser;
+import com.xxhoz.secbox.module.player.video.view.danma.CenteredImageSpan;
 import com.xxhoz.secbox.util.LogUtils;
 
 import java.io.InputStream;
@@ -144,7 +146,7 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
                 hide();
                 break;
             case VideoView.STATE_BUFFERED:
-                seekTo(getCurrentTime());
+                seekTo(controlWrapper.getCurrentPosition());
                 show();
                 break;
             case VideoView.STATE_PREPARING:

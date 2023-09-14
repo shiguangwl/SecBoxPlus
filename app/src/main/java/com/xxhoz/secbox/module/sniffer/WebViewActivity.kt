@@ -231,5 +231,10 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         return super.onKeyDown(keyCode, event)
     }
 
+
+    override fun onDestroy() {
+        videoPlayer.release()
+        super.onDestroy()
+    }
     override fun getPageName() = PageName.SNIFFER
 }

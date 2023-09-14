@@ -9,7 +9,7 @@ import com.xxhoz.secbox.module.player.popup.VideoEpisodePopup
 import com.xxhoz.secbox.module.player.popup.VideoSpeedPopup
 import com.xxhoz.secbox.module.player.video.view.BottomControlView
 import com.xxhoz.secbox.module.player.video.view.ErrorView
-import com.xxhoz.secbox.module.player.video.view.danma.SecDanmakuView
+import com.xxhoz.secbox.module.player.video.view.SecDanmakuView
 
 import xyz.doikki.videocontroller.component.CompleteView
 import xyz.doikki.videocontroller.component.GestureView
@@ -78,7 +78,10 @@ class DanmuVideoPlayer : VideoView {
                 // 手势控制
                 val gestureView = GestureView(getContext())
                 // 弹幕组件
-                vDanmakuView = SecDanmakuView(context)
+                vDanmakuView =
+                    SecDanmakuView(
+                        context
+                    )
                 addControlComponent(completeView)
                 addControlComponent(errorView)
     //                addControlComponent(prepareView)

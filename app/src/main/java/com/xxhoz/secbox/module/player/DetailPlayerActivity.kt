@@ -196,7 +196,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
      */
     private fun epTabItemClick(tab: TabLayout.Tab) {
         currentEpisode = tab.position
-        videoPlayer.setLoadingMsg("加载数据中...")
+        onStateVideoPlayerMsg("加载数据中...")
 
         val currentChannelData: VideoDetailBean.ChannelEpisodes = videoDetailBean!!.getChannelFlagsAndEpisodes().get(currentChannel)
         val currenSelectEposode: VideoDetailBean.Value =
@@ -221,7 +221,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
                 return@launch
             }finally {
                 if (playUrl.isEmpty()){
-                    videoPlayer.setLoadingMsg("获取播放链接失败")
+                    onStateVideoPlayerMsg("获取播放链接失败")
                 }
             }
             if (playUrl.isEmpty()){

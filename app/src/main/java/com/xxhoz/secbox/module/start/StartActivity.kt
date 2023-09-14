@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.activity.viewModels
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.lifecycleScope
 import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.toast.Toaster
@@ -50,6 +51,7 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
     /**
      * 初始化数据
      */
+    @WorkerThread
     private fun initData() {
         if (!NetworkHelper.isNetworkConnect()) {
             Toaster.show("请检查网络连接")
