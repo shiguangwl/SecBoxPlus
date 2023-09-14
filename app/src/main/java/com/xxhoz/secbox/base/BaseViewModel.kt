@@ -16,4 +16,22 @@ abstract class BaseViewModel : ViewModel(), IGetPageName {
     }
 
 
+//    private val taskList:HashMap<String,Job> = HashMap()
+//    open fun submitTask(task :()->Unit){
+//        viewModelScope.launch {
+//            withContext(Dispatchers.IO){
+//                try {
+//                    block()
+//                } catch (e: Exception) {
+//                    e.printStackTrace()
+//                    if (e is SocketTimeoutException) {
+//                        stateVideoPlayerMsg.postValue("网络连接超时")
+//                    } else {
+//                        stateVideoPlayerMsg.postValue("网络连接错误")
+//                    }
+//                }
+//            }
+//        }
+//
+//    }
 }

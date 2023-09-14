@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:background="?attr/selectableItemBackground"
         android:id="@+id/item_movie_root"
         android:clickable="true"
         android:focusable="true"
@@ -10,7 +9,11 @@
         android:layout_height="wrap_content">
 
 
-    <ImageView
+    <com.xxhoz.secbox.widget.RoundAngleImageView
+            app:img_left_top_radius="@dimen/item_radius"
+            app:img_right_top_radius="@dimen/item_radius"
+            app:img_left_bottom_radius="@dimen/item_radius"
+            app:img_right_bottom_radius="@dimen/item_radius"
             android:layout_width="70dp"
             android:layout_height="100dp"
             android:scaleType="fitXY"
@@ -25,6 +28,8 @@
 
     <TextView
             android:text="我是影视标题"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/title_movie"
@@ -32,10 +37,11 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="8dp"
             android:layout_marginStart="8dp"
-            android:textColor="@color/black"
-            android:textSize="16sp"
+            android:textColor="@color/font_color"
+            android:textSize="13sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0" />
+            app:layout_constraintHorizontal_bias="1.0"
+            android:layout_marginEnd="8dp" />
 
     <TextView
             android:textSize="11sp"

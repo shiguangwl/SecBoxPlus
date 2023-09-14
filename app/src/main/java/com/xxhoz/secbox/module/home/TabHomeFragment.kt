@@ -63,8 +63,6 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // 首页顶部信息
-        showNotice()
         // 基本事件监听
         initView()
         // 数据加载
@@ -120,6 +118,9 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
                 initViewFragments()
                 viewBinding.promptView.hide()
             }
+
+            // 首页顶部信息
+            showNotice()
         }
     }
 

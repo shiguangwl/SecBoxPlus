@@ -15,7 +15,7 @@ import xyz.doikki.videocontroller.component.CompleteView
 import xyz.doikki.videocontroller.component.GestureView
 import xyz.doikki.videocontroller.component.TopTitleView
 import xyz.doikki.videoplayer.player.VideoView
-import java.io.InputStream
+import java.io.File
 
 /**
  * 包含弹幕的播放器
@@ -134,6 +134,7 @@ class DanmuVideoPlayer : VideoView {
      * 设置播放数据
      */
     fun setUp(epsodeEntity: EpsodeEntity) {
+        vDanmakuView.release()
         standardVideoController.stopShowBufferSpeed()
         release()
         topTitleView.setTitle(epsodeEntity.videoName)
@@ -156,7 +157,7 @@ class DanmuVideoPlayer : VideoView {
     /**
      * 加载弹幕数据
      */
-    fun setDanmuStream(stream: InputStream){
+    fun setDanmuStream(stream: File){
         vDanmakuView.loadDanmuStream(stream)
     }
 

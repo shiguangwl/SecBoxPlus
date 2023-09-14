@@ -23,9 +23,10 @@ import com.xxhoz.constant.BaseConfig;
 import com.xxhoz.secbox.R;
 import com.xxhoz.secbox.module.player.video.view.danma.BiliDanmukuParser;
 import com.xxhoz.secbox.module.player.video.view.danma.CenteredImageSpan;
-import com.xxhoz.secbox.util.LogUtils;
 
-import java.io.InputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 
 import master.flame.danmaku.controller.DrawHandler;
@@ -48,7 +49,6 @@ import xyz.doikki.videoplayer.util.PlayerUtils;
 public class SecDanmakuView extends DanmakuView implements IControlComponent {
 
     private final DanmakuContext mContext;
-    private final BaseDanmakuParser mParser = new BiliDanmukuParser();;
     private ControlWrapper controlWrapper;
     private int playState;
 
@@ -90,14 +90,12 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
         setCallback(new DrawHandler.Callback() {
             @Override
             public void prepared() {
-                start();
-                new Handler(Looper.getMainLooper()).post(()->{
-                    seekTo(controlWrapper.getCurrentPosition());
-                    LogUtils.INSTANCE.d("playState: " + playState   + "    VideoView.STATE_PLAYING:"+ VideoView.STATE_PLAYING);
-                    if (playState != VideoView.STATE_PLAYING) {
-                        pause();
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (playState == VideoView.STATE_PLAYING) {
+                        seekTo(controlWrapper.getCurrentPosition());
                     }
                 });
+
             }
 
             @Override
@@ -136,7 +134,15 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
 
     @Override
     public void onPlayStateChanged(int playState) {
-
+        // STATE_ERROR = -1; // 错误状态，表示播放出现问题
+        // STATE_IDLE = 0; // 空闲状态，播放器未初始化或已释放
+        // STATE_PREPARING = 1; // 准备中状态，播放器正在准备资源
+        // STATE_PREPARED = 2; // 已准备状态，播放器已经准备好开始播放
+        // STATE_PLAYING = 3; // 播放中状态，表示正在播放
+        // STATE_PAUSED = 4; // 暂停状态，表示播放暂停
+        // STATE_PLAYBACK_COMPLETED = 5; // 播放完成状态，表示播放已完成
+        // STATE_BUFFERING = 6; // 缓冲中状态，表示正在缓冲数据
+        // STATE_BUFFERED = 7; // 缓冲完成状态，表示缓冲已完成
         this.playState = playState;
         switch (playState) {
             case VideoView.STATE_IDLE:
@@ -146,14 +152,12 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
                 hide();
                 break;
             case VideoView.STATE_BUFFERED:
-                seekTo(controlWrapper.getCurrentPosition());
-                show();
+                if (isPrepared()){
+                    seekTo(controlWrapper.getCurrentPosition());
+                    show();
+                }
                 break;
             case VideoView.STATE_PREPARING:
-                // if (isPrepared()) {
-                //     restart();
-                // }
-                // prepare(mParser, mContext);
                 break;
             case VideoView.STATE_PLAYING:
                 if (isPrepared() && isPaused()) {
@@ -242,20 +246,20 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
 
     }
 
-    public void loadDanmuStream(InputStream stream) {
-        ILoader loader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
-        try {
-            loader.load(stream);
-        } catch (IllegalDataException e) {
-            e.printStackTrace();
-        }
-        IDataSource<?> dataSource = loader.getDataSource();
-        mParser.load(dataSource);
-
+    public void loadDanmuStream(File stream) throws IOException {
         if (isPrepared()) {
             release();
         }
 
+        ILoader loader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
+        try {
+            loader.load(new FileInputStream(stream));
+        } catch (IllegalDataException e) {
+            e.printStackTrace();
+        }
+        IDataSource<?> dataSource = loader.getDataSource();
+        BaseDanmakuParser mParser = new BiliDanmukuParser();
+        mParser.load(dataSource);
         prepare(mParser, mContext);
     }
 

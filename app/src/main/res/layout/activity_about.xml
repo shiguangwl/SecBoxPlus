@@ -13,12 +13,14 @@
         app:nav_title="@string/page_about" />
 
     <TextView
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
         android:id="@+id/tv_about"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="100dp"
-        android:text="关于"
+        android:text="@string/about_text"
         android:textSize="16sp" />
 
 </LinearLayout>

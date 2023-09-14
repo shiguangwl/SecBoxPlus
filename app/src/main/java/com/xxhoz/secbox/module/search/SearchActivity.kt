@@ -110,7 +110,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                     return true
                 }
                 viewBinding.promptView.showLoading()
-                startSearch(query)
+                startSearch(query.trim())
 
                 viewBinding.historyLayout.visibility = View.INVISIBLE
                 viewBinding.resultLayout.visibility = View.VISIBLE
@@ -193,7 +193,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         addSearchHistory(query)
 
         sourceList.add(ALL_DATA)
+
         sourceAdapter.notifyDataSetChanged()
+        resultAdapter.notifyDataSetChanged()
 
         searchJobs.add(lifecycleScope.launch(Dispatchers.IO){
 //            val searchAbleList: List<IBaseSource> = SourceManger.getSearchAbleList()

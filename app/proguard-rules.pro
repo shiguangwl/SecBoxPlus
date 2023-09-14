@@ -205,8 +205,8 @@
 
 #----------------------Android通用-----------------
 
-
-
+# EasyHttp
+-keep class com.hjq.http.** {*;}
 
 
 # 保留Gson库

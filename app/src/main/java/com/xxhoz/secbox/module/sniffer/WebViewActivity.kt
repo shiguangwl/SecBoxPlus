@@ -15,6 +15,7 @@ import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.toast.Toaster
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.SourceManger
+import com.xxhoz.secbox.App
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.bean.EpsodeEntity
 import com.xxhoz.secbox.constant.PageName
@@ -27,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.io.File
 import java.net.SocketTimeoutException
 
 class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
@@ -59,6 +61,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
     }
 
     private fun initView() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
         mWebView = viewBinding.webview
         // WebView 配置
         val webSettings: WebSettings = mWebView.getSettings()
@@ -71,7 +74,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         // 支持缩放，默认为 true
         webSettings.setSupportZoom(true)
         // 设置内置的缩放控件，若为 false，则该 WebView 不可缩放
-        webSettings.builtInZoomControls = false
+        webSettings.builtInZoomControls = true
         // 隐藏原生的缩放控件
         webSettings.displayZoomControls = false
         // 设置UA
@@ -197,13 +200,15 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         }
 
         // 加载弹幕
-        Toaster.show("后台弹幕加载中")
+        Toaster.show("后台加载弹幕资源中")
         try {
-            val danmus: String =
-                HttpUtil.get(BaseConfig.DANMAKU_API + url)
-            LogUtils.d("弹幕加载内容: " + danmus.substring(0,1000))
-            withContext(Dispatchers.Main){
-                videoPlayer.setDanmuStream(danmus.byteInputStream())
+            val danmuFile: File =
+                HttpUtil.downLoad(
+                    BaseConfig.DANMAKU_API + url,
+                    App.instance.filesDir.absolutePath + "/danmu.xml"
+                )
+            withContext(Dispatchers.Main) {
+                videoPlayer.setDanmuStream(danmuFile)
             }
             Toaster.show("弹幕正在装载")
         } catch (e: SocketTimeoutException) {
@@ -212,13 +217,12 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
             Toaster.show("加载弹幕资源失败")
             e.printStackTrace()
         }
-
     }
 
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (videoPlayer.isFullScreen) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
             videoPlayer.stopFullScreen()
             videoPlayer.release()
             return true

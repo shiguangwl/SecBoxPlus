@@ -83,6 +83,10 @@ kapt {
 }
 
 dependencies {
+
+    // 网络请求框架：https://github.com/getActivity/EasyHttp
+    implementation 'com.github.getActivity:EasyHttp:12.2'
+
     // XPopup
     implementation 'com.github.li-xiaojun:XPopup:2.9.19'
 

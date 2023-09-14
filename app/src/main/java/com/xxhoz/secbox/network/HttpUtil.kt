@@ -12,6 +12,7 @@ import okhttp3.RequestBody
 import okhttp3.Response
 import okhttp3.ResponseBody
 import java.io.ByteArrayInputStream
+import java.io.File
 import java.io.IOException
 import java.util.zip.Inflater
 import java.util.zip.InflaterInputStream
@@ -22,6 +23,9 @@ object HttpUtil {
         .addInterceptor(DeflateInterceptor())
         .build()
     private val gson = GsonFactory.getSingletonGson()
+
+
+
 
 
     fun getBytes(url: String): ByteArray? {
@@ -129,6 +133,31 @@ object HttpUtil {
                 callback(result, null)
             }
         })
+    }
+
+    /**
+     * 下载文件
+     * @param url 下载地址
+     * @param path 保存路径
+     * @return 保存的文件
+     */
+    fun downLoad(url: String, path: String): File {
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                throw IOException("Unexpected code $response")
+            }
+
+            val file = File(path)
+            if (file.exists()) {
+                file.delete()
+            }
+            file.writeBytes(response.body?.bytes()!!)
+            return file
+        }
     }
 
     class DeflateInterceptor : Interceptor {
