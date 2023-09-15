@@ -10,11 +10,11 @@ import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
 
 class JsonSource(override var sourceBean: SourceBean, var spider: Spider)  :
     IBaseSource {
-    override fun homeVideoList(): List<VideoBean> {
+    override fun homeVideoList(): List<VideoBean>? {
         TODO("Not yet implemented")
     }
 
-    override fun categoryInfo(): CategoryBean {
+    override fun categoryInfo(): CategoryBean? {
         TODO("Not yet implemented")
     }
 

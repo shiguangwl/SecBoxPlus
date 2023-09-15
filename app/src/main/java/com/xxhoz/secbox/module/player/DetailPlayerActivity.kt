@@ -110,7 +110,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
 
         // 当前解析接口
         viewModel.currentParseBean.observe(this){
-            Toaster.show("当前解析接口切换:" + it.name)
+//            Toaster.show("当前解析接口切换:" + it.name)
         }
 
         // 加载提示信息

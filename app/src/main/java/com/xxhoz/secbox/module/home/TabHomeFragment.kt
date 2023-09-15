@@ -22,6 +22,7 @@ import com.lxj.xpopup.enums.PopupAnimation
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.base.BaseFragment
+import com.xxhoz.secbox.bean.exception.GlobalException
 import com.xxhoz.secbox.constant.EventName
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeTabBinding
@@ -32,6 +33,7 @@ import com.xxhoz.secbox.parserCore.bean.CategoryBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 import com.xxhoz.secbox.util.LogUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -49,7 +51,7 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
 
     private var mediator: TabLayoutMediator? = null
 
-    private lateinit var categoryInfo:CategoryBean
+    private lateinit var categoryInfo: CategoryBean
     private lateinit var homeVideoList: List<VideoBean>
 
 //    private val viewModel: HomeViewModel by viewModels()
@@ -88,8 +90,10 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
             .show()
     }
 
+    var currentJob:Job? = null
     private fun initData() {
-        lifecycleScope.launch(Dispatchers.IO) {
+        currentJob?.cancel()
+        val job = lifecycleScope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
                 viewBinding.promptView.showLoading()
             }
@@ -98,10 +102,16 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
             currentSource?.run {
                 try {
                     // 获取首页数据
-                    homeVideoList = homeVideoList()
+                    homeVideoList = homeVideoList() ?: throw GlobalException.of("首页数据为空")
                     // 获取分类数据
-                    categoryInfo = categoryInfo()
-                }catch (e:Exception){
+                    categoryInfo = categoryInfo()?: throw GlobalException.of("分类数据为空")
+                } catch (e: GlobalException) {
+                    LogUtils.d("数据源异常:" + e.message)
+                    withContext(Dispatchers.Main) {
+                        viewBinding.promptView.showEmpty()
+                    }
+                    return@launch
+                } catch (e: Exception) {
                     e.printStackTrace()
                     Toaster.show("数据源异常,请切换源")
                     withContext(Dispatchers.Main) {
@@ -122,12 +132,13 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
             // 首页顶部信息
             showNotice()
         }
+        currentJob = job
     }
 
 
     private fun initView() {
         // 搜索按钮
-        viewBinding.searchBtn.setOnClickListener(){
+        viewBinding.searchBtn.setOnClickListener() {
             SearchActivity.startActivity(requireContext())
         }
         // 设置源显示
@@ -135,9 +146,9 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
         viewBinding.currentSourceText.text = (sourceName + "  ▼")
 
         // 源选择
-        viewBinding.currentSourceText.setOnClickListener(){
+        viewBinding.currentSourceText.setOnClickListener() {
             XPopup.Builder(context)
-                    .atView(viewBinding.tabLayout)
+                .atView(viewBinding.tabLayout)
                 .hasShadowBg(false)
                 .asCustom(BottomSheetSource(requireContext()))
                 .show()
@@ -149,7 +160,7 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
         //Adapter
         viewBinding.viewPager.adapter =
             object :
-                FragmentStateAdapter((getActivity()?.getSupportFragmentManager())!!, lifecycle) {
+                FragmentStateAdapter(requireActivity().getSupportFragmentManager(), lifecycle) {
                 override fun createFragment(position: Int): Fragment {
                     if (position == 0) {
                         // 首页推荐
@@ -157,7 +168,8 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
                     }
 
                     val classType: CategoryBean.ClassType = categoryInfo.`class`.get(position - 1)
-                    val filters: List<CategoryBean.Filter> = categoryInfo.filters.get(classType.type_id)!!
+                    val filters: List<CategoryBean.Filter>? =
+                        categoryInfo.filters?.get(classType.type_id)
                     // 分类页
                     return HomeFilterFragment(classType, filters)
                 }
@@ -189,7 +201,7 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
     }
 
     private fun getCateGoryNameById(position: Int): String {
-        if (position == 0){
+        if (position == 0) {
             return "首页"
         }
         return categoryInfo.`class`.get(position - 1).type_name
@@ -213,11 +225,12 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
         }
     }
 
-     override fun onDestroy() {
+    override fun onDestroy() {
         mediator!!.detach()
         viewBinding.viewPager.unregisterOnPageChangeCallback(changeCallback)
         super.onDestroy()
     }
+
     @PageName
     override fun getPageName() = PageName.HOME
 

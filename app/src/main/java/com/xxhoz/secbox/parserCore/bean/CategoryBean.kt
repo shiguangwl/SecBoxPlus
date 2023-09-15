@@ -5,7 +5,7 @@ package com.xxhoz.secbox.parserCore.bean
  * 分类信息
  */
 data class CategoryBean(
-    val filters: HashMap<String,List<Filter>>,
+    val filters: HashMap<String,List<Filter>>?,
     val `class`: List<ClassType>,
     val list: List<ListItem>
 ) {

@@ -189,12 +189,13 @@ class DetailPlayerViewModel : BaseViewModel() {
                         continue
                     }
                 } catch (e: Exception) {
-                    Toaster.show("[${parseBean1.name}] 解析失败,尝试切换解析")
+                    LogUtils.d("[${parseBean1.name}] 解析失败")
                     e.printStackTrace()
                     continue
                 }
 
                 if (parseRsult.isNotEmpty()) {
+                    Toaster.show("[${parseBean1.name}] 当前来源")
                     break
                 }
             }

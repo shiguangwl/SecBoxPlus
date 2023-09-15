@@ -19,11 +19,14 @@ class SpiderSource(override var sourceBean: SourceBean, var spider: Spider)  :
     /**
      * 获取首页视频列表,赛选条件
      */
-    override fun homeVideoList(): List<VideoBean> {
+    override fun homeVideoList(): List<VideoBean>? {
         val result = ArrayList<VideoBean>()
         var homeVideoContent = spider.homeVideoContent()
         if (homeVideoContent.length == 0){
             homeVideoContent = spider.homeContent(true)
+        }
+        if (homeVideoContent.length == 0){
+            return null;
         }
         LogUtils.d(sourceBean.name +"首页数据String:${homeVideoContent}")
         val jsonobject = gson.fromJson(homeVideoContent, JSONObject::class.java)

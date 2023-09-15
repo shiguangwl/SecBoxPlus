@@ -29,7 +29,7 @@ import com.xxhoz.secbox.widget.GridItemDecoration
 /**
  * 首页
  */
-class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilters: List<CategoryBean.Filter>) : BaseFragment<FragmentHomeFilterBinding>() {
+class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilters: List<CategoryBean.Filter>?) : BaseFragment<FragmentHomeFilterBinding>() {
 
     val conditionView: ConditionTabView by lazy { viewBinding.conditionView }
 
@@ -64,10 +64,13 @@ class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilte
 
         viewModel.category = category
         // 渲染赛选条件
-        conditionView.addTabLine(categoryFilters){
-            viewModel.conditons = it
-            itemListView.startRefresh()
+        categoryFilters?.let {
+            conditionView.addTabLine(it){
+                viewModel.conditons = it
+                itemListView.startRefresh()
+            }
         }
+
         viewModel.conditons = conditionView.conditions
 
         itemListView.init(

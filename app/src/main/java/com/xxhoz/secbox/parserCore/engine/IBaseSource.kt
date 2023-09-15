@@ -16,13 +16,13 @@ interface IBaseSource {
      * 获取首页视频列表,赛选条件
      */
     @Throws(Exception::class)
-    fun homeVideoList(): List<VideoBean>
+    fun homeVideoList(): List<VideoBean>?
 
     /**
      * 获取分类信息
      */
     @Throws(Exception::class)
-    fun categoryInfo(): CategoryBean
+    fun categoryInfo(): CategoryBean?
 
     /**
      * 获取分类数据

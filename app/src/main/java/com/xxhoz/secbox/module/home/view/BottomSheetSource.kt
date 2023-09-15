@@ -1,6 +1,7 @@
 
 import android.content.Context
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lxj.xpopup.core.BottomPopupView
@@ -36,9 +37,10 @@ class BottomSheetSource(context: Context) : BottomPopupView(context) {
             object : UniversalAdapter.DataViewBind<SourceBean> {
                 override fun exec(data: SourceBean, view: View) {
                     val bind = ItemSelectSourceBinding.bind(view)
-//                    if (currentSource != null && data.key.equals(currentSource.sourceBean.key)) {
-//                        bind.root.setBackgroundColor(ContextCompat.getColor(context,R.color.theme_color))
-//                    }
+                    bind.root.setBackgroundColor(ContextCompat.getColor(context,R.color.white))
+                    if (currentSource != null && data.key.equals(currentSource.sourceBean.key)) {
+                        bind.root.setBackgroundColor(ContextCompat.getColor(context,R.color.theme_color))
+                    }
                     bind.sourceItemText.text = data.name
                     view.setOnClickListener(){
                         selectItem(data)

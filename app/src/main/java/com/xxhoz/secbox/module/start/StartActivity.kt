@@ -57,7 +57,9 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             Toaster.show("请检查网络连接")
             return
         }
-        umengInit()
+        if(!BaseConfig.DEBUG){
+            umengInit()
+        }
         try {
             // 加载config.json
             configInit()

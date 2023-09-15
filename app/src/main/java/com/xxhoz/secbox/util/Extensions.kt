@@ -96,3 +96,19 @@ fun <T> Result<T>.get(): T {
 fun Result<*>.exception(): Throwable {
     return this.exceptionOrNull()!!
 }
+
+//// 保存携程任务
+//val jobsMap:HashMap<String,Job> = HashMap()
+//
+///**
+// * 提交任务,同时只能一个任务在执行
+// */
+//fun LifecycleCoroutineScope.submitTask(taskName:String,jobs:suspend ()->Unit){
+//    // 如果有当前任务在执行,则取消当前任务组
+//    if (jobsMap.containsKey(taskName)){
+//        jobsMap[taskName]?.cancel()
+//    }
+//    GlobalScope.launch { jobs() }.apply {
+//        jobsMap[taskName] = this
+//    }
+//}
