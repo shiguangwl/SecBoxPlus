@@ -7,6 +7,17 @@
         tools:context=".module.sniffer.WebViewActivity">
 
 
+  <ProgressBar
+          android:id="@+id/pb_browser_progress"
+          style="?android:attr/progressBarStyleHorizontal"
+          android:layout_width="0dp"
+          android:layout_height="3dp"
+          android:progressDrawable="@drawable/progress_gradient_bg"
+          android:visibility="gone"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
+
   <WebView
           android:layout_width="0dp"
           android:layout_height="0dp"
@@ -14,7 +25,7 @@
           tools:ignore="MissingConstraints"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent"
+          app:layout_constraintTop_toBottomOf="@+id/pb_browser_progress"
           app:layout_constraintBottom_toTopOf="@+id/fastPlay"/>
 
 

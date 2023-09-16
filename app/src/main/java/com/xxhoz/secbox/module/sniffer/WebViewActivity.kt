@@ -3,15 +3,17 @@ package com.xxhoz.secbox.module.sniffer
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.View
+import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.lifecycleScope
-import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.toast.Toaster
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.SourceManger
@@ -39,7 +41,8 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
     lateinit var mWebView: WebView
 
-    val videoPlayer: DanmuVideoPlayer by lazy { DanmuVideoPlayer(this,null) }
+    val videoPlayer: DanmuVideoPlayer by lazy { DanmuVideoPlayer(this, null) }
+
     companion object {
         fun startActivity(context: Context, url: String) {
             val intent = Intent(context, WebViewActivity::class.java)
@@ -53,15 +56,11 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        immersionBar {
-            statusBarDarkFont(true)
-        }
 
         initView()
     }
 
     private fun initView() {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
         mWebView = viewBinding.webview
         // WebView 配置
         val webSettings: WebSettings = mWebView.getSettings()
@@ -88,28 +87,55 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
 
         // 加载指定网站
-
-        // 加载指定网站
         mWebView.webViewClient = object : WebViewClient() {
+
+
+            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                return if (url.startsWith("bilibili://")) {
+                    // 忽略处理bilibili的URL scheme
+                    true
+                } else {
+                    // 处理其他URL
+                    view.loadUrl(url)
+                    false
+                }
+            }
+
+            /**
+             * 网页加载错误时回调，这个方法会在 onPageFinished 之前调用
+             */
+            override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
+            }
+
+            /**
+             * 开始加载网页
+             */
+            override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+                viewBinding.pbBrowserProgress.visibility = View.VISIBLE
+            }
+
+            /**
+             * 完成加载网页
+             */
             override fun onPageFinished(view: WebView, url: String) {
-                super.onPageFinished(view, url)
-                // 加载完成 隐藏部分UI
-                // 爱奇艺
-                var script =
-                    "document.querySelector(\"#app > div:nth-child(2) > div > div > div:nth-child(2) > div.ChannelHomeBanner_hbd_eiF93 > div > div > section > div > img\").style.display='none';"
-                // 哔哩哔哩
-                script += "document.querySelector(\".launch-app-btn\").style.display='none'"
-                // 优酷
-                script += "document.querySelector(\".callEnd_box \").style.display='none'"
-                mWebView.evaluateJavascript(script) {}
+                viewBinding.pbBrowserProgress.visibility = View.GONE
             }
         }
+
+        mWebView.webChromeClient = object : WebChromeClient() {
+            // 加载进度回调
+            override fun onProgressChanged(view: WebView, newProgress: Int) {
+                super.onProgressChanged(view, newProgress)
+                viewBinding.pbBrowserProgress.progress = newProgress
+            }
+        }
+
 
         val url = intent.getStringExtra("url")!!
         mWebView.loadUrl(url)
 
 
-        viewBinding.fastPlay.setOnClickListener{
+        viewBinding.fastPlay.setOnClickListener {
             var currentUrl = mWebView.url!!
 
 //            // 优酷链接处理
@@ -171,32 +197,32 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
      */
     @WorkerThread
     private suspend fun startSniffer(url: String) {
-       LogUtils.d("当前连接是:" + url)
+        LogUtils.d("当前连接是:" + url)
         val parseBeanList = SourceManger.getParseBeanList()
         var parseRsult: String? = null
         for (parseBean in parseBeanList) {
             try {
                 val jsonObject = HttpUtil.get(parseBean.url + url, JSONObject::class.java)
                 parseRsult = jsonObject.getString("url")
-                if (parseRsult.isEmpty()){
+                if (parseRsult.isEmpty()) {
                     continue
                 }
                 break
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 Toaster.show("[${parseBean.name}] 解析失败,尝试切换解析")
                 e.printStackTrace()
                 continue
             }
         }
 
-        if (parseRsult == null || parseRsult.isEmpty()){
+        if (parseRsult == null || parseRsult.isEmpty()) {
             Toaster.showLong("解析资源失败")
             return
         }
-        withContext(Dispatchers.Main){
+        withContext(Dispatchers.Main) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
             videoPlayer.startFullScreen()
-            videoPlayer.setUp(EpsodeEntity("",parseRsult))
+            videoPlayer.setUp(EpsodeEntity("", parseRsult))
         }
 
         // 加载弹幕
@@ -222,7 +248,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (videoPlayer.isFullScreen) {
-//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
             videoPlayer.stopFullScreen()
             videoPlayer.release()
             return true
@@ -240,5 +266,6 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         videoPlayer.release()
         super.onDestroy()
     }
+
     override fun getPageName() = PageName.SNIFFER
 }
