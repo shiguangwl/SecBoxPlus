@@ -18,6 +18,7 @@ import com.hjq.toast.Toaster
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.secbox.App
+import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.bean.EpsodeEntity
 import com.xxhoz.secbox.constant.PageName
@@ -56,6 +57,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        getWindow().setStatusBarColor(getResources().getColor(R.color.black));
 
         initView()
     }
@@ -128,8 +130,12 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
                 super.onProgressChanged(view, newProgress)
                 viewBinding.pbBrowserProgress.progress = newProgress
             }
-        }
 
+            override fun onReceivedTitle(view: WebView?, title: String?) {
+                // 收到网页标题的回调
+                viewBinding.titleText.text = title
+            }
+        }
 
         val url = intent.getStringExtra("url")!!
         mWebView.loadUrl(url)
@@ -153,6 +159,12 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
             btnClick(currentUrl)
         }
+
+
+        viewBinding.returnImage.setOnClickListener(){
+            finish()
+        }
+
     }
 
     private fun btnClick(currentUrl: String) {

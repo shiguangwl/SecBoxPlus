@@ -22,6 +22,8 @@ import com.xxhoz.secbox.parserCore.bean.CategoryBean
 class ConditionTabView : LinearLayout, OnTabSelectedListener {
     val conditions: HashMap<String, String> = HashMap()
     private lateinit var callback: (HashMap<String, String>) -> Unit
+
+    private val tabs = ArrayList<TabLayout.Tab>()
     constructor(context: Context?) : super(context) {
         orientation = VERTICAL
     }
@@ -46,16 +48,17 @@ class ConditionTabView : LinearLayout, OnTabSelectedListener {
             (inflate.findViewById<View>(R.id.tab_key) as TextView).setText(categoryFilter.name)
 
             // 添加value
-            val tabLayout = inflate.findViewById<TabLayout>(R.id.tab_values)
+            val tabLayout: TabLayout = inflate.findViewById<TabLayout>(R.id.tab_values)
             tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
             for (filter in categoryFilter.value) {
-                val tab = tabLayout.newTab()
+                val tab: TabLayout.Tab = tabLayout.newTab()
                 tab.setCustomView(R.layout.view_conditiontab_item_view)
                 val textView = tab.customView!!.findViewById<TextView>(R.id.tab_text)
                 textView.text = filter.n
                 //textView.setTextColor(R.color.ThemeColor);
                 tab.tag = arrayOf(categoryFilter.key,filter.v)
                 tabLayout.addTab(tab)
+                tabs.add(tab)
             }
             this.addView(inflate)
 
@@ -80,6 +83,11 @@ class ConditionTabView : LinearLayout, OnTabSelectedListener {
         callback(conditions)
     }
 
+    fun setClickAble(isClick: Boolean){
+        tabs.forEach {
+            it.view.isClickable = isClick
+        }
+    }
     override fun onTabUnselected(tab: TabLayout.Tab) {}
     override fun onTabReselected(tab: TabLayout.Tab) {}
 

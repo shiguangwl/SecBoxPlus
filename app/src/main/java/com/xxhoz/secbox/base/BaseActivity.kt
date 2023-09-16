@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import androidx.annotation.CallSuper
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.CoroutineScope
 import me.imid.swipebacklayout.lib.app.SwipeBackActivity
 
 /**
  * Activity基类
  */
-abstract class BaseActivity<T : ViewBinding> : SwipeBackActivity(), IGetPageName {
+abstract class BaseActivity<T : ViewBinding> : SwipeBackActivity(), IGetPageName ,TaskManger{
 
     protected lateinit var viewBinding: T
     protected abstract val inflater: (inflater: LayoutInflater) -> T
@@ -38,7 +38,7 @@ abstract class BaseActivity<T : ViewBinding> : SwipeBackActivity(), IGetPageName
 
     @CallSuper
     override fun onDestroy() {
-        lifecycleScope.cancel()
+        clearTask()
         super.onDestroy()
     }
 
@@ -47,6 +47,5 @@ abstract class BaseActivity<T : ViewBinding> : SwipeBackActivity(), IGetPageName
      */
     protected open fun swipeBackEnable() = false
 
-
-
+    override fun getScope(): CoroutineScope  = lifecycleScope
 }

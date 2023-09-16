@@ -26,13 +26,13 @@ class SnifferFragment : BaseFragment<FragmentSnifferBinding>() {
     private fun initView() {
         viewBinding.run {
             bilibiliLogo.setOnClickListener {
-                WebViewActivity.startActivity(requireContext(), "https://m.bilibili.com/channel/v/anime")
+                WebViewActivity.startActivity(requireContext(), "https://www.bilibili.com/anime")
             }
             tenxunLogo.setOnClickListener {
-                WebViewActivity.startActivity(requireContext(), "https://m.v.qq.com")
+                WebViewActivity.startActivity(requireContext(), "https://v.qq.com")
             }
             aiqiyiLogo.setOnClickListener {
-                WebViewActivity.startActivity(requireContext(), "http://m.iqiyi.com")
+                WebViewActivity.startActivity(requireContext(), "http://iqiyi.com")
             }
             youkuLogo.setOnClickListener {
                 WebViewActivity.startActivity(requireContext(), "https://www.youku.com")

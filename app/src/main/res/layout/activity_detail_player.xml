@@ -131,7 +131,6 @@
                 app:tabSelectedTextColor="#ff678f"
                 app:tabTextColor="#333333"
                 app:tabIndicatorColor="#ff678f"
-                app:tabIndicatorHeight="30dp"
                 android:layout_gravity="left"
                 android:id="@+id/channel_tab"
                 android:layout_width="0dp"

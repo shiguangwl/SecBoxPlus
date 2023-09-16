@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.activity.viewModels
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.lifecycleScope
 import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.toast.Toaster
 import com.lxj.xpopup.XPopup
@@ -24,8 +23,6 @@ import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.NetworkHelper
 import com.xxhoz.secbox.util.getActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class StartActivity : BaseActivity<ActivityStartBinding>() {
 
@@ -43,8 +40,8 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             navigationBarDarkIcon(true)
         }
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            initData()
+        Task {
+            onIO2 { initData() }
         }
     }
 

@@ -7,6 +7,37 @@
         tools:context=".module.sniffer.WebViewActivity">
 
 
+  <LinearLayout
+          android:id="@+id/title_bar"
+          android:layout_width="match_parent"
+          android:orientation="horizontal"
+          android:layout_height="30dp"
+          android:gravity="center_vertical"
+          app:layout_constraintTop_toTopOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintEnd_toEndOf="parent" >
+    <ImageView
+            android:layout_marginStart="5dp"
+            android:scaleType="fitXY"
+            android:background="@drawable/back_icon"
+            android:id="@+id/return_image"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+
+
+    <TextView
+            android:id="@+id/title_text"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/font_color"
+            android:text="Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+  </LinearLayout>
+
   <ProgressBar
           android:id="@+id/pb_browser_progress"
           style="?android:attr/progressBarStyleHorizontal"
@@ -16,7 +47,7 @@
           android:visibility="gone"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent" />
+          app:layout_constraintTop_toBottomOf="@+id/title_bar" />
 
   <WebView
           android:layout_width="0dp"

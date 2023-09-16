@@ -132,6 +132,9 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
                 PageState.LOADING -> {
                     viewBinding.promptView.showLoading()
                 }
+                PageState.EMPTY -> {
+                    viewBinding.promptView.showEmpty()
+                }
                 PageState.NORMAL -> {
                     viewBinding.promptView.hide()
                 }

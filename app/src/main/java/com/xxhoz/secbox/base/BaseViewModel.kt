@@ -2,17 +2,17 @@ package com.xxhoz.secbox.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * ViewModel基类
  */
-abstract class BaseViewModel : ViewModel(), IGetPageName {
+abstract class BaseViewModel : ViewModel(), IGetPageName,TaskManger {
 
 
     override fun onCleared() {
+        clearTask()
         super.onCleared()
-        viewModelScope.cancel()
     }
 
 
@@ -34,4 +34,6 @@ abstract class BaseViewModel : ViewModel(), IGetPageName {
 //        }
 //
 //    }
+
+    override fun getScope(): CoroutineScope = viewModelScope
 }

@@ -26,7 +26,7 @@ class AboutActivity : BaseActivity<ActivityAboutBinding>() {
         initSystemBar()
 
         viewBinding.tvAbout.setOnClickListener {
-            XEventBus.post(EventName.TEST, "来自关于页面的消息")
+            XEventBus.post(EventName.CATEGORT_LOADEND, "来自关于页面的消息")
         }
     }
 

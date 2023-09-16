@@ -1,5 +1,6 @@
 package com.github.catvod.crawler;
 
+import com.umeng.commonsdk.internal.crash.UMCrashManager;
 import com.xxhoz.secbox.App;
 import com.xxhoz.secbox.bean.exception.GlobalException;
 import com.xxhoz.secbox.util.LogUtils;
@@ -70,6 +71,7 @@ public class JarLoader {
             //     count++;
             // } while (count < 5);
         } catch (Throwable th) {
+            UMCrashManager.reportCrash(App.instance, GlobalException.Companion.of("加载Jar包失败:" + th.getMessage()));
             success = false;
             th.printStackTrace();
         }

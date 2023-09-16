@@ -2,7 +2,6 @@ package com.xxhoz.secbox.module.player
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.hjq.toast.Toaster
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.SourceManger
@@ -19,11 +18,7 @@ import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.bean.PlayLinkBean
 import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
 import com.xxhoz.secbox.util.LogUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.xxhoz.secbox.util.StringUtils
 import org.json.JSONObject
 import java.io.File
 import java.net.SocketTimeoutException
@@ -64,7 +59,7 @@ class DetailPlayerViewModel : BaseViewModel() {
     val pageState = MutableLiveData<Int>()
 
     // 搜索job
-    var getUrlJob: Job? = null
+    var getUrlJob: String = "GET_URL_JOB"
 
     /**
      * 数据初始化
@@ -78,14 +73,14 @@ class DetailPlayerViewModel : BaseViewModel() {
         // 默认选择第一个解析接口
         currentParseBean.postValue(SourceManger.getParseBeanList().get(0))
 
-        viewModelScope.launch(Dispatchers.IO) {
+        Task {
             try {
                 val sourceKey = infoBean.sourceKey
-                val spiderSource = SourceManger.getSpiderSource(sourceKey)
+                val spiderSource = onIO { SourceManger.getSpiderSource(sourceKey) }
                     ?: throw Exception("获取数据源失败")
 
-                val videoDetail = spiderSource.videoDetail(listOf(infoBean.videoBean.vod_id))
-                    ?: throw Exception("获取详情失败")
+                val videoDetail = onIO { spiderSource.videoDetail(listOf(infoBean.videoBean.vod_id)) }
+                    ?: throw GlobalException.of("获取详情失败")
 
                 val channelFlagsAndEpisodes = videoDetail.getChannelFlagsAndEpisodes()
 
@@ -95,6 +90,10 @@ class DetailPlayerViewModel : BaseViewModel() {
                 this@DetailPlayerViewModel.channelFlagsAndEpisodes.postValue(channelFlagsAndEpisodes)
 
                 pageState.postValue(PageState.NORMAL)
+            }catch (e:GlobalException){
+                LogUtils.d("获取数据失败: ${e.message}")
+                e.printStackTrace()
+                pageState.postValue(PageState.EMPTY)
             } catch (e: Exception) {
                 LogUtils.d("获取数据失败: ${e.message}")
                 e.printStackTrace()
@@ -108,8 +107,7 @@ class DetailPlayerViewModel : BaseViewModel() {
      * 获取播放链接
      */
     fun getPlayUrl() {
-        getUrlJob?.cancel()
-        val job = viewModelScope.launch(Dispatchers.IO) {
+        Task(getUrlJob) {
             onStateVideoPlayerMsg("加载数据中...")
 
             val currentChannelData: VideoDetailBean.ChannelEpisodes =
@@ -117,30 +115,27 @@ class DetailPlayerViewModel : BaseViewModel() {
             val currenSelectEposode: VideoDetailBean.Value =
                 currentChannelData.episodes.get(currentEpisode.value!!)
 
-
-            async {
-                loadDanmu(currenSelectEposode)
-            }
-
             var playUrl: String = ""
             try {
                 var parseBeanList: List<ParseBean> = SourceManger.getParseBeanList()
-                playUrl =
-                    getPlayUrl(currentChannelData.channelFlag, currenSelectEposode, parseBeanList)
+                onIO2 {
+                    playUrl =
+                        getPlayUrl(currentChannelData.channelFlag, currenSelectEposode, parseBeanList)
+                }
             } catch (e: GlobalException) {
                 Toaster.show(e.message)
-                return@launch
+                return@Task
             } catch (e: Exception) {
                 Toaster.show("获取播放链接失败")
                 e.printStackTrace()
-                return@launch
+                return@Task
             } finally {
-                if (playUrl.isEmpty()) {
+                if (StringUtils.isEmpty(playUrl)) {
                     onStateVideoPlayerMsg("获取播放链接失败")
                 }
             }
-            if (playUrl.isEmpty()) {
-                return@launch
+            if (StringUtils.isEmpty(playUrl)) {
+                return@Task
             }
 
             LogUtils.d("最终播放链接:  ${playUrl}")
@@ -149,13 +144,10 @@ class DetailPlayerViewModel : BaseViewModel() {
                 currenSelectEposode.name,
                 playUrl
             )
-
             playEntity.postValue(epsodeEntity)
-
+            // 加载弹幕
+            onIO2 { loadDanmu(currenSelectEposode) }
         }
-
-        getUrlJob = job
-
     }
 
 
@@ -216,7 +208,7 @@ class DetailPlayerViewModel : BaseViewModel() {
 
 
     @WorkerThread
-    private suspend fun loadDanmu(currenSelectEposode: VideoDetailBean.Value) {
+    private fun loadDanmu(currenSelectEposode: VideoDetailBean.Value) {
         if (isVideoPlatformURL(currenSelectEposode.urlCode)) {
             Toaster.show("后台加载弹幕资源中")
             try {
@@ -225,9 +217,7 @@ class DetailPlayerViewModel : BaseViewModel() {
                         BaseConfig.DANMAKU_API + currenSelectEposode.urlCode,
                         App.instance.filesDir.absolutePath + "/danmu.xml"
                     )
-                withContext(Dispatchers.Main) {
-                    danmuStream.postValue(danmuFile)
-                }
+                danmuStream.postValue(danmuFile)
                 Toaster.show("弹幕正在装载")
             } catch (e: SocketTimeoutException) {
                 Toaster.show("加载弹幕超时,请重试")

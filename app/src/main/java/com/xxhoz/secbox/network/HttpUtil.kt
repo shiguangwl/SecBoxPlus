@@ -14,6 +14,7 @@ import okhttp3.ResponseBody
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 import java.util.zip.Inflater
 import java.util.zip.InflaterInputStream
 
@@ -144,6 +145,16 @@ object HttpUtil {
     fun downLoad(url: String, path: String): File {
         val request = Request.Builder()
             .url(url)
+            .build()
+
+
+        // 设置超时时间为20秒
+        val client = OkHttpClient.Builder()
+            // 设置连接超时时间，单位为秒
+            .connectTimeout(10, TimeUnit.SECONDS)
+            // 设置读取超时时间，单位为秒
+            .readTimeout(15, TimeUnit.SECONDS)
+            .addInterceptor(DeflateInterceptor())
             .build()
 
         client.newCall(request).execute().use { response ->
