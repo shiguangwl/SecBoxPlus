@@ -82,8 +82,8 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
         mContext = DanmakuContext.create();
         mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3)
                 .setDuplicateMergingEnabled(false) //是否启用合并重复弹幕
-                .setScrollSpeedFactor(1.6f)//设置弹幕滚动速度系数,只对滚动弹幕有效
-                .setScaleTextSize(0.9f)  // 设置缩放字体大小
+                .setScrollSpeedFactor(1.8f)//设置弹幕滚动速度系数,只对滚动弹幕有效
+                .setScaleTextSize(0.8f)  // 设置缩放字体大小
                 .setMaximumLines(maxLinesPair) //设置最大显示行数
                 .preventOverlapping(overlappingEnablePair); //设置防弹幕重叠，null为允许重叠
 
