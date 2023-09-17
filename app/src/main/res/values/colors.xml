@@ -65,4 +65,6 @@
     <color name="bg_window">#FFFFFFFF</color>
     <color name="bg_image">#0A000000</color>
     <color name="black5">#0D000000</color>
+    <color name="background_color">#E3F8F1</color>
+    <color name="background_color1">#10B8A3</color>
 </resources>

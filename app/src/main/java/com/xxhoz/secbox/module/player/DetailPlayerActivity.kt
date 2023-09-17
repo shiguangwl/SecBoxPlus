@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.annotation.MainThread
@@ -112,7 +113,12 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
 
         // 当前解析接口
         viewModel.currentParseBean.observe(this){
-//            Toaster.show("当前解析接口切换:" + it.name)
+            if (it == null){
+                viewBinding.cureentJxText.visibility = View.GONE
+            }else{
+                viewBinding.cureentJxText.visibility = View.VISIBLE
+                viewBinding.cureentJxText.text = it.name
+            }
         }
 
         // 加载提示信息

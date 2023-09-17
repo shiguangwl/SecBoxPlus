@@ -18,7 +18,7 @@
             android:layout_marginTop="5dp"
             android:textSize="19sp"
             android:textStyle="bold"
-            android:textColor="@color/font_color"
+            android:textColor="@color/background_color1"
             android:id="@+id/textView"
             app:layout_constraintBottom_toTopOf="@+id/recyclerView_choose_source"
             android:layout_marginBottom="5dp" />

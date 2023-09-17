@@ -7,6 +7,7 @@ import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.App
+import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.base.BaseViewModel
 import com.xxhoz.secbox.bean.EpsodeEntity
 import com.xxhoz.secbox.bean.PlayInfoBean
@@ -17,6 +18,8 @@ import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.bean.PlayLinkBean
 import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
+import com.xxhoz.secbox.parserCore.engine.SnifferEngine
+import com.xxhoz.secbox.util.GlobalActivityManager
 import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.StringUtils
 import org.json.JSONObject
@@ -44,7 +47,7 @@ class DetailPlayerViewModel : BaseViewModel() {
     val currentEpisode = MutableLiveData<Int>()
 
     // 当前解析接口对象
-    val currentParseBean = MutableLiveData<ParseBean>()
+    val currentParseBean = MutableLiveData<ParseBean?>()
 
     // 加载提示信息
     val stateVideoPlayerMsg = MutableLiveData<String>()
@@ -57,6 +60,10 @@ class DetailPlayerViewModel : BaseViewModel() {
 
     // 页面状态
     val pageState = MutableLiveData<Int>()
+
+    // SnifferJobs
+    val snifferJobs: ArrayList<SnifferEngine.SnifferJob> = ArrayList<SnifferEngine.SnifferJob>()
+    var snifferJobsCount: Int = 0
 
     // 搜索job
     var getUrlJob: String = "GET_URL_JOB"
@@ -73,7 +80,10 @@ class DetailPlayerViewModel : BaseViewModel() {
         // 默认选择第一个剧集
         currentEpisode.value = 0
         // 默认选择第一个解析接口
-        currentParseBean.postValue(SourceManger.getParseBeanList().get(0))
+        val parseBeanList = SourceManger.getParseBeanList()
+        if (parseBeanList.size > 0){
+            currentParseBean.postValue(parseBeanList.get(0))
+        }
 
         Task {
             try {
@@ -81,8 +91,9 @@ class DetailPlayerViewModel : BaseViewModel() {
                 val spiderSource = onIO { SourceManger.getSpiderSource(sourceKey) }
                     ?: throw Exception("获取数据源失败")
 
-                val videoDetail = onIO { spiderSource.videoDetail(listOf(infoBean.videoBean.vod_id)) }
-                    ?: throw GlobalException.of("获取详情失败")
+                val videoDetail =
+                    onIO { spiderSource.videoDetail(listOf(infoBean.videoBean.vod_id)) }
+                        ?: throw GlobalException.of("获取详情失败")
 
                 val channelFlagsAndEpisodes = videoDetail.getChannelFlagsAndEpisodes()
 
@@ -92,7 +103,7 @@ class DetailPlayerViewModel : BaseViewModel() {
                 this@DetailPlayerViewModel.channelFlagsAndEpisodes.postValue(channelFlagsAndEpisodes)
 
                 pageState.postValue(PageState.NORMAL)
-            }catch (e:GlobalException){
+            } catch (e: GlobalException) {
                 LogUtils.d("获取数据失败: ${e.message}")
                 e.printStackTrace()
                 pageState.postValue(PageState.EMPTY)
@@ -111,48 +122,53 @@ class DetailPlayerViewModel : BaseViewModel() {
     fun getPlayUrl() {
         Task(getUrlJob) {
             onStateVideoPlayerMsg("加载数据中...")
-
             val currentChannelData: VideoDetailBean.ChannelEpisodes =
                 channelFlagsAndEpisodes.value!!.get(currentChannel.value!!)
             val currenSelectEposode: VideoDetailBean.Value =
                 currentChannelData.episodes.get(currentEpisode.value!!)
 
-            var playUrl: String = ""
-            try {
-                var parseBeanList: List<ParseBean> = SourceManger.getParseBeanList()
-                onIO2 {
-                    playUrl =
-                        getPlayUrl(currentChannelData.channelFlag, currenSelectEposode, parseBeanList)
-                }
-            } catch (e: GlobalException) {
-                Toaster.show(e.message)
-                return@Task
-            } catch (e: Exception) {
-                Toaster.show("获取播放链接失败")
-                e.printStackTrace()
-                return@Task
-            } finally {
-                if (StringUtils.isEmpty(playUrl)) {
-                    onStateVideoPlayerMsg("获取播放链接失败")
-                }
+            val parseBeanList: List<ParseBean> = SourceManger.getParseBeanList()
+            onIO2 {
+                getPlayUrl(
+                    currentChannelData.channelFlag,
+                    currenSelectEposode.urlCode,
+                    parseBeanList,
+                    object : SnifferEngine.Callback {
+                        override fun success(parseBean: ParseBean?, res: String?) {
+                            clearSnifferJobs()
+                            LogUtils.d("最终播放链接:  ${res}")
+                            val epsodeEntity: EpsodeEntity = EpsodeEntity(
+                                currenSelectEposode.name,
+                                res
+                            )
+                            playEntity.postValue(epsodeEntity)
+                            currentParseBean.postValue(parseBean)
+                        }
+
+                        override fun failed(parseBean: ParseBean?, errorInfo: String?) {
+                            LogUtils.d("[${parseBean?.type}]解析失败: ${errorInfo}")
+                            snifferJobsCount -= 1
+                            if (snifferJobsCount <= 0) {
+                                onStateVideoPlayerMsg("获取播放链接失败")
+                                clearSnifferJobs()
+                            }
+                        }
+
+                        override fun timeOut(parseBean: ParseBean?) {
+                            LogUtils.d("[${parseBean?.type}]解析超时")
+                            snifferJobsCount -= 1
+                            if (snifferJobsCount <= 0) {
+                                onStateVideoPlayerMsg("获取播放链接失败")
+                                clearSnifferJobs()
+                            }
+                        }
+                    }
+                )
             }
-            if (StringUtils.isEmpty(playUrl)) {
-                return@Task
-            }
-
-            LogUtils.d("最终播放链接:  ${playUrl}")
-
-            val epsodeEntity: EpsodeEntity = EpsodeEntity(
-                currenSelectEposode.name,
-                playUrl
-            )
-            playEntity.postValue(epsodeEntity)
-
         }
     }
 
-
-    fun loadDanmaku(){
+    fun loadDanmaku() {
         Task(getDanmakuJob) {
             val currentChannelData: VideoDetailBean.ChannelEpisodes =
                 channelFlagsAndEpisodes.value!!.get(currentChannel.value!!)
@@ -167,64 +183,64 @@ class DetailPlayerViewModel : BaseViewModel() {
         }
     }
 
-    /**
-     * @param currentChannelData 当前线路数据
-     * @param currenSelectEposode 当前选中的剧集
-     * @param parseBean 当前解析接口对象
-     * @return 播放链接
+    /** 解析接口
+     * @param channelFlag 当前线路数
+     * @param urlCode 当前选中的剧集
+     * @param parseBeanList 当前解析接口对象
+     * @param callback 回调
      */
     @WorkerThread
     private fun getPlayUrl(
         channelFlag: String,
-        currenSelectEposode: VideoDetailBean.Value,
-        parseBean: List<ParseBean>,
-    ): String {
+        urlCode: String,
+        parseBeanList: List<ParseBean>,
+        callback: SnifferEngine.Callback
+    ) {
         val playLinkBean: PlayLinkBean =
-            spiderSource.value!!.playInfo(channelFlag, currenSelectEposode.urlCode)
+            spiderSource.value!!.playInfo(channelFlag, urlCode)
         LogUtils.i("影视播放数据: ${playLinkBean}")
-
+        onStateVideoPlayerMsg("资源加载中...")
         if (playLinkBean.parse == 1) {
-            // 解析播放链接
-            onStateVideoPlayerMsg("解析数据中...")
-
-            var parseRsult: String = ""
-            for (parseBean1 in parseBean) {
-                try {
-                    val jsonObject =
-                        HttpUtil.get(parseBean1.url + playLinkBean.url, JSONObject::class.java)
-                    parseRsult = jsonObject.getString("url")
-                    if (parseRsult.isEmpty()) {
-                        continue
+            // 解析嗅探播放链接
+            snifferJobsCount = parseBeanList.count { it.type == 1 || it.type == 0 }
+            for (parseBean in parseBeanList) {
+                if (parseBean.type == 1) {
+                    var parseRsult: String = ""
+                    try {
+                        val jsonObject =
+                            HttpUtil.get(parseBean.url + playLinkBean.url, JSONObject::class.java)
+                        parseRsult = jsonObject.getString("url")
+                    } catch (e: Exception) {
+                        LogUtils.d("[${parseBean.name}] 解析失败")
+                        e.printStackTrace()
                     }
-                } catch (e: Exception) {
-                    LogUtils.d("[${parseBean1.name}] 解析失败")
-                    e.printStackTrace()
-                    continue
-                }
 
-                if (parseRsult.isNotEmpty()) {
-                    Toaster.show("[${parseBean1.name}] 当前来源")
-                    break
+                    if (StringUtils.isNotEmpty(parseRsult)) {
+                        callback.success(parseBean, parseRsult)
+                        break
+                    } else {
+                        callback.failed(parseBean,"解析失败")
+                    }
+                } else if (parseBean.type == 0) {
+                    val snifferJob: SnifferEngine.SnifferJob = SnifferEngine.JX(
+                        GlobalActivityManager.getTopActivity() as BaseActivity<*>,
+                        parseBean,
+                        playLinkBean.url,
+                        15000,
+                        callback
+                    )
+                    snifferJobs.add(snifferJob)
                 }
             }
-
-            if (parseRsult.equals("")) {
-                throw GlobalException.of("解析失败,请尝试切换播放源")
-            }
-
-            playLinkBean.url = parseRsult
-
         } else if (playLinkBean.parse == 0) {
-            // TODO 嗅探播放链接
-            onStateVideoPlayerMsg("嗅探资源占时无法播放,请切换源")
+            // 直接播放
+            callback.success(null,playLinkBean.url)
         }
-
-        return playLinkBean.url
     }
 
 
     @WorkerThread
-    private fun loadDanmu(urlCode:String) : File?{
+    private fun loadDanmu(urlCode: String): File? {
         if (!isVideoPlatformURL(urlCode)) {
             return null
         }
@@ -261,6 +277,17 @@ class DetailPlayerViewModel : BaseViewModel() {
         stateVideoPlayerMsg.postValue(msg)
     }
 
+    override fun onCleared() {
+        clearSnifferJobs()
+        super.onCleared()
+    }
+
+    fun clearSnifferJobs() {
+        snifferJobs.forEach {
+            it.cancel()
+        }
+        snifferJobs.clear()
+    }
 
     @PageName
     override fun getPageName() = PageName.DETAIL_PLAYER
