@@ -287,6 +287,11 @@
     public *;
 }
 
+# 状态栏
+ -keep class com.gyf.immersionbar.* {*;}
+ -dontwarn com.gyf.immersionbar.**
+
+
 # spide
 -keep class com.github.** { *; }
 

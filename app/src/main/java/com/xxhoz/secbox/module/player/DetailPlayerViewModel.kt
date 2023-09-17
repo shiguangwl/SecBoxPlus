@@ -49,8 +49,8 @@ class DetailPlayerViewModel : BaseViewModel() {
     // 加载提示信息
     val stateVideoPlayerMsg = MutableLiveData<String>()
 
-    // 弹幕流
-    val danmuStream = MutableLiveData<File>()
+    // 弹幕文件
+    val danmuFile = MutableLiveData<File>()
 
     // 播放链接
     val playEntity = MutableLiveData<EpsodeEntity>()
@@ -60,6 +60,8 @@ class DetailPlayerViewModel : BaseViewModel() {
 
     // 搜索job
     var getUrlJob: String = "GET_URL_JOB"
+
+    var getDanmakuJob: String = "GET_DANMAKU_JOB"
 
     /**
      * 数据初始化
@@ -111,7 +113,7 @@ class DetailPlayerViewModel : BaseViewModel() {
             onStateVideoPlayerMsg("加载数据中...")
 
             val currentChannelData: VideoDetailBean.ChannelEpisodes =
-                videoDetailBean.value!!.getChannelFlagsAndEpisodes().get(currentChannel.value!!)
+                channelFlagsAndEpisodes.value!!.get(currentChannel.value!!)
             val currenSelectEposode: VideoDetailBean.Value =
                 currentChannelData.episodes.get(currentEpisode.value!!)
 
@@ -145,11 +147,25 @@ class DetailPlayerViewModel : BaseViewModel() {
                 playUrl
             )
             playEntity.postValue(epsodeEntity)
-            // 加载弹幕
-            onIO2 { loadDanmu(currenSelectEposode) }
+
         }
     }
 
+
+    fun loadDanmaku(){
+        Task(getDanmakuJob) {
+            val currentChannelData: VideoDetailBean.ChannelEpisodes =
+                channelFlagsAndEpisodes.value!!.get(currentChannel.value!!)
+            val currenSelectEposode: VideoDetailBean.Value =
+                currentChannelData.episodes.get(currentEpisode.value!!)
+
+            val danmu: File? = onIO { loadDanmu(currenSelectEposode.urlCode) }
+
+            danmu?.run {
+                danmuFile.postValue(this)
+            }
+        }
+    }
 
     /**
      * @param currentChannelData 当前线路数据
@@ -208,24 +224,26 @@ class DetailPlayerViewModel : BaseViewModel() {
 
 
     @WorkerThread
-    private fun loadDanmu(currenSelectEposode: VideoDetailBean.Value) {
-        if (isVideoPlatformURL(currenSelectEposode.urlCode)) {
-            Toaster.show("后台加载弹幕资源中")
-            try {
-                val danmuFile: File =
-                    HttpUtil.downLoad(
-                        BaseConfig.DANMAKU_API + currenSelectEposode.urlCode,
-                        App.instance.filesDir.absolutePath + "/danmu.xml"
-                    )
-                danmuStream.postValue(danmuFile)
-                Toaster.show("弹幕正在装载")
-            } catch (e: SocketTimeoutException) {
-                Toaster.show("加载弹幕超时,请重试")
-            } catch (e: Exception) {
-                Toaster.show("加载弹幕资源失败")
-                e.printStackTrace()
-            }
+    private fun loadDanmu(urlCode:String) : File?{
+        if (!isVideoPlatformURL(urlCode)) {
+            return null
         }
+        Toaster.show("后台加载弹幕资源中")
+        try {
+            val danmuFile: File =
+                HttpUtil.downLoad(
+                    BaseConfig.DANMAKU_API + urlCode,
+                    App.instance.filesDir.absolutePath + "/danmu.xml"
+                )
+            Toaster.show("弹幕正在装载")
+            return danmuFile
+        } catch (e: SocketTimeoutException) {
+            Toaster.show("加载弹幕超时,请重试")
+        } catch (e: Exception) {
+            Toaster.show("加载弹幕资源失败")
+            e.printStackTrace()
+        }
+        return null
     }
 
     fun isVideoPlatformURL(url: String?): Boolean {

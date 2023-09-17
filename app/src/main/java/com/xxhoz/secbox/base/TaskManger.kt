@@ -16,39 +16,40 @@ interface TaskManger {
     /**
      * 取消之前任务,提交一个新任务
      */
-    fun Task(task: suspend () -> Unit) {
-        Task(DefaultJobName,task)
+    fun Task(task: suspend () -> Unit): Job {
+        return Task(DefaultJobName, task)
     }
 
     /**
      * 取消之前任务,提交一个新任务
      */
-    fun Task(taskNae: String, task: suspend () -> Unit) {
+    fun Task(taskNae: String, task: suspend () -> Unit): Job {
         jobs[taskNae]?.cancel()
         jobs[taskNae] = getScope().launch {
             task()
         }
+        return jobs[taskNae]!!
     }
 
     fun getScope(): CoroutineScope
 
-    fun clearTask(){
-        jobs.values.forEach{
+    fun clearTask() {
+        jobs.values.forEach {
             it.cancel()
         }
         jobs.clear()
     }
 
 
-    suspend fun <T> onIO(task: ()->T) : T{
-        return withContext(Dispatchers.IO){
+    suspend fun <T> onIO(task: () -> T): T {
+        return withContext(Dispatchers.IO) {
             return@withContext task()
         }
     }
 
-    suspend fun onIO2(task: ()->Unit){
-         withContext(Dispatchers.IO){
+    suspend fun onIO2(task: () -> Unit) {
+        withContext(Dispatchers.IO) {
             task()
-         }
+        }
     }
 }

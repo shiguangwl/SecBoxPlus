@@ -7,17 +7,21 @@ import com.xxhoz.secbox.R
 import xyz.doikki.videocontroller.component.VodControlView
 import xyz.doikki.videoplayer.player.VideoView
 
-class BottomControlView(context: Context) : VodControlView(context) {
+class BottomControlView(context: Context, var danmuState: Boolean) : VodControlView(context) {
 
     private var nextVod: ImageView
     private var changeEposde: TextView
     private var changeSpeed: TextView
     private var fullScreen: ImageView
+    private var danmuBtn: ImageView
+
     init {
         nextVod = findViewById(R.id.next_vod)
         changeEposde = findViewById(R.id.change_epsode)
         changeSpeed = findViewById(R.id.change_speed)
+        danmuBtn = findViewById(R.id.danmu_control)
         fullScreen = findViewById(R.id.fullscreen);
+        changeDanmuState(danmuState)
     }
 
     override fun getLayoutId(): Int {
@@ -25,7 +29,7 @@ class BottomControlView(context: Context) : VodControlView(context) {
     }
 
 
-    override fun onPlayerStateChanged(playerState: Int){
+    override fun onPlayerStateChanged(playerState: Int) {
         super.onPlayerStateChanged(playerState)
 
         when (playerState) {
@@ -34,6 +38,7 @@ class BottomControlView(context: Context) : VodControlView(context) {
                 changeSpeed.visibility = GONE
                 fullScreen.visibility = VISIBLE
             }
+
             VideoView.PLAYER_FULL_SCREEN -> {
                 changeEposde.visibility = VISIBLE
                 changeSpeed.visibility = VISIBLE
@@ -42,15 +47,32 @@ class BottomControlView(context: Context) : VodControlView(context) {
         }
     }
 
+    fun changeDanmuState(danmuState: Boolean) {
+        if (danmuState) {
+            danmuBtn.setImageResource(R.drawable.icon_danmu_open)
+        } else {
+            danmuBtn.setImageResource(R.drawable.icon_danmu_close)
+        }
+    }
 
     fun setNextVodListener(listener: OnClickListener) {
         nextVod.setOnClickListener(listener)
     }
+
     fun setChangeEposdeListener(listener: OnClickListener) {
         changeEposde.setOnClickListener(listener)
     }
+
     fun setChangeSpeedListener(listener: OnClickListener) {
         changeSpeed.setOnClickListener(listener)
+    }
+
+    fun setDanmuBtnListener(listener: (danmuState: Boolean) -> Unit) {
+        danmuBtn.setOnClickListener() {
+            danmuState = !danmuState
+            changeDanmuState(danmuState)
+            listener(danmuState)
+        }
     }
 
 }

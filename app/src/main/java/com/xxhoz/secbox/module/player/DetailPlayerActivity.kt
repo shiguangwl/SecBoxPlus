@@ -23,11 +23,13 @@ import com.xxhoz.secbox.databinding.ActivityDetailPlayerBinding
 import com.xxhoz.secbox.module.player.video.DanmuVideoPlayer
 import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
 import com.xxhoz.secbox.util.setImageUrl
+import java.io.File
 
 
 class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
     DanmuVideoPlayer.PlayerCallback {
 
+    private lateinit var loadDanmu: (File) -> Unit
     private val viewModel: DetailPlayerViewModel by viewModels()
 
     private lateinit var channelTab: TabLayout
@@ -123,8 +125,8 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
             videoPlayer.setUp(it)
         }
 
-        viewModel.danmuStream.observe(this){
-            videoPlayer.setDanmuStream(it)
+        viewModel.danmuFile.observe(this){
+            loadDanmu(it)
         }
 
         viewModel.pageState.observe(this){
@@ -316,6 +318,14 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
      */
     override fun retryClick() {
         episodeTab.getTabAt(viewModel.currentEpisode.value!!)!!.select()
+    }
+
+    /**
+     * 弹幕加载事假
+     */
+    override fun loadDanmaku(callBack: (File) -> Unit) {
+        this.loadDanmu = callBack
+        viewModel.loadDanmaku()
     }
 
     fun removeHtmlAndWhitespace(input: String): String {

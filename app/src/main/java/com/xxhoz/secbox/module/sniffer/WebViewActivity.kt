@@ -15,9 +15,7 @@ import android.webkit.WebViewClient
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.lifecycleScope
 import com.hjq.toast.Toaster
-import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.SourceManger
-import com.xxhoz.secbox.App
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.bean.EpsodeEntity
@@ -31,8 +29,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.io.File
-import java.net.SocketTimeoutException
 
 class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 //    val USER_AGENT =
@@ -237,24 +233,24 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
             videoPlayer.setUp(EpsodeEntity("", parseRsult))
         }
 
-        // 加载弹幕
-        Toaster.show("后台加载弹幕资源中")
-        try {
-            val danmuFile: File =
-                HttpUtil.downLoad(
-                    BaseConfig.DANMAKU_API + url,
-                    App.instance.filesDir.absolutePath + "/danmu.xml"
-                )
-            withContext(Dispatchers.Main) {
-                videoPlayer.setDanmuStream(danmuFile)
-            }
-            Toaster.show("弹幕正在装载")
-        } catch (e: SocketTimeoutException) {
-            Toaster.show("加载弹幕超时,请重试")
-        } catch (e: Exception) {
-            Toaster.show("加载弹幕资源失败")
-            e.printStackTrace()
-        }
+//        // 加载弹幕
+//        Toaster.show("后台加载弹幕资源中")
+//        try {
+//            val danmuFile: File =
+//                HttpUtil.downLoad(
+//                    BaseConfig.DANMAKU_API + url,
+//                    App.instance.filesDir.absolutePath + "/danmu.xml"
+//                )
+//            withContext(Dispatchers.Main) {
+//                videoPlayer.setDanmuStream(danmuFile)
+//            }
+//            Toaster.show("弹幕正在装载")
+//        } catch (e: SocketTimeoutException) {
+//            Toaster.show("加载弹幕超时,请重试")
+//        } catch (e: Exception) {
+//            Toaster.show("加载弹幕资源失败")
+//            e.printStackTrace()
+//        }
     }
 
 

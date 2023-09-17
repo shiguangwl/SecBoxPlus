@@ -4,12 +4,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
 import com.hjq.toast.Toaster
+import com.xxhoz.constant.Key
 import com.xxhoz.secbox.bean.EpsodeEntity
 import com.xxhoz.secbox.module.player.popup.VideoEpisodePopup
 import com.xxhoz.secbox.module.player.popup.VideoSpeedPopup
 import com.xxhoz.secbox.module.player.video.view.BottomControlView
 import com.xxhoz.secbox.module.player.video.view.ErrorView
 import com.xxhoz.secbox.module.player.video.view.SecDanmakuView
+import com.xxhoz.secbox.persistence.XKeyValue
 
 import xyz.doikki.videocontroller.component.CompleteView
 import xyz.doikki.videocontroller.component.GestureView
@@ -24,7 +26,7 @@ import java.io.File
 class DanmuVideoPlayer : VideoView {
 
     lateinit var topTitleView: TopTitleView
-    private lateinit var vDanmakuView : SecDanmakuView
+    private lateinit var vDanmakuView: SecDanmakuView
     lateinit var standardVideoController: StandardVideoController
     var episodes: ArrayList<EpsodeEntity>? = null
 
@@ -57,7 +59,7 @@ class DanmuVideoPlayer : VideoView {
         defStyleAttr
     )
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs){
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         initController(context)
     }
 
@@ -68,13 +70,13 @@ class DanmuVideoPlayer : VideoView {
                 val completeView = CompleteView(getContext())
                 // 错误页面
                 val errorView: ErrorView = ErrorView(getContext())
-                errorView.setOnRetryListener(){
+                errorView.setOnRetryListener() {
                     actionCallback?.retryClick()
                 }
                 // 顶部
                 topTitleView = TopTitleView(getContext())
                 // 底部
-                val bottomControlView = BottomControlView(getContext())
+                val bottomControlView = BottomControlView(getContext(), XKeyValue.getBoolean(Key.DANMAKU_STATE, true))
                 // 手势控制
                 val gestureView = GestureView(getContext())
                 // 弹幕组件
@@ -84,7 +86,7 @@ class DanmuVideoPlayer : VideoView {
                     )
                 addControlComponent(completeView)
                 addControlComponent(errorView)
-    //                addControlComponent(prepareView)
+                //                addControlComponent(prepareView)
                 addControlComponent(topTitleView)
                 addControlComponent(bottomControlView)
                 addControlComponent(gestureView)
@@ -101,7 +103,7 @@ class DanmuVideoPlayer : VideoView {
                 }
                 // 选集
                 bottomControlView.setChangeEposdeListener() {
-                    if (episodes == null){
+                    if (episodes == null) {
                         return@setChangeEposdeListener
                     }
 
@@ -116,7 +118,29 @@ class DanmuVideoPlayer : VideoView {
 
                 // 速度
                 bottomControlView.setChangeSpeedListener() {
-                    videoSpeedPopup.showAtLocation(activity.getWindow().getDecorView(), Gravity.RIGHT, 0, 0)
+                    videoSpeedPopup.showAtLocation(
+                        activity.getWindow().getDecorView(),
+                        Gravity.RIGHT,
+                        0,
+                        0
+                    )
+                }
+
+                // 弹幕
+                bottomControlView.setDanmuBtnListener() {
+                    if (it){
+                        XKeyValue.putBoolean(Key.DANMAKU_STATE, true)
+                        if (vDanmakuView.isPrepared) {
+                            vDanmakuView.show()
+                        }else{
+                            // 加载弹幕
+                            actionCallback?.loadDanmaku(@DanmuVideoPlayer::setDanmuStream)
+                        }
+                    }else{
+                        XKeyValue.putBoolean(Key.DANMAKU_STATE, false)
+                        // 关闭弹幕
+                        vDanmakuView.hide()
+                    }
                 }
             }
         }
@@ -141,14 +165,18 @@ class DanmuVideoPlayer : VideoView {
         setUrl(epsodeEntity.videoUrl)
         startPlay()
         standardVideoController.startShowBufferSpeed()
+
+        if (XKeyValue.getBoolean(Key.DANMAKU_STATE, true)){
+            actionCallback?.loadDanmaku(this::setDanmuStream)
+        }
     }
 
     /**
      * 显示loading信息
      */
-    fun setLoadingMsg(msg:String){
+    fun setLoadingMsg(msg: String) {
         standardVideoController.stopShowBufferSpeed()
-        if (currentPlayerState != STATE_IDLE){
+        if (currentPlayerState != STATE_IDLE) {
             release()
         }
         standardVideoController.setLoadingMsg(msg)
@@ -157,7 +185,7 @@ class DanmuVideoPlayer : VideoView {
     /**
      * 加载弹幕数据
      */
-    fun setDanmuStream(stream: File){
+    private fun setDanmuStream(stream: File) {
         vDanmakuView.loadDanmuStream(stream)
     }
 
@@ -166,5 +194,6 @@ class DanmuVideoPlayer : VideoView {
         fun throwingScreenClick()
         fun selectPartsClick(position: Int)
         fun retryClick()
+        fun loadDanmaku(callBack: (File)->Unit)
     }
 }

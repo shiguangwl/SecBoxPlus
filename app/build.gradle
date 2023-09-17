@@ -170,11 +170,11 @@ dependencies {
     kapt("com.github.bumptech.glide:compiler:${versions.glide}")
 
     // ImmersionBar(状态栏、导航栏适配)
-    implementation("com.gyf.immersionbar:immersionbar:${versions.immersionbar}")
+    implementation("com.geyifeng.immersionbar:immersionbar:${versions.immersionbar}")
     // fragment快速实现
-    implementation("com.gyf.immersionbar:immersionbar-components:${versions.immersionbar}")
+    implementation("com.geyifeng.immersionbar:immersionbar-components:${versions.immersionbar}")
     // kotlin扩展
-    implementation("com.gyf.immersionbar:immersionbar-ktx:${versions.immersionbar}")
+    implementation("com.geyifeng.immersionbar:immersionbar-ktx:${versions.immersionbar}")
 
     // 右滑返回
     implementation("me.imid.swipebacklayout.lib:library:${versions.swipebacklayout}")
