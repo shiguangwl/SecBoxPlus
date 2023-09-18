@@ -190,7 +190,7 @@ class DanmuVideoPlayer : VideoView {
     /**
      * 加载弹幕数据
      */
-    private fun setDanmuStream(stream: File) {
+    fun setDanmuStream(stream: File) {
         vDanmakuView.loadDanmuStream(stream)
     }
 

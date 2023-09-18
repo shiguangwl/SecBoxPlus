@@ -171,6 +171,16 @@ object XKeyValue {
     }
 
     /**
+     * 列表删除元素
+     */
+    inline fun <reified T> removeObjectList(@Key key: String, value: T) {
+        val list = getObjectList<T>(key)
+        if (list != null) {
+            list.remove(value)
+            putObjectList(key, list)
+        }
+    }
+    /**
      * 清空某个列表
      */
     fun clearObjectList(@Key key: String) {

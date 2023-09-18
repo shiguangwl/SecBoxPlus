@@ -58,53 +58,73 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.xxhoz.secbox.widget.SettingItemView
-            android:id="@+id/item_history"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:setting_item_icon="@drawable/history_icon"
-            app:setting_item_title="@string/setting_item_history" />
 
-        <com.xxhoz.secbox.widget.SettingItemView
-                android:visibility="gone"
-            android:id="@+id/item_collection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:setting_item_icon="@drawable/icon_collection"
-            app:setting_item_title="@string/setting_item_collection" />
 
-        <com.xxhoz.secbox.widget.SettingItemView
-                android:visibility="gone"
-            android:id="@+id/item_subscribe"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:setting_item_icon="@drawable/icon_subscribe"
-            app:setting_item_title="@string/setting_item_subscribe" />
 
-        <com.xxhoz.secbox.widget.SettingItemView
-                android:visibility="gone"
-                android:id="@+id/item_setting"
+        <androidx.cardview.widget.CardView
+                android:id="@+id/cardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:setting_item_icon="@drawable/icon_setting"
-                app:setting_item_title="@string/setting_item_setting" />
+                android:layout_margin="16dp"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
+            <androidx.appcompat.widget.LinearLayoutCompat
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+
+                <com.xxhoz.secbox.widget.SettingItemView
+                        android:id="@+id/item_history"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:setting_item_icon="@drawable/history_icon"
+                        app:setting_item_title="@string/setting_item_history" />
+
+                <com.xxhoz.secbox.widget.SettingItemView
+                        android:visibility="gone"
+                        android:id="@+id/item_collection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:setting_item_icon="@drawable/icon_collection"
+                        app:setting_item_title="@string/setting_item_collection" />
+
+                <com.xxhoz.secbox.widget.SettingItemView
+                        android:visibility="gone"
+                        android:id="@+id/item_subscribe"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:setting_item_icon="@drawable/icon_subscribe"
+                        app:setting_item_title="@string/setting_item_subscribe" />
+
+                <com.xxhoz.secbox.widget.SettingItemView
+                        android:visibility="gone"
+                        android:id="@+id/item_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:setting_item_icon="@drawable/icon_setting"
+                        app:setting_item_title="@string/setting_item_setting" />
 
 
 
-        <com.xxhoz.secbox.widget.SettingItemView
-                android:id="@+id/item_clearCache"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:setting_item_icon="@drawable/icon_clearcache"
-                app:setting_item_title="@string/setting_item_clearCache" />
+                <com.xxhoz.secbox.widget.SettingItemView
+                        android:id="@+id/item_clearCache"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:setting_item_icon="@drawable/icon_clearcache"
+                        app:setting_item_title="@string/setting_item_clearCache" />
 
 
-        <com.xxhoz.secbox.widget.SettingItemView
-                android:id="@+id/item_about"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:setting_item_icon="@drawable/icon_about"
-                app:setting_item_title="@string/setting_item_about" />
+                <com.xxhoz.secbox.widget.SettingItemView
+                        android:id="@+id/item_about"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:setting_item_icon="@drawable/icon_about"
+                        app:setting_item_title="@string/setting_item_about" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 

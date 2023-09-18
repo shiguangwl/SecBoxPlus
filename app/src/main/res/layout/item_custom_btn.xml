@@ -1,0 +1,14 @@
+<LinearLayout android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <Button android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/custom_btn"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:text="你好生活"
+            android:backgroundTint="#F4F4F4"
+            android:textColor="@color/font_color"
+            xmlns:android="http://schemas.android.com/apk/res/android"/>
+
+</LinearLayout>

@@ -6,7 +6,8 @@ import androidx.annotation.StringDef
     Key.CURRENT_SOURCE_KEY,
     Key.SEARCH_HISTORY,
     Key.DANMAKU_STATE,
-    Key.PLAY_History
+    Key.PLAY_History,
+    Key.CUSTOM_SITE
 )
 @Retention(AnnotationRetention.SOURCE)
 annotation class Key {
@@ -36,5 +37,10 @@ annotation class Key {
          * 播放记录
          */
         const val PLAY_History = "account_play_history"
+
+        /**
+         * 自定义站点
+         */
+        const val CUSTOM_SITE = "account_custom_site"
     }
 }
