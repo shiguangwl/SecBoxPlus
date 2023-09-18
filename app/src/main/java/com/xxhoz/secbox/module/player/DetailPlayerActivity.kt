@@ -197,6 +197,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
                     val parseBean: ParseBean = parseBeanList.get(position)
                     viewModel.currentParseBean.value = parseBean
                     Toaster.show("选择: $text")
+                    viewModel.getPlayUrl()
                 }
                 .show()
         }

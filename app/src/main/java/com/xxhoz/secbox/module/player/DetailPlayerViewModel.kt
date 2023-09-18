@@ -147,6 +147,7 @@ class DetailPlayerViewModel : BaseViewModel() {
                     object : SnifferEngine.Callback {
                         override fun success(parseBean: ParseBean?, res: String?) {
                             clearSnifferJobs()
+                            LogUtils.d("[${parseBean?.type}] 解析成功")
                             LogUtils.d("最终播放链接:  ${res}")
                             val epsodeEntity: EpsodeEntity = EpsodeEntity(
                                 currenSelectEposode.name,
@@ -158,26 +159,13 @@ class DetailPlayerViewModel : BaseViewModel() {
 
                         override fun failed(parseBean: ParseBean?, errorInfo: String?) {
                             LogUtils.d("[${parseBean?.type}]解析失败: ${errorInfo}")
-                            onStateVideoPlayerMsg("获取播放链接失败")
-//                            if (parseBean?.type == 1) {
-//                                return
-//                            }
-//                            snifferJobsCount -= 1
-//                            if (snifferJobsCount <= 0) {
-//                                onStateVideoPlayerMsg("获取播放链接失败")
-//                                clearSnifferJobs()
-//                            }
-                        }
-
-                        override fun timeOut(parseBean: ParseBean?) {
-                            LogUtils.d("[${parseBean?.type}]解析超时")
-                            onStateVideoPlayerMsg("获取播放链接超时")
-
-//                            snifferJobsCount -= 1
-//                            if (snifferJobsCount <= 0) {
-//                                onStateVideoPlayerMsg("获取播放链接失败")
-//                                clearSnifferJobs()
-//                            }
+                            if (parseBean?.type == 0) {
+                                snifferJobsCount -= 1
+                                if (snifferJobsCount <= 0) {
+                                    onStateVideoPlayerMsg("获取播放链接失败")
+                                    clearSnifferJobs()
+                                }
+                            }
                         }
                     }
                 )
@@ -247,7 +235,7 @@ class DetailPlayerViewModel : BaseViewModel() {
                         GlobalActivityManager.getTopActivity() as BaseActivity<*>,
                         parseBean,
                         playLinkBean.url,
-                        15000,
+                        30000,
                         callback
                     )
                     snifferJobs.add(snifferJob)

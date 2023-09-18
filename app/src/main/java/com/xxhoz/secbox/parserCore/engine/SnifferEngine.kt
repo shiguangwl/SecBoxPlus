@@ -2,6 +2,11 @@ package com.xxhoz.secbox.parserCore.engine
 
 import android.net.http.SslError
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
+import android.webkit.ConsoleMessage
+import android.webkit.JsPromptResult
+import android.webkit.JsResult
 import android.webkit.SslErrorHandler
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -9,6 +14,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.xxhoz.constant.BaseConfig
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.util.LogUtils
@@ -47,8 +53,16 @@ object SnifferEngine {
         val mWebView: AtomicReference<WebView> = AtomicReference()
         // 启动协程
         activity.runOnUiThread() {
-            mWebView!!.set(WebView(activity))
-            //mWebView = activity.findViewById(R.id.test_webview);
+            mWebView.set(WebView(activity))
+
+            configWebViewSys(mWebView.get())
+            val layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            mWebView.get().visibility = View.GONE
+            activity.addContentView(mWebView.get(),layoutParams)
+
             // 超时回调
             val timer = Timer()
             val timerTask: TimerTask = object : TimerTask() {
@@ -56,29 +70,12 @@ object SnifferEngine {
                     activity.runOnUiThread {
                         mWebView.get().removeAllViews()
                         mWebView.get().destroy()
-                        // 超时回调
-                        callback.timeOut(parseBean)
+                         //超时回调
+                        callback.failed(parseBean,"解析超时")
                     }
                 }
             }
             timer.schedule(timerTask, timeout)
-            mWebView.get().settings.mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
-            mWebView.get().settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-            mWebView.get().settings.blockNetworkImage = false
-
-            // WebView 配置
-            val webSettings = mWebView.get().settings
-            // js 相关
-            webSettings.javaScriptEnabled = true // 支持 js。如果碰到后台无法释放 js 导致耗电，应在 onStop 和 onResume 里分别设成 false 和 true
-            // 设置自适应屏幕，两者合用
-            webSettings.useWideViewPort = true // 将图片调整到适合 WebView 的大小
-            webSettings.loadWithOverviewMode = true // 缩放至屏幕的大小
-            // 缩放操作
-            webSettings.setSupportZoom(false) // 支持缩放，默认为 true
-            webSettings.builtInZoomControls = false // 设置内置的缩放控件，若为 false，则该 WebView 不可缩放
-            webSettings.displayZoomControls = false // 隐藏原生的缩放控件
-            webSettings.domStorageEnabled = true
-            webSettings.setUserAgentString("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.42")
 
 
             // 加载是否发生异常
@@ -101,20 +98,10 @@ object SnifferEngine {
                     Log.e(TAG, errorInfo.get())
                 }
 
-//                override fun onReceivedSslError(
-//                    view: WebView,
-//                    handler: SslErrorHandler,
-//                    error: SslError
-//                ) {
-////                super.onReceivedSslError(view, handler, error);
-//                    isError.set(true)
-//                    errorInfo.set("onReceivedSslError:" + error.url)
-//                    Log.e(TAG, errorInfo.get())
-//                }
-
                 override fun onLoadResource(view: WebView, url: String) {
                     LogUtils.d("Webview加载资源:" + url)
-                    if (url.contains(".m3u8") || url.contains(".mp4") || url.contains(".flv")) {
+                    if (isM3u8Url(url) || url.contains(".mp4") || url.contains(".flv")) {
+                        if (url.contains(".m3u8") )
                         callback.success(parseBean, url)
                         timer.cancel()
                         mWebView.get().removeAllViews()
@@ -142,15 +129,49 @@ object SnifferEngine {
                         timer.cancel()
                         if (isError.get()) {
                             // 异常错误回调
-                            callback.failed(parseBean,errorInfo.get())
+//                            callback.failed(parseBean,errorInfo.get())
                             return
                         }
-                        mWebView.get().removeAllViews()
-                        mWebView.get().destroy()
+//                        mWebView.get().removeAllViews()
+//                        mWebView.get().destroy()
                     }
+                }
+
+                override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+                    return false
+                }
+
+                override fun onJsAlert(
+                    view: WebView,
+                    url: String,
+                    message: String,
+                    result: JsResult
+                ): Boolean {
+                    return true
+                }
+
+                override fun onJsConfirm(
+                    view: WebView,
+                    url: String,
+                    message: String,
+                    result: JsResult
+                ): Boolean {
+                    return true
+                }
+
+                override fun onJsPrompt(
+                    view: WebView,
+                    url: String,
+                    message: String,
+                    defaultValue: String,
+                    result: JsPromptResult
+                ): Boolean {
+                    return true
                 }
             })
             mWebView.get().loadUrl(parseBean.url + url)
+//            mWebView.get().loadUrl("https://www.ajeee.com/play/211517-3-1.html")
+
         }
 
         while (true){
@@ -160,21 +181,68 @@ object SnifferEngine {
             }
             return object : SnifferJob {
                 override fun cancel() {
-                    val webView = mWebView!!.get()
-                    if (webView != null) {
-                        webView.removeAllViews()
-                        webView.destroy()
+                    activity.runOnUiThread {
+                        val webView = mWebView!!.get()
+                        if (webView != null) {
+                            webView.removeAllViews()
+                            webView.destroy()
+                        }
                     }
                 }
             }
         }
     }
 
+    fun isM3u8Url(url: String): Boolean {
+        // 使用正则表达式来匹配m3u8链接的模式
+        val m3u8Pattern = """^https?://.*\.m3u8(\?.*)?$""".toRegex()
+        return m3u8Pattern.matches(url)
+    }
+
+
+    open fun configWebViewSys(webView: WebView) {
+        webView.isFocusable = false
+        webView.isFocusableInTouchMode = false
+        webView.clearFocus()
+        webView.overScrollMode = View.OVER_SCROLL_ALWAYS
+
+        /* 添加webView配置 */
+        val settings = webView.settings
+        settings.setNeedInitialFocus(false)
+        settings.allowContentAccess = true
+        settings.allowFileAccess = true
+        settings.allowUniversalAccessFromFileURLs = true
+        settings.allowFileAccessFromFileURLs = true
+        settings.databaseEnabled = true
+        settings.domStorageEnabled = true
+        settings.javaScriptEnabled = true
+        settings.mediaPlaybackRequiresUserGesture = false
+        if (BaseConfig.DEBUG) {
+            settings.blockNetworkImage = false
+        } else {
+            settings.blockNetworkImage = true
+        }
+        settings.useWideViewPort = true
+        settings.domStorageEnabled = true
+        settings.javaScriptCanOpenWindowsAutomatically = true
+        settings.setSupportMultipleWindows(false)
+        settings.loadWithOverviewMode = true
+        settings.builtInZoomControls = true
+        settings.setSupportZoom(false)
+        settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+        settings.cacheMode = WebSettings.LOAD_NO_CACHE
+        /* 添加webView配置 */
+        //设置编码
+        settings.defaultTextEncodingName = "utf-8"
+        settings.setUserAgentString(webView.settings.userAgentString)
+//         settings.setUserAgentString(ANDROID_UA);
+//        webView.setBackgroundColor(Color.BLACK)
+    }
+
     // 访问回调
     interface Callback {
         fun success(parseBean: ParseBean?, res: String?)
         fun failed(parseBean: ParseBean?,errorInfo: String?)
-        fun timeOut(parseBean: ParseBean?)
     }
 
     interface SnifferJob {
