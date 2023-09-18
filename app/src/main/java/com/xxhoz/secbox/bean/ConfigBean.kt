@@ -10,5 +10,6 @@ data class ConfigBean(
     val state: String,
     val stateInfo: String,
     val configJsonUrl: String,
-    val danmukuApi: String
+    val danmukuApi: String,
+    val banner:List<String>,
 )

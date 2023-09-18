@@ -30,7 +30,7 @@ class XmlSource(override var sourceBean: SourceBean, var spider: Spider)  :
         TODO("Not yet implemented")
     }
 
-    override fun playInfo(flag: String, id: String): PlayLinkBean {
+    override fun playInfo(flag: String, id: String): PlayLinkBean? {
         TODO("Not yet implemented")
     }
 

@@ -3,6 +3,7 @@ package com.xxhoz.secbox.item
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.xxhoz.secbox.base.list.base.BaseItemViewDelegate
 import com.xxhoz.secbox.databinding.ItemBannerBinding
@@ -36,6 +37,7 @@ class BannerViewDelegate : BaseItemViewDelegate<BannerViewData, BannerViewDelega
 
     class BannerAdapter : BannerImageAdapter<String>(null) {
         override fun onBindView(holder: BannerImageHolder, image: String, position: Int, size: Int) {
+            holder.imageView.scaleType = ImageView.ScaleType.FIT_XY
             holder.imageView.setImageUrl(image)
         }
     }

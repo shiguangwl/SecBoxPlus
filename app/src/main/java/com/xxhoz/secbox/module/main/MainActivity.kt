@@ -19,6 +19,7 @@ import com.xxhoz.secbox.databinding.ActivityMainBinding
 import com.xxhoz.secbox.module.home.TabHomeFragment
 import com.xxhoz.secbox.module.mine.MineFragment
 import com.xxhoz.secbox.module.sniffer.SnifferFragment
+import com.xxhoz.secbox.util.GlobalActivityManager
 import com.xxhoz.secbox.widget.NavigationView
 import com.xxhoz.secbox.widget.TabIndicatorView
 
@@ -107,8 +108,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     override fun onBackPressed() {
         if (doubleBackToExitPressedOnce) {
             super.onBackPressed()
+            GlobalActivityManager.finishAll()
             MobclickAgent.onKillProcess(this)
-            finish()
             System.exit(0)
             return
         }

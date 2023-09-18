@@ -14,6 +14,9 @@ import com.google.android.material.tabs.TabLayout
 import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.gson.factory.GsonFactory
 import com.hjq.toast.Toaster
+import com.lxj.xpopup.XPopup
+import com.xxhoz.constant.Key
+import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.bean.EpsodeEntity
@@ -22,12 +25,14 @@ import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.constant.PageState
 import com.xxhoz.secbox.databinding.ActivityDetailPlayerBinding
 import com.xxhoz.secbox.module.player.video.DanmuVideoPlayer
+import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
+import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.setImageUrl
 import java.io.File
 
 
-class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
+class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
     DanmuVideoPlayer.PlayerCallback {
 
     private lateinit var loadDanmu: (File) -> Unit
@@ -38,6 +43,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
 
     private lateinit var videoPlayer: DanmuVideoPlayer
 
+    private var position = 0L
     override fun getPageName() = PageName.DETAIL_PLAYER
     override val inflater: (inflater: LayoutInflater) -> ActivityDetailPlayerBinding
         get() = ActivityDetailPlayerBinding::inflate
@@ -48,7 +54,25 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
         fun startActivity(context: Context, playInfoBean: PlayInfoBean) {
             val intent = Intent(context, DetailPlayerActivity::class.java)
             val bundle = Bundle()
-            bundle.putSerializable("playInfoBean", playInfoBean)
+
+            // 查找播放记录
+            var playInfo = playInfoBean
+            var playInfoBeans: ArrayList<PlayInfoBean>? =
+                XKeyValue.getObjectList<PlayInfoBean>(Key.PLAY_History)
+            if (playInfoBeans == null) {
+                playInfoBeans = ArrayList()
+            }
+            for (i in playInfoBeans.indices) {
+                if (
+                    (playInfoBeans[i].videoBean.vod_id == playInfoBean.videoBean.vod_id) &&
+                    (playInfoBeans[i].sourceKey == playInfoBean.sourceKey)
+                )
+                    playInfo = playInfoBeans[i]
+                break
+            }
+
+
+            bundle.putSerializable("playInfoBean", playInfo)
             intent.putExtras(bundle)
             context.startActivity(intent)
         }
@@ -72,11 +96,12 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
     private fun initData() {
         val playInfoBean = intent.getSerializableExtra("playInfoBean") as PlayInfoBean
         viewModel.initData(playInfoBean)
+        position = playInfoBean.position
     }
 
     private fun initView() {
 
-        viewBinding.button.setOnClickListener(){
+        viewBinding.button.setOnClickListener() {
             episodeTab.setScrollPosition(7, 0F, true);
         }
         videoPlayer = viewBinding.danmakuPlayer
@@ -88,15 +113,16 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
 
         // 详情变化
         viewModel.videoDetailBean.observe(this) {
-            viewBinding.titleText.text= it.vod_name
+            viewBinding.titleText.text = it.vod_name
             viewBinding.roundAngleImageView.setImageUrl(it.vod_pic)
             viewBinding.descText.text = removeHtmlAndWhitespace(it.vod_content)
-            viewBinding.textView.text = "${it.vod_year?:"-"}  /  ${it.type_name?:"-"}  /  ${it.vod_director?:"-"}"
+            viewBinding.textView.text =
+                "${it.vod_year ?: "-"}  /  ${it.type_name ?: "-"}  /  ${it.vod_director ?: "-"}"
             viewBinding.currentSourceText.text = viewModel.spiderSource.value!!.sourceBean.name
         }
 
         // 线路和剧集变化
-        viewModel.channelFlagsAndEpisodes.observe(this){
+        viewModel.channelFlagsAndEpisodes.observe(this) {
             renderChannelsTab(it)
 //            renderEpisodesTab(it)
         }
@@ -112,46 +138,67 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
 //        }
 
         // 当前解析接口
-        viewModel.currentParseBean.observe(this){
-            if (it == null){
+        viewModel.currentParseBean.observe(this) {
+            if (it == null) {
                 viewBinding.cureentJxText.visibility = View.GONE
-            }else{
+            } else {
                 viewBinding.cureentJxText.visibility = View.VISIBLE
-                viewBinding.cureentJxText.text = it.name
+                viewBinding.cureentJxText.text = it.name  + " ▼"
             }
         }
 
         // 加载提示信息
-        viewModel.stateVideoPlayerMsg.observe(this){
+        viewModel.stateVideoPlayerMsg.observe(this) {
             videoPlayer.setLoadingMsg(it)
         }
 
         // 播放链接变化
-        viewModel.playEntity.observe(this){
-            videoPlayer.setUp(it)
+        viewModel.playEntity.observe(this) {
+            videoPlayer.setUp(it, position)
+            position = 0;
         }
 
-        viewModel.danmuFile.observe(this){
+        viewModel.danmuFile.observe(this) {
             loadDanmu(it)
         }
 
-        viewModel.pageState.observe(this){
-            when(it){
+        viewModel.pageState.observe(this) {
+            when (it) {
                 PageState.LOADING -> {
                     viewBinding.promptView.showLoading()
                 }
+
                 PageState.EMPTY -> {
                     viewBinding.promptView.showEmpty()
                 }
+
                 PageState.NORMAL -> {
                     viewBinding.promptView.hide()
                 }
+
                 PageState.LOAD_ERROR -> {
                     viewBinding.promptView.showNetworkError({
                         initData()
                     })
                 }
             }
+        }
+
+        viewBinding.cureentJxText.setOnClickListener(){
+
+            val parseBeanList = SourceManger.getParseBeanList()
+            val indexOf = parseBeanList.indexOf(viewModel.currentParseBean.value)
+            XPopup.Builder(this)
+                .isDestroyOnDismiss(true)
+                .asCenterList(
+                    "选择首选接口", parseBeanList.map { it.name }.toTypedArray(),
+                    null, indexOf
+                ) { position, text ->
+                    val parseBean: ParseBean = parseBeanList.get(position)
+                    viewModel.currentParseBean.value = parseBean
+                    Toaster.show("选择: $text")
+                }
+                .show()
         }
 
         // 切换线路逻辑
@@ -168,7 +215,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
                 episodeTab.getTabAt(viewModel.currentEpisode.value!!)!!.select()
                 Handler(Looper.getMainLooper()).postDelayed({
                     episodeTab.setScrollPosition(viewModel.currentEpisode.value!!, 0F, true);
-                },400)
+                }, 400)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {
@@ -213,7 +260,6 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
     }
 
 
-
     /**
      * 用来改变tabLayout选中后的字体大小及颜色
      *
@@ -238,7 +284,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
 
 
     @MainThread
-    private fun renderChannelsTab(channelFlagsAndEpisodes : List<VideoDetailBean.ChannelEpisodes>) {
+    private fun renderChannelsTab(channelFlagsAndEpisodes: List<VideoDetailBean.ChannelEpisodes>) {
         channelTab.removeAllTabs()
         // 初始化 线路列表
         for (channel in channelFlagsAndEpisodes) {
@@ -257,7 +303,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
         // 设置播放器控件选集数据
         val eposodeList = ArrayList<EpsodeEntity>()
         channelEpisodes.episodes.forEach {
-            eposodeList.add(EpsodeEntity(it.name,""))
+            eposodeList.add(EpsodeEntity(it.name, ""))
         }
         videoPlayer.episodes = eposodeList
 
@@ -266,7 +312,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
             newTab.setCustomView(R.layout.item_tab_video_episodes)
             var textView: TextView = newTab.customView!!.findViewById(R.id.tab_video_episodes_tv)
             textView.text = episode.name
-            episodeTab.addTab(newTab,false)
+            episodeTab.addTab(newTab, false)
         }
 
     }
@@ -283,8 +329,41 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>() ,
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        if (videoPlayer.currentPosition != 0L && viewModel.videoDetailBean.value != null) {
+            saveHistory()
+        }
         videoPlayer.release()
+        super.onDestroy()
+    }
+
+    /**
+     * 保存播放历史记录
+     */
+    private fun saveHistory() {
+        // 保存播放记录
+        var playInfoBeans: ArrayList<PlayInfoBean>? =
+            XKeyValue.getObjectList<PlayInfoBean>(Key.PLAY_History)
+        if (playInfoBeans == null) {
+            playInfoBeans = ArrayList()
+        }
+        val item: PlayInfoBean? = viewModel.playInfoBean.value
+
+        // 查找是否有当前记录 删除
+        for (i in playInfoBeans.indices) {
+            if (
+                (playInfoBeans[i].videoBean.vod_id == item!!.videoBean.vod_id) &&
+                (playInfoBeans[i].sourceKey == item.sourceKey)
+            )
+                playInfoBeans.removeAt(i)
+            break
+        }
+
+        if (item != null) {
+            item.position = videoPlayer.currentPosition
+            item.preNum = viewModel.currentEpisode.value!!
+            playInfoBeans.add(0, item)
+        }
+        XKeyValue.putObjectList(Key.PLAY_History, playInfoBeans)
     }
 
 

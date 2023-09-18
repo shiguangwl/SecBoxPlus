@@ -1,5 +1,6 @@
 package com.xxhoz.secbox.module.mine
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,8 +15,10 @@ import com.xxhoz.secbox.base.BaseFragment
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentMineBinding
 import com.xxhoz.secbox.module.about.AboutActivity
+import com.xxhoz.secbox.module.history.HistoryActivity
 import com.xxhoz.secbox.module.home.view.NotificationMsgPopup
-import com.xxhoz.secbox.persistence.XKeyValue
+import java.io.File
+
 
 /**
  * 我的
@@ -34,7 +37,7 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
     private fun initView() {
         // 历史记录
         viewBinding.itemHistory.setOnClickListener {
-            showNotice()
+            HistoryActivity.startActivity(requireContext())
         }
 
         // 收藏
@@ -60,12 +63,41 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
 
         // 清理缓存
         viewBinding.itemClearCache.setOnClickListener {
+            // 清理Android缓存
             Toaster.show("清理缓存成功")
-            XKeyValue.clearAccountMMKV()
         }
 
     }
 
+
+    // 清除应用缓存
+    fun clearAppCache(context: Context) {
+        try {
+            val cacheDir = context.cacheDir
+            if (cacheDir != null && cacheDir.isDirectory) {
+                val children = cacheDir.list()
+                for (child in children) {
+                    deleteDir(File(cacheDir, child))
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    // 递归删除文件夹及其内容
+    fun deleteDir(dir: File?): Boolean {
+        if (dir != null && dir.isDirectory) {
+            val children = dir.list()
+            for (child in children) {
+                val success = deleteDir(File(dir, child))
+                if (!success) {
+                    return false
+                }
+            }
+        }
+        return dir!!.delete()
+    }
     /**
      * 首页顶部信息,公告
      */

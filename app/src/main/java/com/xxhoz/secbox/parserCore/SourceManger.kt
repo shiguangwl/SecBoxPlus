@@ -212,7 +212,7 @@ object SourceManger {
     /**
      * 获取解析接口列表
      */
-    fun getParseBeanList(): List<ParseBean> {
+    fun getParseBeanList(): MutableList<ParseBean> {
         return parseBeanList
     }
 

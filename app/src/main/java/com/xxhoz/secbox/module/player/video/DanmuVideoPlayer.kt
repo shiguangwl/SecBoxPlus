@@ -92,6 +92,7 @@ class DanmuVideoPlayer : VideoView {
                 addControlComponent(gestureView)
                 addControlComponent(vDanmakuView)
 
+                setEnableInNormal(true)
                 // 投屏
                 topTitleView.setThrowingScreenListener() {
                     actionCallback?.throwingScreenClick()
@@ -157,12 +158,16 @@ class DanmuVideoPlayer : VideoView {
     /**
      * 设置播放数据
      */
-    fun setUp(epsodeEntity: EpsodeEntity) {
+    /**
+     * 设置播放数据
+     */
+    fun setUp(epsodeEntity: EpsodeEntity,position: Long) {
         vDanmakuView.release()
         standardVideoController.stopShowBufferSpeed()
         release()
         topTitleView.setTitle(epsodeEntity.videoName)
         setUrl(epsodeEntity.videoUrl)
+        mCurrentPosition = position
         startPlay()
         standardVideoController.startShowBufferSpeed()
 

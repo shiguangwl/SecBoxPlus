@@ -9,6 +9,7 @@ import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
 import com.xxhoz.secbox.util.LogUtils
+import com.xxhoz.secbox.util.StringUtils
 import org.json.JSONObject
 
 class SpiderSource(override var sourceBean: SourceBean, var spider: Spider)  :
@@ -82,9 +83,12 @@ class SpiderSource(override var sourceBean: SourceBean, var spider: Spider)  :
     /**
      * 获取播放链接
      */
-    override fun playInfo(flag:String, id:String):PlayLinkBean{
+    override fun playInfo(flag:String, id:String): PlayLinkBean? {
         val playerContent: String = spider.playerContent(flag, id, sourceBean.flags)
         LogUtils.d(sourceBean.name +"    播放链接数据String:${playerContent}")
+        if (StringUtils.isEmpty(playerContent)){
+            return null
+        }
         return gson.fromJson(playerContent, PlayLinkBean::class.java)
     }
 

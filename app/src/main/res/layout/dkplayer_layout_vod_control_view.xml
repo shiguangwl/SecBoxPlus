@@ -59,14 +59,14 @@
                     android:id="@+id/next_vod"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:padding="7dp"
+                    android:padding="8dp"
                     android:src="@mipmap/ag_btn_movie_next" />
             <ImageView
                     android:id="@+id/danmu_control"
                     android:scaleType="fitXY"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:padding="1dp"
+                    android:padding="2dp"
                     android:src="@drawable/icon_danmu_open" />
 
             <View
@@ -129,8 +129,8 @@
             <ImageView
                     android:scaleType="fitXY"
                     android:id="@+id/fullscreen"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
                     android:src="@drawable/dkplayer_selector_full_screen_button" />
         </LinearLayout>
 

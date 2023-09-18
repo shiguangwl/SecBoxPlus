@@ -6,5 +6,7 @@ import java.io.Serializable
 data class PlayInfoBean(
     val sourceKey: String,
     val videoBean: VideoBean,
-    val preNum: Int
+    var preNum: Int,
+    var position: Long = 0,
+    var subscription: String = ""
 ): Serializable

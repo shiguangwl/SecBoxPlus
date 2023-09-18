@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="#f0f8ff"
+        android:orientation="horizontal"
+        android:paddingLeft="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
+
+
+    <ImageView
+            android:scaleType="fitXY"
+            android:src="@drawable/loading_mask"
+            android:layout_width="52dp"
+            android:layout_height="70dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/pic_imageview" />
+
+    <TextView
+            android:text="我是标题 第2集"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/playhistory_title"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@+id/pic_imageview"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="8dp" />
+
+    <TextView
+            android:text="观看至 1分06秒"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/currentPosition_textView"
+            android:textColor="@color/ThemeColor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/playhistory_title"
+            android:layout_marginBottom="3dp" />
+
+    <TextView
+            android:text="饭团TV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/sourceName_text"
+            app:layout_constraintTop_toBottomOf="@+id/playhistory_title"
+            app:layout_constraintStart_toStartOf="@+id/playhistory_title" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

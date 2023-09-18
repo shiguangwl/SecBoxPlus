@@ -1,5 +1,6 @@
 package com.xxhoz.secbox.module.home
 
+import com.xxhoz.constant.BaseConfig
 import com.xxhoz.secbox.base.list.base.BaseRecyclerViewModel
 import com.xxhoz.secbox.base.list.base.BaseViewData
 import com.xxhoz.secbox.bean.BannerBean
@@ -14,7 +15,7 @@ class HomeViewModel : BaseRecyclerViewModel() {
     fun loadData(homeVideoList: List<VideoBean>){
         val viewDataList = mutableListOf<BaseViewData<*>>()
 
-        val bannerBean = BannerBean(listOf("https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2656327176.webp"))
+        val bannerBean = BannerBean(BaseConfig.CONFIG_BEAN.banner)
         viewDataList.add(BannerViewData(bannerBean))
 
         for (videoBean in homeVideoList) {

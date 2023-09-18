@@ -27,6 +27,7 @@ import java.io.File
 import java.net.SocketTimeoutException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlin.math.min
 
 class DetailPlayerViewModel : BaseViewModel() {
 
@@ -78,7 +79,7 @@ class DetailPlayerViewModel : BaseViewModel() {
         // 默认选择第一个线路
         currentChannel.value = 0
         // 默认选择第一个剧集
-        currentEpisode.value = 0
+        currentEpisode.value = infoBean.preNum
         // 默认选择第一个解析接口
         val parseBeanList = SourceManger.getParseBeanList()
         if (parseBeanList.size > 0){
@@ -96,6 +97,7 @@ class DetailPlayerViewModel : BaseViewModel() {
                         ?: throw GlobalException.of("获取详情失败")
 
                 val channelFlagsAndEpisodes = videoDetail.getChannelFlagsAndEpisodes()
+                LogUtils.d("播放线路和链接:" + videoDetail.getChannelFlagsAndEpisodes())
 
                 this@DetailPlayerViewModel.playInfoBean.postValue(infoBean)
                 this@DetailPlayerViewModel.spiderSource.postValue(spiderSource)
@@ -121,13 +123,22 @@ class DetailPlayerViewModel : BaseViewModel() {
      */
     fun getPlayUrl() {
         Task(getUrlJob) {
-            onStateVideoPlayerMsg("加载数据中...")
-            val currentChannelData: VideoDetailBean.ChannelEpisodes =
-                channelFlagsAndEpisodes.value!!.get(currentChannel.value!!)
+            onStateVideoPlayerMsg("资源加载中...")
+            val currentChannelData = channelFlagsAndEpisodes.value!!.get(currentChannel.value!!)
+            val episodes = currentChannelData.episodes
             val currenSelectEposode: VideoDetailBean.Value =
-                currentChannelData.episodes.get(currentEpisode.value!!)
+                episodes.get(min(currentEpisode.value!!,episodes.size))
 
-            val parseBeanList: List<ParseBean> = SourceManger.getParseBeanList()
+            val parseBeanList = SourceManger.getParseBeanList()
+            // 将currentParseBean移到第一项
+            if (currentParseBean.value != null) {
+                val index = parseBeanList.indexOf(currentParseBean.value!!)
+                if (index > 0) {
+                    parseBeanList.removeAt(index)
+                    parseBeanList.add(0, currentParseBean.value!!)
+                }
+            }
+
             onIO2 {
                 getPlayUrl(
                     currentChannelData.channelFlag,
@@ -147,20 +158,26 @@ class DetailPlayerViewModel : BaseViewModel() {
 
                         override fun failed(parseBean: ParseBean?, errorInfo: String?) {
                             LogUtils.d("[${parseBean?.type}]解析失败: ${errorInfo}")
-                            snifferJobsCount -= 1
-                            if (snifferJobsCount <= 0) {
-                                onStateVideoPlayerMsg("获取播放链接失败")
-                                clearSnifferJobs()
-                            }
+                            onStateVideoPlayerMsg("获取播放链接失败")
+//                            if (parseBean?.type == 1) {
+//                                return
+//                            }
+//                            snifferJobsCount -= 1
+//                            if (snifferJobsCount <= 0) {
+//                                onStateVideoPlayerMsg("获取播放链接失败")
+//                                clearSnifferJobs()
+//                            }
                         }
 
                         override fun timeOut(parseBean: ParseBean?) {
                             LogUtils.d("[${parseBean?.type}]解析超时")
-                            snifferJobsCount -= 1
-                            if (snifferJobsCount <= 0) {
-                                onStateVideoPlayerMsg("获取播放链接失败")
-                                clearSnifferJobs()
-                            }
+                            onStateVideoPlayerMsg("获取播放链接超时")
+
+//                            snifferJobsCount -= 1
+//                            if (snifferJobsCount <= 0) {
+//                                onStateVideoPlayerMsg("获取播放链接失败")
+//                                clearSnifferJobs()
+//                            }
                         }
                     }
                 )
@@ -196,8 +213,12 @@ class DetailPlayerViewModel : BaseViewModel() {
         parseBeanList: List<ParseBean>,
         callback: SnifferEngine.Callback
     ) {
-        val playLinkBean: PlayLinkBean =
+        val playLinkBean: PlayLinkBean? =
             spiderSource.value!!.playInfo(channelFlag, urlCode)
+        if (playLinkBean == null){
+            callback.failed(null,"获取播放链接失败")
+            return
+        }
         LogUtils.i("影视播放数据: ${playLinkBean}")
         onStateVideoPlayerMsg("资源加载中...")
         if (playLinkBean.parse == 1) {

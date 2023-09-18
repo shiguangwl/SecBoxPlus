@@ -230,7 +230,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         withContext(Dispatchers.Main) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
             videoPlayer.startFullScreen()
-            videoPlayer.setUp(EpsodeEntity("", parseRsult))
+            videoPlayer.setUp(EpsodeEntity("", parseRsult),0)
         }
 
 //        // 加载弹幕

@@ -41,7 +41,7 @@ interface IBaseSource {
      * 获取播放链接
      */
     @Throws(Exception::class)
-    fun playInfo(flag: String, id: String): PlayLinkBean
+    fun playInfo(flag: String, id: String): PlayLinkBean?
 
     /**
      * 影视搜索

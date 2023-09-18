@@ -64,6 +64,8 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
         super(context, attrs, defStyleAttr);
     }
 
+    private long lastTime = System.currentTimeMillis();
+
     {
         // 设置弹幕的最大显示行数
         HashMap<Integer, Integer> maxLinesPair = new HashMap<Integer, Integer>();
@@ -100,7 +102,19 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
 
             @Override
             public void updateTimer(DanmakuTimer timer) {
+                // new Handler(Looper.getMainLooper()).post(() -> {
+                //     timer.update(controlWrapper.getCurrentPosition());
+                // });
 
+                // System.out.println(System.currentTimeMillis() -  lastTime);
+                // lastTime = System.currentTimeMillis();
+                //
+                float speed = controlWrapper.getSpeed();
+                if (speed != 1){
+                    // 弹幕倍速
+                    float v = timer.lastInterval() * (speed - 1);
+                    timer.add((long)v);
+                }
             }
 
             @Override

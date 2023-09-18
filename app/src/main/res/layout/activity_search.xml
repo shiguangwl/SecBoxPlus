@@ -47,6 +47,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+                android:visibility="gone"
                 android:padding="5dp"
                 android:src="@drawable/filter_icon"
                 android:id="@+id/filter_source"

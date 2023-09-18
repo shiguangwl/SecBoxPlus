@@ -26,13 +26,13 @@ import com.xxhoz.secbox.constant.EventName
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeTabBinding
 import com.xxhoz.secbox.eventbus.XEventBus
+import com.xxhoz.secbox.module.history.HistoryActivity
 import com.xxhoz.secbox.module.home.view.NotificationMsgPopup
 import com.xxhoz.secbox.module.search.SearchActivity
 import com.xxhoz.secbox.parserCore.bean.CategoryBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 import com.xxhoz.secbox.util.LogUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 
 
@@ -88,7 +88,7 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
             .show()
     }
 
-    var currentJob:Job? = null
+
     private fun initData() {
         Task {
             viewBinding.promptView.showLoading()
@@ -127,6 +127,10 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
         // 搜索按钮
         viewBinding.searchBtn.setOnClickListener() {
             SearchActivity.startActivity(requireContext())
+        }
+        // 历史记录
+        viewBinding.historyBtn.setOnClickListener() {
+            HistoryActivity.startActivity(requireContext())
         }
         // 设置源显示
         val sourceName: String? = BaseConfig.getCurrentSource()?.sourceBean?.name
