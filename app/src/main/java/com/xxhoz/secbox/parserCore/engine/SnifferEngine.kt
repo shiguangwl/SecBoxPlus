@@ -3,7 +3,6 @@ package com.xxhoz.secbox.parserCore.engine
 import android.net.http.SslError
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.webkit.ConsoleMessage
 import android.webkit.JsPromptResult
 import android.webkit.JsResult
@@ -50,38 +49,23 @@ object SnifferEngine {
         timeout: Long,
         callback: Callback
     ): SnifferJob {
-        val mWebView: AtomicReference<WebView> = AtomicReference()
+         val mWebView: WebView by lazy { WebView(activity) }
+         var isInit = false
         // 启动协程
         activity.runOnUiThread() {
-            mWebView.set(WebView(activity))
-
-            configWebViewSys(mWebView.get())
-            val layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            mWebView.get().visibility = View.GONE
-            activity.addContentView(mWebView.get(),layoutParams)
-
-            // 超时回调
-            val timer = Timer()
-            val timerTask: TimerTask = object : TimerTask() {
-                override fun run() {
-                    activity.runOnUiThread {
-                        mWebView.get().removeAllViews()
-                        mWebView.get().destroy()
-                         //超时回调
-                        callback.failed(parseBean,"解析超时")
-                    }
-                }
-            }
-            timer.schedule(timerTask, timeout)
-
-
+            configWebViewSys(mWebView)
+//            val layoutParams = ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.MATCH_PARENT
+//            )
+//            mWebView.visibility = View.GONE
+//            activity.addContentView(mWebView,layoutParams)
+            // 超时回调 防止内存泄露
+            val timer = timeOutTask(activity, mWebView, callback, parseBean, timeout)
             // 加载是否发生异常
             val isError = AtomicBoolean(false)
             val errorInfo = AtomicReference<String>()
-            mWebView.get().webViewClient = object : WebViewClient() {
+            mWebView.webViewClient = object : WebViewClient() {
                 // onPageFinished回调并不能代表网页加载成功了，是无法判断的，因为即使失败了也会调用onPageFinished，而且它和onError的调用顺序不固定，所以失败的判断条件有时候会出错
                 override fun onPageFinished(view: WebView, url: String) {
                     super.onPageFinished(view, url)
@@ -101,11 +85,11 @@ object SnifferEngine {
                 override fun onLoadResource(view: WebView, url: String) {
                     LogUtils.d("Webview加载资源:" + url)
                     if (isM3u8Url(url) || url.contains(".mp4") || url.contains(".flv")) {
-                        if (url.contains(".m3u8") )
-                        callback.success(parseBean, url)
-                        timer.cancel()
-                        mWebView.get().removeAllViews()
-                        mWebView.get().destroy()
+                        if (url.contains(".m3u8")){
+                            callback.success(parseBean, url)
+                            timer.cancel()
+                            webviewDestory(mWebView)
+                        }
                     }
                     super.onLoadResource(view, url)
                 }
@@ -121,7 +105,7 @@ object SnifferEngine {
 
             }
 
-            mWebView.get().setWebChromeClient(object : WebChromeClient() {
+            mWebView.setWebChromeClient(object : WebChromeClient() {
                 override fun onProgressChanged(view: WebView, newProgress: Int) {
                     super.onProgressChanged(view, newProgress)
                     if (newProgress == 100) {
@@ -132,8 +116,7 @@ object SnifferEngine {
 //                            callback.failed(parseBean,errorInfo.get())
                             return
                         }
-//                        mWebView.get().removeAllViews()
-//                        mWebView.get().destroy()
+//                        webviewDestory(mWebView)
                     }
                 }
 
@@ -169,28 +152,54 @@ object SnifferEngine {
                     return true
                 }
             })
-            mWebView.get().loadUrl(parseBean.url + url)
-//            mWebView.get().loadUrl("https://www.ajeee.com/play/211517-3-1.html")
-
+            isInit = true
+            mWebView.loadUrl(parseBean.url + url)
         }
 
         while (true){
-            if (mWebView.get() == null){
+            if (!isInit){
                 Thread.sleep(50)
                 continue
             }
             return object : SnifferJob {
                 override fun cancel() {
                     activity.runOnUiThread {
-                        val webView = mWebView!!.get()
-                        if (webView != null) {
-                            webView.removeAllViews()
-                            webView.destroy()
-                        }
+                        webviewDestory(mWebView)
                     }
                 }
             }
         }
+    }
+
+    private fun timeOutTask(
+        activity: BaseActivity<*>,
+        mWebView: WebView,
+        callback: Callback,
+        parseBean: ParseBean,
+        timeout: Long
+    ): Timer {
+        // 超时回调
+        val timer = Timer()
+        val timerTask: TimerTask = object : TimerTask() {
+            override fun run() {
+                activity.runOnUiThread {
+                    webviewDestory(mWebView)
+                    //超时回调
+                    callback.failed(parseBean, "解析超时")
+                }
+            }
+        }
+        timer.schedule(timerTask, timeout)
+        return timer
+    }
+
+    private fun webviewDestory(mWebView: WebView?) {
+        if (mWebView == null){
+            return
+        }
+        mWebView.clearCache(true)
+        mWebView.removeAllViews()
+        mWebView.destroy()
     }
 
     fun isM3u8Url(url: String): Boolean {

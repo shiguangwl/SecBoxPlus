@@ -35,9 +35,7 @@ import com.xxhoz.secbox.databinding.ItemSnifferResultBinding
 import com.xxhoz.secbox.module.player.video.DanmuVideoPlayer
 import com.xxhoz.secbox.module.sniffer.view.CustomPartShadowPopupView
 import com.xxhoz.secbox.network.HttpUtil
-import com.xxhoz.secbox.parserCore.engine.SnifferEngine
 import com.xxhoz.secbox.util.LogUtils
-import com.xxhoz.secbox.util.StandardPlatformLink
 import com.xxhoz.secbox.util.UniversalAdapter
 import com.xxhoz.secbox.util.getActivity
 import kotlinx.coroutines.Dispatchers
@@ -64,7 +62,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         get() = ActivityWebViewBinding::inflate
 
     private val popupView: BasePopupView by lazy {
-        val customPartShadowPopupView = CustomPartShadowPopupView(this){
+        val customPartShadowPopupView = CustomPartShadowPopupView(this) {
             val recyclerView = it
             recyclerView.layoutManager = LinearLayoutManager(this)
             universalAdapter = UniversalAdapter(
@@ -75,11 +73,11 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
                         ItemSnifferResultBinding.bind(view).run {
                             tvUrlText.text = data
                             startPlay.tag = data
-                            startPlay.setOnClickListener{
+                            startPlay.setOnClickListener {
                                 startPlay(it.tag as String)
                             }
-                            tvUrlText.setOnClickListener{
-                                var confirm =  XPopup.Builder(getActivity()).asInputConfirm(
+                            tvUrlText.setOnClickListener {
+                                var confirm = XPopup.Builder(getActivity()).asInputConfirm(
                                     "编辑结果", ""
                                 ) { text ->
                                     (it as TextView).text = text
@@ -87,7 +85,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
                                 confirm.show()
                                 Handler(Looper.myLooper()!!).postDelayed({
                                     confirm?.editText?.setText((it as TextView).text)
-                                },400)
+                                }, 400)
 
                             }
                         }
@@ -113,7 +111,12 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         var isCustomSite: Boolean = false
 
         var homeUrl = ""
-        fun startActivity(context: Context, url: String,ua:String = USER_AGENT, isCustomSite: Boolean = false) {
+        fun startActivity(
+            context: Context,
+            url: String,
+            ua: String = USER_AGENT,
+            isCustomSite: Boolean = false
+        ) {
             this.homeUrl = url
             this.USER_AGENT = ua
             this.isCustomSite = isCustomSite
@@ -122,7 +125,6 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
             context.startActivity(intent)
         }
     }
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -136,9 +138,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         }
         initView()
     }
-
-    private fun initView() {
-        mWebView = viewBinding.webview
+    private fun webviewConfig() {
         // WebView 配置
         val webSettings: WebSettings = mWebView.getSettings()
         // 开启 JavaScript
@@ -161,61 +161,20 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         webSettings.domStorageEnabled = true
         // 解决 Android 5.0 上 WebView 默认不允许加载 Http 与 Https 混合内容
         webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+        //LOAD_DEFAULT：默认的缓存模式，根据缓存策略决定是否从网络加载数据。
+        //LOAD_CACHE_ELSE_NETWORK：优先使用缓存，如果缓存中没有数据则从网络加载。
+        //LOAD_NO_CACHE：不使用缓存，直接从网络加载。
+        //LOAD_CACHE_ONLY：只使用缓存，不从网络加载。
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+    }
 
+    private fun initView() {
+        mWebView = viewBinding.webview
+        webviewConfig()
 
-        mWebView.webViewClient = object : WebViewClient() {
-            override fun onLoadResource(view: WebView, url: String) {
-                LogUtils.d("Webview加载资源:" + url)
-                if (isCustomSite && SnifferEngine.isM3u8Url(url) || url.contains(".mp4") || url.contains(".flv")) {
-                    dataList.add(url)
-                    universalAdapter?.let {
-                        it.notifyDataSetChanged()
-                    }
-                    if (isShowBottom && !popupView.isShow){
-                        showBottom()
-                    }
-                    isShowBottom = false
-                }
-                super.onLoadResource(view, url)
-            }
-            /**
-             * 网页加载错误时回调，这个方法会在 onPageFinished 之前调用
-             */
-            override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
-            }
+        mWebView.webViewClient = webViewClient
 
-            /**
-             * 开始加载网页
-             */
-            override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-                isShowBottom = true
-                dataList.clear()
-                universalAdapter?.let {
-                    it.notifyDataSetChanged()
-                }
-                viewBinding.pbBrowserProgress.visibility = View.VISIBLE
-            }
-
-            /**
-             * 完成加载网页
-             */
-            override fun onPageFinished(view: WebView, url: String) {
-                viewBinding.pbBrowserProgress.visibility = View.GONE
-            }
-        }
-
-        mWebView.webChromeClient = object : WebChromeClient() {
-            // 加载进度回调
-            override fun onProgressChanged(view: WebView, newProgress: Int) {
-                super.onProgressChanged(view, newProgress)
-                viewBinding.pbBrowserProgress.progress = newProgress
-            }
-
-            override fun onReceivedTitle(view: WebView?, title: String?) {
-                // 收到网页标题的回调
-                viewBinding.titleText.text = title
-            }
-        }
+        mWebView.webChromeClient = webChromeClient
 
         val url = intent.getStringExtra("url")!!
         mWebView.loadUrl(url)
@@ -223,44 +182,94 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
         viewBinding.fastPlay.setOnClickListener {
             if (isCustomSite) {
-                showBottom()
-//                if (popupView.viewCount > 0){
-//                    showBottom()
-//                }else{
-//                    Toaster.showLong("未发现可播放资源")
-//                }
+                if (dataList.size > 0){
+                    showBottom()
+                }else{
+                    Toaster.showLong("未找到资源")
+                }
                 return@setOnClickListener
             }
 
-            var currentUrl = mWebView.url!!
-
-//            // 优酷链接处理
-//            if (currentUrl.contains("youku.com")) {
-//                mWebView.evaluateJavascript("__INITIAL_DATA__.videoMap.videoId") { value: String ->
-//
-//                    if ("\"null\"".equals(value)){
-//                        return@evaluateJavascript
-//                    }
-//                    val tag = "https://v.youku.com/v_show/id_+$value.html"
-//                    butnClick(tag)
-//                }
-//                return@setOnClickListener
-//            }
-
-            btnClick(currentUrl)
+            btnClick(mWebView.url!!)
         }
 
 
-        viewBinding.returnImage.setOnClickListener(){
+        viewBinding.returnImage.setOnClickListener() {
             finish()
         }
 
-        viewBinding.homeBtn.setOnClickListener{
+        viewBinding.homeBtn.setOnClickListener {
             mWebView.loadUrl(homeUrl)
         }
 
-        viewBinding.refresh.setOnClickListener{
+        viewBinding.refresh.setOnClickListener {
             mWebView.reload()
+        }
+    }
+
+
+    private val webViewClient = object : WebViewClient() {
+        override fun onLoadResource(view: WebView, url: String) {
+            LogUtils.d("Webview加载资源:" + url)
+            if (isCustomSite && isM3u8Url(url) || url.contains(".mp4") || url.contains(".flv")) {
+                addItem(url)
+                if (isCustomSite && isShowBottom){
+                    showBottom()
+                }
+                isShowBottom = false
+            }
+            super.onLoadResource(view, url)
+        }
+
+        /**
+         * 网页加载错误时回调，这个方法会在 onPageFinished 之前调用
+         */
+        override fun onReceivedError(
+            view: WebView,
+            errorCode: Int,
+            description: String,
+            failingUrl: String
+        ) {
+        }
+
+        /**
+         * 开始加载网页
+         */
+        override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+            isShowBottom = true
+            removeAll()
+            viewBinding.pbBrowserProgress.visibility = View.VISIBLE
+        }
+
+        /**
+         * 完成加载网页
+         */
+        override fun onPageFinished(view: WebView, url: String) {
+            viewBinding.pbBrowserProgress.visibility = View.GONE
+        }
+    }
+
+    private fun addItem(url: String) {
+        dataList.add(url)
+        universalAdapter?.notifyDataSetChanged()
+    }
+
+
+    private fun removeAll() {
+        dataList.clear()
+        universalAdapter?.notifyDataSetChanged()
+    }
+
+    private val webChromeClient = object : WebChromeClient() {
+        // 加载进度回调
+        override fun onProgressChanged(view: WebView, newProgress: Int) {
+            super.onProgressChanged(view, newProgress)
+            viewBinding.pbBrowserProgress.progress = newProgress
+        }
+
+        override fun onReceivedTitle(view: WebView?, title: String?) {
+            // 收到网页标题的回调
+            viewBinding.titleText.text = title
         }
     }
 
@@ -272,55 +281,23 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
     }
 
 
-    private fun startPlay(parseRsult: String){
+    private fun startPlay(parseRsult: String) {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
         videoPlayer.startFullScreen()
-        videoPlayer.setUp(EpsodeEntity("", parseRsult),0)
+        videoPlayer.setUp(EpsodeEntity("", parseRsult), 0)
     }
 
     private fun btnClick(currentUrl: String) {
-        showBottom()
-        var currentUrl1 = currentUrl
         lifecycleScope.launch(Dispatchers.IO) {
-            // 标准化URL
-//            currentUrl1 = formatUrl(currentUrl1!!)
-            startSniffer(currentUrl1)
+            startJsonParser(currentUrl)
         }
     }
-
-    @WorkerThread
-    private suspend fun formatUrl(currentUrl: String): String {
-        var resultUrl = ""
-        if (currentUrl.contains("bilibili.com") || currentUrl.contains("tv/ep")) {
-            var JsonObject = try {
-                StandardPlatformLink.biUrlFormat(currentUrl, true).getAsJsonObject()
-            } catch (e: java.lang.Exception) {
-                e.printStackTrace()
-                return ""
-            }
-
-            val id = JsonObject!!["id"].asString
-            resultUrl = "https://www.bilibili.com/bangumi/play/ep$id"
-        }
-
-
-        if (currentUrl.contains("v.qq.com")) {
-            try {
-                resultUrl = StandardPlatformLink.txUrlFormat(currentUrl)
-            } catch (e: java.lang.Exception) {
-                e.printStackTrace()
-            }
-        }
-
-        return resultUrl
-    }
-
 
     /**
      * 点击解析按钮
      */
     @WorkerThread
-    private suspend fun startSniffer(url: String) {
+    private suspend fun startJsonParser(url: String) {
         LogUtils.d("当前连接是:" + url)
         val parseBeanList = SourceManger.getParseBeanList()
         var parseRsult: String? = null
@@ -347,7 +324,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
             startPlay(parseRsult)
         }
 
-        if (isCustomSite){
+        if (isCustomSite) {
             return
         }
         // 加载弹幕
@@ -377,7 +354,6 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
     }
 
 
-
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (popupView.isShow) {
             return true
@@ -399,6 +375,9 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
 
     override fun onDestroy() {
+        mWebView.clearCache(true);
+        mWebView.removeAllViews()
+        mWebView.destroy()
         videoPlayer.release()
         super.onDestroy()
     }

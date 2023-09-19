@@ -9,6 +9,16 @@ import com.xxhoz.secbox.util.GlobalActivityManager
 import com.xxhoz.secbox.util.LogUtils
 
 object BaseConfig {
+
+    /**
+     * 是否第一次启动
+     */
+    val isFirstStart: Boolean by lazy {
+        val boolean = XKeyValue.getBoolean(Key.FIRST_START, true)
+        XKeyValue.putBoolean(Key.FIRST_START, false)
+        return@lazy boolean
+    }
+
     /**
      * 是否为debug版本
      */

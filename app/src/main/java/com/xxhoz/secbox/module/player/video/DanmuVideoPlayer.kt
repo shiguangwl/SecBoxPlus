@@ -1,6 +1,7 @@
 package com.xxhoz.secbox.module.player.video;
 
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.util.AttributeSet
 import android.view.Gravity
 import com.hjq.toast.Toaster
@@ -72,6 +73,12 @@ class DanmuVideoPlayer : VideoView {
                 val errorView: ErrorView = ErrorView(getContext())
                 errorView.setOnRetryListener() {
                     actionCallback?.retryClick()
+                    if (actionCallback == null){
+                        // 如果没设置回调则直接退出
+                        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                        stopFullScreen()
+                        release()
+                    }
                 }
                 // 顶部
                 topTitleView = TopTitleView(getContext())

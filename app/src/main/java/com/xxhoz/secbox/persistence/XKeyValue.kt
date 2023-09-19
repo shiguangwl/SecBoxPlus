@@ -162,7 +162,7 @@ object XKeyValue {
         val list = getObjectList<T>(key)
         if (list == null) {
             val newList = ArrayList<T>()
-            newList.add(value)
+            newList.add(0,value)
             putObjectList(key, newList)
         } else {
             list.add(value)

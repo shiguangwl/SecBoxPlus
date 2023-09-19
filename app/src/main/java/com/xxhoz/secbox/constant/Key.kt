@@ -7,7 +7,8 @@ import androidx.annotation.StringDef
     Key.SEARCH_HISTORY,
     Key.DANMAKU_STATE,
     Key.PLAY_History,
-    Key.CUSTOM_SITE
+    Key.CUSTOM_SITE,
+    Key.FIRST_START
 )
 @Retention(AnnotationRetention.SOURCE)
 annotation class Key {
@@ -42,5 +43,10 @@ annotation class Key {
          * 自定义站点
          */
         const val CUSTOM_SITE = "account_custom_site"
+
+        /**
+         * 是否第一次启动
+         */
+        const val FIRST_START: String = "first_start"
     }
 }
