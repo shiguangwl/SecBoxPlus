@@ -129,7 +129,6 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getWindow().setStatusBarColor(getResources().getColor(R.color.black));
         immersionBar {
             transparentStatusBar()
             statusBarDarkFont(true)

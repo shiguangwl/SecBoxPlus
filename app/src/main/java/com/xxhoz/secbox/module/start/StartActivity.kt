@@ -11,6 +11,7 @@ import com.hjq.toast.Toaster
 import com.lxj.xpopup.XPopup
 import com.umeng.commonsdk.UMConfigure
 import com.xxhoz.constant.BaseConfig
+import com.xxhoz.constant.Key
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
@@ -20,6 +21,7 @@ import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.ActivityStartBinding
 import com.xxhoz.secbox.module.main.MainActivity
 import com.xxhoz.secbox.network.HttpUtil
+import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.NetworkHelper
 import com.xxhoz.secbox.util.getActivity
@@ -65,7 +67,15 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
                 return
             }
             // 加载数据源配置
-            SourceManger.loadSourceConfig(BaseConfig.SOURCE_BASE_API)
+            try {
+                SourceManger.loadSourceConfig(XKeyValue.getString(Key.CURRENT_SOURCE_URL,BaseConfig.BASE_SOURCE_URL))
+            }catch (e:Exception){
+                // 切换默认源
+                Toaster.show("加载数据源配置失败,尝试切换默认源")
+                XKeyValue.putString(Key.CURRENT_SOURCE_URL,BaseConfig.BASE_SOURCE_URL)
+                SourceManger.loadSourceConfig(BaseConfig.BASE_SOURCE_URL)
+            }
+
             MainActivity.startActivity(getActivity()!!)
         }catch (e:Exception){
             Toaster.showLong(e.message)
@@ -88,7 +98,7 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
 
         // 设置基本配置信息
         BaseConfig.CONFIG_BEAN = configBean
-        BaseConfig.SOURCE_BASE_API = configBean.configJsonUrl
+        BaseConfig.BASE_SOURCE_URL = configBean.configJsonUrl
         BaseConfig.DANMAKU_API = configBean.danmukuApi
         BaseConfig.NOTION = configBean.notice
     }

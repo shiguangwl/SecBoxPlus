@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="?attr/selectableItemBackground"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+
+    <ImageView
+            android:background="?attr/selectableItemBackground"
+            android:src="@drawable/icon_select_off"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="fitXY"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="16dp"
+            android:id="@+id/select_active_imageview" />
+
+    <TextView
+            android:text="默认源"
+            android:textColor="@color/font_color"
+            android:id="@+id/source_name_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toEndOf="@+id/select_active_imageview"
+            android:layout_marginStart="8dp" />
+
+    <TextView
+            android:text="http://baisfjadslf.com"
+            android:id="@+id/source_url_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/source_name_textview"
+            app:layout_constraintStart_toStartOf="@+id/source_name_textview"
+            android:layout_marginTop="5dp" />
+
+
+    <ImageView
+            android:id="@+id/cancel_imageview"
+            android:background="?attr/selectableItemBackground"
+            android:src="@drawable/icon_cancel"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="24dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>

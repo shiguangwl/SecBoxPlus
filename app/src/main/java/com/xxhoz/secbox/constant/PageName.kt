@@ -3,6 +3,7 @@ package com.xxhoz.secbox.constant
 import androidx.annotation.StringDef
 
 @StringDef(
+    PageName.CUSTOM_SOURCE,
     PageName.START,
     PageName.MAIN,
     PageName.HOME,
@@ -21,6 +22,7 @@ import androidx.annotation.StringDef
 @Retention(AnnotationRetention.SOURCE)
 annotation class PageName {
     companion object {
+        const val CUSTOM_SOURCE = "custom_source"
         const val START = "start"
         const val MAIN = "main"
         const val HOME = "home"

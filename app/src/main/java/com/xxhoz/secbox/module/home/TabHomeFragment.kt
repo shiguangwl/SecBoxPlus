@@ -70,7 +70,9 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
         // 监听数据源的变化
         XEventBus.observe(viewLifecycleOwner, EventName.SOURCE_CHANGE) { message: String ->
             LogUtils.i("监听到数据变化: " + message)
-            initView()
+            getActivity()?.runOnUiThread{
+                initView()
+            }
             initData()
         }
     }

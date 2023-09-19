@@ -43,7 +43,7 @@ object BaseConfig {
     /**
      * 加载爬虫配置URL
      */
-    var SOURCE_BASE_API = ""
+    var BASE_SOURCE_URL = ""
 
     /**
      * 默认源

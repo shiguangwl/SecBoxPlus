@@ -3,6 +3,8 @@ package com.xxhoz.constant
 import androidx.annotation.StringDef
 
 @StringDef(
+    Key.SUBSCRIBE_LIST,
+    Key.CURRENT_SOURCE_URL,
     Key.CURRENT_SOURCE_KEY,
     Key.SEARCH_HISTORY,
     Key.DANMAKU_STATE,
@@ -20,7 +22,16 @@ annotation class Key {
 //        const val ACCOUNT_XXX = "account_xxx"
 
         /**
-         * 源
+         * 订阅列表
+         */
+        const val SUBSCRIBE_LIST = "account_subscribe_list"
+
+        /**
+         * 当前订阅链接
+         */
+        const val CURRENT_SOURCE_URL = "account_current_source_url"
+        /**
+        * 当前源key
          */
         const val CURRENT_SOURCE_KEY = "account_source_key"
 

@@ -45,19 +45,15 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
         }
 
         // 收藏
-        viewBinding.itemCollection.setOnClickListener {
-            showNotice()
-        }
+//        viewBinding.itemCollection.setOnClickListener {
+//            showNotice()
+//        }
 
-        // 订阅
-        viewBinding.itemSubscribe.setOnClickListener {
-            showNotice()
-        }
 
         // 设置
-        viewBinding.itemSetting.setOnClickListener {
-            showNotice()
-        }
+//        viewBinding.itemSetting.setOnClickListener {
+//            showNotice()
+//        }
 
         // 关于
         viewBinding.itemAbout.setOnClickListener {
@@ -84,6 +80,13 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
                 Toaster.show("清理缓存成功 " + Math.round(cacheSize / (1024.0 * 1024.0) * 100.0) / 100.0 + "MB")
             }
         }
+
+        // 订阅
+        viewBinding.itemSubscribe.setOnClickListener {
+            val intent = Intent(activity, CustomSourceActivity::class.java);
+            startActivity(intent)
+        }
+
 
     }
 

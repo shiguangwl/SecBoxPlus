@@ -22,6 +22,9 @@
             tools:replace="android:allowBackup,android:networkSecurityConfig,android:supportsRtl"
             tools:targetApi="n">
         <activity
+                android:name=".module.mine.CustomSourceActivity"
+                android:exported="false" />
+        <activity
                 android:name=".module.history.HistoryActivity"
                 android:exported="false" />
         <activity
