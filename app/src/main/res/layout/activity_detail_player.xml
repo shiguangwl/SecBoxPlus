@@ -60,6 +60,7 @@
                     android:layout_height="wrap_content" />
 
             <TextView
+                    android:background="?android:attr/selectableItemBackground"
                     android:textAlignment="center"
                     android:text="🌈┃彩虹┃4K  ▼"
                     android:textSize="17sp"
@@ -108,6 +109,7 @@
                 android:layout_marginTop="8dp" />
 
         <com.xxhoz.secbox.widget.RoundAngleImageView
+                android:background="?android:attr/selectableItemBackground"
                 app:img_left_top_radius="@dimen/item_radius"
                 app:img_right_top_radius="@dimen/item_radius"
                 app:img_left_bottom_radius="@dimen/item_radius"
@@ -144,9 +146,9 @@
                 app:layout_constraintEnd_toStartOf="@+id/cureent_jx_text" />
 
         <TextView
+                android:visibility="invisible"
                 android:textStyle="bold"
                 android:gravity="center"
-                android:text="智能解析"
                 android:textSize="16sp"
                 android:layout_width="100dp"
                 android:layout_height="0dp"

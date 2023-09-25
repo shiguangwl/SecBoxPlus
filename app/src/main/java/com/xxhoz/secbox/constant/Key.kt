@@ -10,7 +10,8 @@ import androidx.annotation.StringDef
     Key.DANMAKU_STATE,
     Key.PLAY_History,
     Key.CUSTOM_SITE,
-    Key.FIRST_START
+    Key.FIRST_START,
+    Key.CACHE_FILE_LIST
 )
 @Retention(AnnotationRetention.SOURCE)
 annotation class Key {
@@ -59,5 +60,10 @@ annotation class Key {
          * 是否第一次启动
          */
         const val FIRST_START: String = "first_start"
+
+        /**
+         * 缓存文件记录
+         */
+        const val CACHE_FILE_LIST: String = "cache_file_list"
     }
 }

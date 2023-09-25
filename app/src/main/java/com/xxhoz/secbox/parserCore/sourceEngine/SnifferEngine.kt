@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.parserCore.engine
+package com.xxhoz.secbox.parserCore.sourceEngine
 
 import android.net.http.SslError
 import android.util.Log
@@ -197,9 +197,14 @@ object SnifferEngine {
         if (mWebView == null){
             return
         }
-        mWebView.clearCache(true)
-        mWebView.removeAllViews()
-        mWebView.destroy()
+        try {
+            mWebView.clearCache(true)
+            mWebView.removeAllViews()
+            mWebView.destroy()
+        }catch (e:Exception){
+            e.message?.let { LogUtils.d("webviewDestory:" + it) }
+        }
+
     }
 
     fun isM3u8Url(url: String): Boolean {

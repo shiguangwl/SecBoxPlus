@@ -87,7 +87,7 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="@dimen/item_padding"
         android:ellipsize="end"
-        android:lines="2"
+        android:maxLines="2"
         android:text="我是视频标题我是视频标题我是视频标题"
         android:textColor="@color/black_90_color"
         android:textSize="14sp"

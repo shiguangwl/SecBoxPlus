@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
@@ -33,6 +34,8 @@ import com.xxhoz.secbox.parserCore.bean.CategoryBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 import com.xxhoz.secbox.util.LogUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
@@ -70,9 +73,7 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
         // 监听数据源的变化
         XEventBus.observe(viewLifecycleOwner, EventName.SOURCE_CHANGE) { message: String ->
             LogUtils.i("监听到数据变化: " + message)
-            getActivity()?.runOnUiThread{
-                initView()
-            }
+            initView()
             initData()
         }
     }
@@ -92,36 +93,38 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
 
 
     private fun initData() {
-        Task {
+        SingleTask(lifecycleScope.launch{
             viewBinding.promptView.showLoading()
             val currentSource: IBaseSource? = withContext(Dispatchers.IO){ BaseConfig.getCurrentSource() }
             currentSource?.run {
                 try {
                     // 获取首页数据
-                    homeVideoList = onIO{ homeVideoList() } ?: throw GlobalException.of("首页数据为空")
+                    homeVideoList = withContext(Dispatchers.IO){ homeVideoList() } ?: throw GlobalException.of("首页数据为空")
                     // 获取分类数据
-                    categoryInfo = onIO{ categoryInfo() }?: throw GlobalException.of("分类数据为空")
+                    categoryInfo = withContext(Dispatchers.IO){ categoryInfo() } ?: throw GlobalException.of("分类数据为空")
 
                 } catch (e: GlobalException) {
                     LogUtils.d("数据源异常:" + e.message)
                     viewBinding.promptView.showEmpty()
-                    return@Task
+                    return@launch
                 } catch (e: Exception) {
                     e.printStackTrace()
                     Toaster.show("数据源异常,请切换源")
                     viewBinding.promptView.showNetworkError({
                         initData()
                     })
-                    return@Task
+                    return@launch
                 }
 
-                // 初始化tab选项卡
-                initViewFragments()
-                // 首页顶部信息
-                showNotice()
+                if (isActive){
+                    // 初始化tab选项卡
+                    initViewFragments()
+                    // 首页顶部信息
+                    showNotice()
+                }
                 viewBinding.promptView.hide()
             }
-        }
+        })
     }
 
 
@@ -219,7 +222,7 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
     }
 
     override fun onDestroy() {
-        mediator!!.detach()
+        mediator?.detach()
         viewBinding.viewPager.unregisterOnPageChangeCallback(changeCallback)
         super.onDestroy()
     }

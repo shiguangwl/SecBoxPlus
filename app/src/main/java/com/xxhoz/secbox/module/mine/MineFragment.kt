@@ -14,6 +14,7 @@ import com.lxj.xpopup.enums.PopupAnimation
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.secbox.App
 import com.xxhoz.secbox.base.BaseFragment
+import com.xxhoz.secbox.base.CacheManger
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentMineBinding
 import com.xxhoz.secbox.module.about.AboutActivity
@@ -77,6 +78,7 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
 
                 val webviewChace: File = App.instance.getDir("webview", 0)
                 cacheSize += getFolderSizeAncdDel(webviewChace)
+                CacheManger.cleanCache()
                 Toaster.show("清理缓存成功 " + Math.round(cacheSize / (1024.0 * 1024.0) * 100.0) / 100.0 + "MB")
             }
         }

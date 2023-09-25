@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.activity.viewModels
 import androidx.annotation.WorkerThread
+import androidx.lifecycle.lifecycleScope
 import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.toast.Toaster
 import com.lxj.xpopup.XPopup
@@ -25,6 +26,8 @@ import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.NetworkHelper
 import com.xxhoz.secbox.util.getActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class StartActivity : BaseActivity<ActivityStartBinding>() {
 
@@ -41,9 +44,8 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             navigationBarColor(R.color.white)
             navigationBarDarkIcon(true)
         }
-
-        Task {
-            onIO2 { initData() }
+        lifecycleScope.launch(Dispatchers.IO) {
+            initData()
         }
     }
 
@@ -99,8 +101,9 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
         // 设置基本配置信息
         BaseConfig.CONFIG_BEAN = configBean
         BaseConfig.BASE_SOURCE_URL = configBean.configJsonUrl
-        BaseConfig.DANMAKU_API = configBean.danmukuApi
+        BaseConfig.DANMAKU_API = configBean.danmukuApi + "?url="
         BaseConfig.NOTION = configBean.notice
+        BaseConfig.DefaultSourceKey = configBean.defaultSource
     }
 
 

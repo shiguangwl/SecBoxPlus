@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.xxhoz.constant.BaseConfig.DefualtSourceKey
+import com.xxhoz.constant.BaseConfig.DefaultSourceKey
 import com.xxhoz.constant.Key
 import com.xxhoz.secbox.base.BaseFragment
 import com.xxhoz.secbox.base.list.XRecyclerView
@@ -83,9 +83,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding> {
      */
     private fun onVideoItemClick(viewData: BaseViewData<*>) {
         val playInfoBean: PlayInfoBean = PlayInfoBean(
-            XKeyValue.getString(Key.CURRENT_SOURCE_KEY, DefualtSourceKey),
+            XKeyValue.getString(Key.CURRENT_SOURCE_KEY, DefaultSourceKey),
             viewData.value as VideoBean,
-            1
+            0
         )
         DetailPlayerActivity.startActivity(requireContext(), playInfoBean)
     }

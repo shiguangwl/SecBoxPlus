@@ -84,9 +84,9 @@ class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilte
                     override fun onItemClick(parent: RecyclerView, view: View, viewData: BaseViewData<*>, position: Int, id: Long) {
 
                         val playInfoBean = PlayInfoBean(
-                            XKeyValue.getString(Key.CURRENT_SOURCE_KEY, BaseConfig.DefualtSourceKey),
+                            XKeyValue.getString(Key.CURRENT_SOURCE_KEY, BaseConfig.DefaultSourceKey),
                             viewData.value as VideoBean,
-                            1
+                            0
                         )
                         LogUtils.i("条目点击: ${playInfoBean}")
                         DetailPlayerActivity.startActivity(context!!, playInfoBean)

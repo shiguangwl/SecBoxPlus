@@ -272,7 +272,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         val playInfoBean: PlayInfoBean = PlayInfoBean(
             data.sourceBean!!.key,
             data,
-            1
+            0
         )
         LogUtils.i("条目点击: ${playInfoBean}")
         searchJobs.forEach {

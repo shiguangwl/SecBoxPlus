@@ -7,6 +7,9 @@ import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.GlobalActivityManager
 import com.xxhoz.secbox.util.LogUtils
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object BaseConfig {
 
@@ -31,7 +34,12 @@ object BaseConfig {
         false
     }
 
-    val CONFIG_JSON: String = "https://secbox.xxhoz.com/config.json"
+    val CONFIG_JSON: String by lazy {
+        val sdf = SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA)
+        val format = sdf.format(Date())
+        val d = format.takeLast(2).toInt() / 15
+        "https://secbox.xxhoz.com/config.json?key=" + "${format.dropLast(2)}%02d".format(d)
+    }
 
     lateinit var CONFIG_BEAN: ConfigBean
 
@@ -40,6 +48,7 @@ object BaseConfig {
      */
 
     var DANMAKU_API = ""
+
     /**
      * 加载爬虫配置URL
      */
@@ -48,7 +57,7 @@ object BaseConfig {
     /**
      * 默认源
      */
-     val DefualtSourceKey = "Qtv"
+    var DefaultSourceKey = ""
 
     /**
      * 公告
@@ -71,11 +80,11 @@ object BaseConfig {
             return null
         }
 
-        var sourceKey: String = XKeyValue.getString(Key.CURRENT_SOURCE_KEY, DefualtSourceKey)
+        var sourceKey: String = XKeyValue.getString(Key.CURRENT_SOURCE_KEY, DefaultSourceKey)
 
         var source: IBaseSource? = SourceManger.getSpiderSource(sourceKey)
 
-        if (source == null){
+        if (source == null) {
             LogUtils.i("设置的源未找到,默认使用第一个源")
             var firstSource: SourceBean = sourceBeanList.get(0)
             sourceKey = firstSource.key

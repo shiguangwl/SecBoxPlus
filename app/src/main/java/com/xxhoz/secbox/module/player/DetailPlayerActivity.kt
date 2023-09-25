@@ -197,7 +197,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
                     val parseBean: ParseBean = parseBeanList.get(position)
                     viewModel.currentParseBean.value = parseBean
                     Toaster.show("选择: $text")
-                    viewModel.getPlayUrl()
+                    viewModel.getPlayData()
                 }
                 .show()
         }
@@ -257,7 +257,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
      */
     private fun epTabItemClick(tab: TabLayout.Tab) {
         viewModel.currentEpisode.value = tab.position
-        viewModel.getPlayUrl()
+        viewModel.getPlayData()
     }
 
 

@@ -1,10 +1,7 @@
 package com.xxhoz.secbox.base
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 interface TaskManger {
     companion object {
@@ -16,40 +13,28 @@ interface TaskManger {
     /**
      * 取消之前任务,提交一个新任务
      */
-    fun Task(task: suspend () -> Unit): Job {
-        return Task(DefaultJobName, task)
+    fun SingleTask(task: Job): Job {
+        return SingleTask(DefaultJobName, task)
     }
 
     /**
      * 取消之前任务,提交一个新任务
      */
-    fun Task(taskNae: String, task: suspend () -> Unit): Job {
+    fun SingleTask(taskNae: String, task: Job): Job {
         jobs[taskNae]?.cancel()
-        jobs[taskNae] = getScope().launch {
-            task()
-        }
-        return jobs[taskNae]!!
+        jobs[taskNae] = task
+        return task
     }
 
-    fun getScope(): CoroutineScope
 
-    fun clearTask() {
-        jobs.values.forEach {
-            it.cancel()
+    fun clearTask(){
+        jobs.forEach {
+            if (it.value.isActive) {
+                it.value.cancel()
+            }
         }
         jobs.clear()
     }
+    fun getScope(): CoroutineScope
 
-
-    suspend fun <T> onIO(task: () -> T): T {
-        return withContext(Dispatchers.IO) {
-            return@withContext task()
-        }
-    }
-
-    suspend fun onIO2(task: () -> Unit) {
-        withContext(Dispatchers.IO) {
-            task()
-        }
-    }
 }

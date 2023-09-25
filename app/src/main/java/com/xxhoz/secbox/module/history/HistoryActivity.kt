@@ -45,17 +45,17 @@ class HistoryActivity : BaseActivity<ActivityHistoryBinding>() {
         get() {
             var playInfoBeans =
                 XKeyValue.getObjectList<PlayInfoBean>(Key.PLAY_History)
-            if (playInfoBeans == null || playInfoBeans.isEmpty()){
+            if (playInfoBeans == null || playInfoBeans.isEmpty()) {
                 playInfoBeans = ArrayList()
             }
             return playInfoBeans
         }
 
-    fun initView(){
-        viewBinding.returnImageview.setOnClickListener(){
+    fun initView() {
+        viewBinding.returnImageview.setOnClickListener() {
             finish()
         }
-        viewBinding.clearAllTextview.setOnClickListener(){
+        viewBinding.clearAllTextview.setOnClickListener() {
             // 清空数据
             XKeyValue.clearObjectList(Key.PLAY_History)
             initView()
@@ -71,7 +71,7 @@ class HistoryActivity : BaseActivity<ActivityHistoryBinding>() {
                     val itemView: ItemHistoryVideoBinding = ItemHistoryVideoBinding.bind(view)
                     val videoBean: VideoBean = data.videoBean
 
-                    itemView.playhistoryTitle.text = videoBean.vod_name + "  第${data.preNum}集"
+                    itemView.playhistoryTitle.text = videoBean.vod_name + "  第${data.preNum + 1}集"
 
                     var vodPic = videoBean.vod_pic
                     if (videoBean.vod_pic.contains("@")) {
@@ -106,6 +106,7 @@ class HistoryActivity : BaseActivity<ActivityHistoryBinding>() {
             mFormatter.format("%02d:%02d", minutes, seconds).toString()
         }
     }
+
     @PageName
     override fun getPageName() = PageName.HISTORY
 

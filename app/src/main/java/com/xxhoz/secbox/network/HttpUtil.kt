@@ -151,9 +151,9 @@ object HttpUtil {
         // 设置超时时间为20秒
         val client = OkHttpClient.Builder()
             // 设置连接超时时间，单位为秒
-            .connectTimeout(10, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
             // 设置读取超时时间，单位为秒
-            .readTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
             .addInterceptor(DeflateInterceptor())
             .build()
 
