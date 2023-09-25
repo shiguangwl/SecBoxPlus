@@ -89,7 +89,8 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
             startActivity(intent)
         }
 
-
+        // 版本号 设置
+        viewBinding.tvUserPhone.text = App.instance.packageManager.getPackageInfo(App.instance.packageName, 0).versionName
     }
 
 
