@@ -13,6 +13,7 @@ import com.xxhoz.secbox.module.player.video.view.BottomControlView
 import com.xxhoz.secbox.module.player.video.view.ErrorView
 import com.xxhoz.secbox.module.player.video.view.SecDanmakuView
 import com.xxhoz.secbox.persistence.XKeyValue
+import com.xxhoz.secbox.util.LogUtils
 
 import xyz.doikki.videocontroller.component.CompleteView
 import xyz.doikki.videocontroller.component.GestureView
@@ -140,8 +141,10 @@ class DanmuVideoPlayer : VideoView {
                         XKeyValue.putBoolean(Key.DANMAKU_STATE, true)
                         if (vDanmakuView.isPrepared) {
                             vDanmakuView.show()
+                            LogUtils.d("弹幕已加载,直接显示")
                         }else{
                             // 加载弹幕
+                            LogUtils.d("执行加载弹幕回调逻辑")
                             actionCallback?.loadDanmaku(@DanmuVideoPlayer::setDanmuStream)
                         }
                     }else{

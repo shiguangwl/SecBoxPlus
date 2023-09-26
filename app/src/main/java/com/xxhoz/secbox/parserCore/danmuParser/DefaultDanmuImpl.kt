@@ -32,7 +32,7 @@ class DefaultDanmuImpl(private val danmuApi: String) : IDanmuInterface {
         )
         LogUtils.d("下载弹幕文件成功:${cacheFile.length() / 1024} kb")
         // 当cacheFile文件小于300kb则不缓存
-        if ((cacheFile.length() / 1024) < 500){
+        if ((cacheFile.length() / 1024) < 200){
             LogUtils.d("acheFile文件小于300kb不缓存")
             return cacheFile
         }

@@ -35,7 +35,7 @@ import java.io.File
 class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
     DanmuVideoPlayer.PlayerCallback {
 
-    private lateinit var loadDanmu: (File) -> Unit
+    private lateinit var loadDanmuCallback: (File) -> Unit
     private val viewModel: DetailPlayerViewModel by viewModels()
 
     private lateinit var channelTab: TabLayout
@@ -159,7 +159,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
         }
 
         viewModel.danmuFile.observe(this) {
-            loadDanmu(it)
+            loadDanmuCallback(it)
         }
 
         viewModel.pageState.observe(this) {
@@ -410,7 +410,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
      * 弹幕加载事假
      */
     override fun loadDanmaku(callBack: (File) -> Unit) {
-        this.loadDanmu = callBack
+        this.loadDanmuCallback = callBack
         viewModel.loadDanmaku()
     }
 

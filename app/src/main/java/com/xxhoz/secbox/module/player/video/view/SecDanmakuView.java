@@ -95,6 +95,7 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     if (playState == VideoView.STATE_PLAYING) {
                         seekTo(controlWrapper.getCurrentPosition());
+                        show();
                     }
                 });
 
@@ -166,16 +167,19 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
                 hide();
                 break;
             case VideoView.STATE_BUFFERED:
+                show();
                 if (isPrepared()){
                     seekTo(controlWrapper.getCurrentPosition());
-                    show();
                 }
                 break;
             case VideoView.STATE_PREPARING:
                 break;
             case VideoView.STATE_PLAYING:
-                if (isPrepared() && isPaused()) {
-                    resume();
+                if (isPrepared()) {
+                    show();
+                    if (isPaused()){
+                        resume();
+                    }
                 }
                 break;
             case VideoView.STATE_PAUSED:

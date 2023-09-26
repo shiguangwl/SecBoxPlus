@@ -222,11 +222,11 @@ class DetailPlayerViewModel : BaseViewModel() {
             // 当前选择的剧集的URL
             val urlCode = currentChannelData.episodes.get(currentEpisode.value!!).urlCode
             // 加载弹幕数据
-            loadDanmakuData(urlCode)
+            loadDanmukuData(urlCode)
         })
     }
 
-    private suspend fun CoroutineScope.loadDanmakuData(urlCode: String) {
+    private suspend fun CoroutineScope.loadDanmukuData(urlCode: String) {
         val danmu: File? = withContext(Dispatchers.IO) {
             if (!isVideoPlatformURL(urlCode)) {
                 return@withContext null
