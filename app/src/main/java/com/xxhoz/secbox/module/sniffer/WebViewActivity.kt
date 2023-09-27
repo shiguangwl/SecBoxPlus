@@ -114,16 +114,19 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
     companion object {
         val PHONE_AGENT =
             "UCWEB/2.0 (MIDP-2.0; U; Adr 9.0.0) UCBrowser U2/1.0.0 Gecko/63.0 Firefox/63.0 iPhone/7.1 SearchCraft/2.8.2 baiduboxapp/3.2.5.10 BingWeb/9.1 ALiSearchApp/2.4"
+        var PC_AGENT =
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.51"
         var USER_AGENT =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.51"
 
         var isCustomSite: Boolean = false
 
         var homeUrl = ""
+
         fun startActivity(
             context: Context,
             url: String,
-            ua: String = USER_AGENT,
+            ua: String = PC_AGENT,
             isCustomSite: Boolean = false
         ) {
             this.homeUrl = url
@@ -149,7 +152,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
     private fun webviewConfig() {
         // WebView 配置
-        val webSettings: WebSettings = mWebView.getSettings()
+        val webSettings: WebSettings = mWebView.settings
         // 开启 JavaScript
         webSettings.javaScriptEnabled = true
         // 设置自适应屏幕，两者合用
@@ -163,7 +166,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         // 隐藏原生的缩放控件
         webSettings.displayZoomControls = false
         // 设置UA
-        webSettings.setUserAgentString(USER_AGENT)
+        webSettings.userAgentString = USER_AGENT
         // 加快网页加载完成的速度，等页面完成再加载图片
         webSettings.loadsImagesAutomatically = true
         // 本地 DOM 存储（解决加载某些网页出现白板现象）
@@ -174,7 +177,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         //LOAD_CACHE_ELSE_NETWORK：优先使用缓存，如果缓存中没有数据则从网络加载。
         //LOAD_NO_CACHE：不使用缓存，直接从网络加载。
         //LOAD_CACHE_ONLY：只使用缓存，不从网络加载。
-        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        webSettings.cacheMode = WebSettings.LOAD_NO_CACHE
     }
 
     private fun initView() {
@@ -203,7 +206,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         }
 
 
-        viewBinding.returnImage.setOnClickListener() {
+        viewBinding.returnImage.setOnClickListener {
             finish()
         }
 
@@ -222,7 +225,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
             viewBinding.cureentJxText.visibility = View.VISIBLE
             viewBinding.cureentJxText.text = currentParseBean.name  + " ▼"
 
-            viewBinding.cureentJxText.setOnClickListener() {
+            viewBinding.cureentJxText.setOnClickListener {
                 val indexOf = parseBeanList.indexOf(currentParseBean)
                 XPopup.Builder(this)
                     .isDestroyOnDismiss(true)
@@ -232,7 +235,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
                     ) { position, text ->
                         val parseBean: ParseBean = parseBeanList.get(position)
                         currentParseBean = parseBean
-                        viewBinding.cureentJxText.text = currentParseBean.name  + " ▼"
+                        viewBinding.cureentJxText.text = currentParseBean.name + " ▼"
                         Toaster.show("选择: $text")
                     }
                     .show()
@@ -315,7 +318,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
 
     private fun startPlay(parseRsult: String) {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         videoPlayer.startFullScreen()
         videoPlayer.setUp(EpsodeEntity("", parseRsult), 0)
     }
@@ -411,7 +414,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         }
 
         if (videoPlayer.isFullScreen) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             videoPlayer.stopFullScreen()
             videoPlayer.release()
             return true
@@ -426,7 +429,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
 
     override fun onDestroy() {
-        mWebView.clearCache(true);
+        mWebView.clearCache(true)
         mWebView.removeAllViews()
         mWebView.destroy()
         videoPlayer.release()

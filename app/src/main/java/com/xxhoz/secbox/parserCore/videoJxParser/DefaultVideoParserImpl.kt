@@ -10,9 +10,9 @@ import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.StringUtils
 import org.json.JSONObject
 
-class DefaultVideoParserImpl() {
+class DefaultVideoParserImpl {
 
-    private var current = 0;
+    private var current = 0
 
     private lateinit var parsers: List<ParseBean>
 
@@ -55,57 +55,69 @@ class DefaultVideoParserImpl() {
         val parseBean = parsers.get(current)
         if (parseBean.type == 1) {
             // JSON
-            try {
-                val jsonObject = HttpUtil.get(parseBean.url + videoUrl, JSONObject::class.java)
-                val result = jsonObject.getString("url")
-                if (StringUtils.isEmpty(result)) {
-                    throw Exception("解析结果为空")
-                }
-                if (interrupt){
-                    return
-                }
-                cancel()
-                callback.success(parseBean, result)
-            } catch (e: Exception) {
-                LogUtils.d("接口: [${parseBean.name}]  解析失败")
-                e.printStackTrace()
-                if (interrupt){
-                    return
-                }
-                current++
-                getVideo()
-            }
-
+            jsonParser(parseBean)
         } else if (parseBean.type == 0) {
             // 嗅探
-            val snifferJob: SnifferEngine.SnifferJob = SnifferEngine.JX(
-                GlobalActivityManager.getTopActivity() as BaseActivity<*>,
-                parseBean,
-                videoUrl,
-                15000,
-                object : SnifferEngine.Callback {
-                    override fun success(parseBean: ParseBean?, res: String?) {
-                        if (interrupt) {
-                            return
-                        }
-                        cancel()
-                        callback.success(parseBean, res)
-                    }
-
-                    override fun failed(parseBean: ParseBean?, errorInfo: String?) {
-                        if (interrupt) {
-                            return
-                        }
-                        LogUtils.d("接口: [${parseBean?.name}]  嗅探失败  ${errorInfo}")
-                        current++
-                        getVideo()
-                    }
-
-                }
-            )
-            snifferJobs.add(snifferJob)
-
+            snifferParser(parseBean)
         }
+    }
+
+    private fun snifferParser(parseBean: ParseBean) {
+        val snifferJob: SnifferEngine.SnifferJob = SnifferEngine.JX(
+            GlobalActivityManager.getTopActivity() as BaseActivity<*>,
+            parseBean,
+            videoUrl,
+            15000,
+            object : SnifferEngine.Callback {
+                override fun success(parseBean: ParseBean?, res: String?) {
+                    if (interrupt) {
+                        return
+                    }
+                    cancel()
+                    callback.success(parseBean, res)
+                }
+
+                override fun failed(parseBean: ParseBean?, errorInfo: String?) {
+                    if (interrupt) {
+                        return
+                    }
+                    LogUtils.d("接口: [${parseBean?.name}]  嗅探失败  ${errorInfo}")
+                    next()
+                }
+
+            }
+        )
+        snifferJobs.add(snifferJob)
+    }
+
+    private fun jsonParser(parseBean: ParseBean) {
+        try {
+            val jsonObject = HttpUtil.get(parseBean.url + videoUrl, JSONObject::class.java)
+            val result = jsonObject.getString("url")
+            if (StringUtils.isEmpty(result)) {
+                throw Exception("解析结果为空")
+            }
+            if (interrupt) {
+                return
+            }
+            cancel()
+            callback.success(parseBean, result)
+        } catch (e: Exception) {
+            LogUtils.d("接口: [${parseBean.name}]  解析失败")
+            e.printStackTrace()
+            if (interrupt) {
+                return
+            }
+            next()
+        }
+    }
+
+    /**
+     * 执行下一个解析
+     */
+    private fun next() {
+        current++
+        getVideo()
     }
 
 
