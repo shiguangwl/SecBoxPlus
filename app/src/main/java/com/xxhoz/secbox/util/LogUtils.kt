@@ -2,7 +2,7 @@ package com.xxhoz.secbox.util
 
 import android.util.Log
 import com.xxhoz.secbox.BuildConfig
-import java.util.*
+import java.util.Objects
 
 object LogUtils {
     var className //类名
@@ -44,6 +44,18 @@ object LogUtils {
             return
         }
         Log.e(className, createLog(message))
+    }
+
+    fun e(message: String, e: Throwable) {
+        if (!isDebuggable) {
+            return
+        }
+        getMethodNames(Throwable().stackTrace)
+        if (isUnitTestEnvironment) {
+            println(createLog(message))
+            return
+        }
+        Log.e(className, createLog(message), e)
     }
 
     fun i(message: String) {

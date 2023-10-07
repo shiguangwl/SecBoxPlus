@@ -1,8 +1,10 @@
 package com.xxhoz.secbox.base
 
+import com.umeng.commonsdk.internal.crash.UMCrashManager
 import com.xxhoz.constant.Key
 import com.xxhoz.secbox.App
 import com.xxhoz.secbox.persistence.XKeyValue
+import com.xxhoz.secbox.util.LogUtils
 import java.io.File
 
 /**
@@ -11,26 +13,33 @@ import java.io.File
 object CacheManger {
 
     init {
-        //  缓存惰性删除,每次启动时检查缓存文件是否过期,过期则删除
-        val cacheList = getCacheList()
-        val expiredCacheList = cacheList.filter { it.expirationMillis < System.currentTimeMillis() }
-        expiredCacheList.forEach {
-            deleteCacheFile(it.cacheName)
+        try {
+            //  缓存惰性删除,每次启动时检查缓存文件是否过期,过期则删除
+            val cacheList = getCacheList()
+            val expiredCacheList =
+                cacheList.filter { it.expirationMillis < System.currentTimeMillis() }
+            expiredCacheList.forEach {
+                deleteCacheFile(it.cacheName)
+            }
+            cacheList.removeAll(expiredCacheList)
+            XKeyValue.putObjectList(Key.CACHE_FILE_LIST, cacheList)
+        } catch (e: Exception) {
+            UMCrashManager.reportCrash(App.instance, e)
+            LogUtils.e("缓存管理初始化异常:", e)
         }
-        cacheList.removeAll(expiredCacheList)
-        XKeyValue.putObjectList(Key.CACHE_FILE_LIST, cacheList)
     }
+
     /**
      * 缓存保存位置
      */
-    private val cacheDir:String by lazy {
+    private fun cacheDir(): String {
         val danmuDir = App.instance.filesDir.absolutePath + "/danmu/"
         //  创建缓存文件夹
         val cacheDir = File(danmuDir)
         if (!cacheDir.exists()) {
             cacheDir.mkdirs()
         }
-        danmuDir
+        return danmuDir
     }
 
     /**
@@ -67,7 +76,7 @@ object CacheManger {
      */
     fun cacheFile(cacheName: String, file: File, expirationMillis: Long) :File{
         //  缓存记录中判断是否存在缓存文件,存在则删除文件 写入新的缓存文件
-        val cacheFile = File(cacheDir, cacheName)
+        val cacheFile = File(cacheDir(), cacheName)
         file.copyTo(cacheFile, overwrite = true)
         //  记录缓存信息
         val cacheItem = CacheItem(cacheName, System.currentTimeMillis() + expirationMillis)
@@ -84,7 +93,7 @@ object CacheManger {
         val cacheItem = cacheList.find { it.cacheName == cacheName }
 
         return if (cacheItem != null) {
-            val cacheFile = File(cacheDir, cacheItem.cacheName)
+            val cacheFile = File(cacheDir(), cacheItem.cacheName)
             if (cacheFile.exists()) {
                 cacheFile
             } else {
@@ -103,7 +112,7 @@ object CacheManger {
      * @param cacheName 缓存名称
      */
     fun deleteCacheFile(cacheName: String) {
-        val cacheFile = File(cacheDir, cacheName)
+        val cacheFile = File(cacheDir(), cacheName)
         if (cacheFile.exists()) {
             cacheFile.delete()
         }

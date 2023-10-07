@@ -54,9 +54,8 @@ public class CrashManager {
             Toaster.showLong("发生未知错误:" + e.getMessage());
         }
         // 异常上报
-        LogUtils.INSTANCE.e("未知错误,错误已上报");
+        LogUtils.INSTANCE.e("未知错误,错误已上报:", e);
         UMCrashManager.reportCrash(App.instance, e);
-        e.printStackTrace();
     }
 
 

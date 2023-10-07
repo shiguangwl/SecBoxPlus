@@ -15,7 +15,6 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
-import androidx.annotation.WorkerThread
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gyf.immersionbar.ktx.immersionBar
@@ -23,6 +22,8 @@ import com.hjq.toast.Toaster
 import com.lxj.xpopup.XPopup
 import com.lxj.xpopup.core.BasePopupView
 import com.lxj.xpopup.enums.PopupPosition
+import com.lxj.xpopup.impl.LoadingPopupView
+import com.lxj.xpopup.interfaces.SimpleCallback
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.secbox.R
@@ -32,6 +33,7 @@ import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.ActivityWebViewBinding
 import com.xxhoz.secbox.databinding.ItemSnifferResultBinding
 import com.xxhoz.secbox.module.player.video.DanmuVideoPlayer
+import com.xxhoz.secbox.module.player.video.SimpleVideoCallback
 import com.xxhoz.secbox.module.sniffer.view.CustomPartShadowPopupView
 import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.danmuParser.DefaultDanmuImpl
@@ -40,7 +42,6 @@ import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.StringUtils
 import com.xxhoz.secbox.util.UniversalAdapter
 import com.xxhoz.secbox.util.getActivity
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -54,7 +55,49 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
     lateinit var mWebView: WebView
 
-    val videoPlayer: DanmuVideoPlayer by lazy { DanmuVideoPlayer(this, null) }
+    private var currentUrl: String = ""
+
+    val videoPlayer: DanmuVideoPlayer by lazy {
+        val simpleVideoCallback = object : SimpleVideoCallback() {
+            override fun featureEnabled(): DanmuVideoPlayer.ViewState =
+                DanmuVideoPlayer.ViewState(false, true, false)
+
+            override fun loadDanmaku(callBack: (File) -> Unit) {
+                SingleTask("DanmuJob", lifecycleScope.launch(Dispatchers.IO) {
+                    val danmuFile: File? = withContext(Dispatchers.IO) {
+
+                        Toaster.show("后台加载弹幕资源中")
+                        var errorInfo = ""
+                        for (i in 0..5) {
+                            try {
+                                return@withContext danmuSource.getDanmaku(currentUrl)
+                            } catch (e: SocketTimeoutException) {
+                                LogUtils.d("弹幕加载超时,尝试从试")
+                                errorInfo = "加载弹幕超时,请重试"
+                            } catch (e: Exception) {
+                                LogUtils.d("弹幕加载失败,尝试从试")
+                                errorInfo = "加载弹幕资源失败"
+                                e.printStackTrace()
+                            }
+                        }
+                        if (StringUtils.isNotEmpty(errorInfo)) {
+                            Toaster.show(errorInfo)
+                        }
+                        return@withContext null
+                    }
+                    if (danmuFile != null && isActive) {
+                        Toaster.show("弹幕正在装载")
+
+                        withContext(Dispatchers.Main) {
+                            callBack(danmuFile)
+                        }
+                    }
+                })
+            }
+        }
+
+        DanmuVideoPlayer(this, null, simpleVideoCallback)
+    }
 
     var isShowBottom = true
 
@@ -65,6 +108,8 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
     var VideoParser: DefaultVideoParserImpl? = null
 
     val danmuSource = DefaultDanmuImpl(BaseConfig.DANMAKU_API)
+
+    var loadding: LoadingPopupView? = null
 
     lateinit var currentParseBean: ParseBean
     override val inflater: (inflater: LayoutInflater) -> ActivityWebViewBinding
@@ -178,6 +223,8 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         //LOAD_NO_CACHE：不使用缓存，直接从网络加载。
         //LOAD_CACHE_ONLY：只使用缓存，不从网络加载。
         webSettings.cacheMode = WebSettings.LOAD_NO_CACHE
+
+        mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
     }
 
     private fun initView() {
@@ -201,7 +248,9 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
                 }
                 return@setOnClickListener
             } else {
+                // 官方嗅探播放
                 snifferPlay(mWebView.url!!)
+                this.currentUrl = mWebView.url!!
             }
         }
 
@@ -230,8 +279,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
                 XPopup.Builder(this)
                     .isDestroyOnDismiss(true)
                     .asCenterList(
-                        "选择首选接口", parseBeanList.map { it.name }.toTypedArray(),
-                        null, indexOf
+                        "选择首选接口", parseBeanList.map { it.name }.toTypedArray(), null, indexOf
                     ) { position, text ->
                         val parseBean: ParseBean = parseBeanList.get(position)
                         currentParseBean = parseBean
@@ -246,7 +294,7 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
     private val webViewClient = object : WebViewClient() {
         override fun onLoadResource(view: WebView, url: String) {
-            LogUtils.d("Webview加载资源:" + url)
+//            LogUtils.d("Webview加载资源:" + url)
             if (isCustomSite && isM3u8Url(url) || url.contains(".mp4") || url.contains(".flv")) {
                 addItem(url)
                 if (isCustomSite && isShowBottom) {
@@ -334,71 +382,58 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
                 parseBeanList.add(0, currentParseBean)
             }
 
-            val loadding = XPopup.Builder(getActivity())
-                .isDestroyOnDismiss(true)
-                .dismissOnBackPressed(false)
-                .dismissOnTouchOutside(false)
-                .asLoading("尝试加载资源中...")
-            loadding.show()
+            if (loadding == null) {
+                loadding = XPopup.Builder(getActivity())
+                    .setPopupCallback(object : SimpleCallback() {
+                        override fun onDismiss(popupView: BasePopupView?) {
+                            VideoParser!!.cancel()
+                            Toaster.showLong("若长时间无反应可尝试左下角选择首选节点")
+                            super.onDismiss(popupView)
+                        }
+                    })
+                    .asLoading("尝试加载资源中...")
+            }
+            loadding!!.show()
             VideoParser?.cancel()
             VideoParser = DefaultVideoParserImpl()
             VideoParser!!.JX(
                 currentUrl,
                 parseBeanList,
                 object : DefaultVideoParserImpl.Callback {
-                    override fun success(parseBean: ParseBean?, res: String?) {
+                    override fun success(parseBean: ParseBean?, res: String) {
                         getActivity()!!.runOnUiThread {
                             currentParseBean = parseBean!!
-                            viewBinding.cureentJxText.text = currentParseBean.name  + " ▼"
+                            viewBinding.cureentJxText.text = currentParseBean.name + " ▼"
+                            loadding!!.dismiss()
+                            startPlay(res)
+                            Toaster.show("加载视频内容成功")
+                        }
+                    }
 
-                            startPlay(res!!)
-                            loadding.dismiss()
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                // 加载弹幕
-                                loadDanmu(currentUrl)
+                    override fun failed(parseBean: ParseBean?, errorInfo: String) {
+                        getActivity()!!.runOnUiThread {
+                            if (parseBean == null) {
+                                Toaster.showLong("解析资源失败")
+                                loadding!!.dismiss()
                             }
                         }
                     }
 
-                    override fun failed(errorInfo: String?) {
-                        Toaster.showLong("解析资源失败")
-                        loadding.dismiss()
+                    override fun notifyChange(parseBean: ParseBean) {
+                        getActivity()!!.runOnUiThread {
+//                            Toaster.show("当前解析接口: ${parseBean.name}")
+                            loadding?.setTitle("当前解析接口: ${parseBean.name}")
+                            currentParseBean = parseBean
+                            viewBinding.cureentJxText.text = currentParseBean.name + " ▼"
+                        }
                     }
-                })
-
-        }
-    }
-
-    @WorkerThread
-    private suspend fun CoroutineScope.loadDanmu(urlCode: String) {
-        val danmu: File? = withContext(Dispatchers.IO) {
-
-            Toaster.show("后台加载弹幕资源中")
-            var errorInfo = ""
-            for (i in 0..3) {
-                try {
-                    return@withContext danmuSource.getDanmaku(urlCode)
-                } catch (e: SocketTimeoutException) {
-                    LogUtils.d("弹幕加载超时,尝试从试")
-                    errorInfo = "加载弹幕超时,请重试"
-                } catch (e: Exception) {
-                    LogUtils.d("弹幕加载失败,尝试从试")
-                    errorInfo = "加载弹幕资源失败"
-                    e.printStackTrace()
                 }
-            }
-            if (StringUtils.isNotEmpty(errorInfo)) {
-                Toaster.show(errorInfo)
-            }
-            return@withContext null
-        }
-        if (danmu != null && isActive) {
-            Toaster.show("弹幕正在装载")
-            withContext(Dispatchers.Main) {
-                videoPlayer.setDanmuStream(danmu)
-            }
+            )
+
         }
     }
+
+
 
 
     fun isM3u8Url(url: String): Boolean {

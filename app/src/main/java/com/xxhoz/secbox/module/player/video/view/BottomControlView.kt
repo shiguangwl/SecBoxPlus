@@ -15,12 +15,16 @@ class BottomControlView(context: Context, var danmuState: Boolean) : VodControlV
     private var fullScreen: ImageView
     private var danmuBtn: ImageView
 
+    private var next: Boolean = true
+    private var danmu: Boolean = true
+    private var eposde: Boolean = true
+
     init {
         nextVod = findViewById(R.id.next_vod)
         changeEposde = findViewById(R.id.change_epsode)
         changeSpeed = findViewById(R.id.change_speed)
         danmuBtn = findViewById(R.id.danmu_control)
-        fullScreen = findViewById(R.id.fullscreen);
+        fullScreen = findViewById(R.id.fullscreen)
         changeDanmuState(danmuState)
     }
 
@@ -40,7 +44,9 @@ class BottomControlView(context: Context, var danmuState: Boolean) : VodControlV
             }
 
             VideoView.PLAYER_FULL_SCREEN -> {
-                changeEposde.visibility = VISIBLE
+                if (eposde) {
+                    changeEposde.visibility = VISIBLE
+                }
                 changeSpeed.visibility = VISIBLE
                 fullScreen.visibility = GONE
             }
@@ -68,11 +74,25 @@ class BottomControlView(context: Context, var danmuState: Boolean) : VodControlV
     }
 
     fun setDanmuBtnListener(listener: (danmuState: Boolean) -> Unit) {
-        danmuBtn.setOnClickListener() {
+        danmuBtn.setOnClickListener {
             danmuState = !danmuState
             changeDanmuState(danmuState)
             listener(danmuState)
         }
     }
 
+    /**
+     * 设置可视视图
+     * @param next 下一集
+     * @param eposde 选集
+     * @param danmu 弹幕
+     */
+    fun setViewVisible(next: Boolean, danmu: Boolean, eposde: Boolean) {
+        this.danmu = danmu
+        this.eposde = eposde
+        this.next = next
+        nextVod.visibility = if (next) VISIBLE else GONE
+        danmuBtn.visibility = if (danmu) VISIBLE else GONE
+        changeEposde.visibility = if (eposde) VISIBLE else GONE
+    }
 }

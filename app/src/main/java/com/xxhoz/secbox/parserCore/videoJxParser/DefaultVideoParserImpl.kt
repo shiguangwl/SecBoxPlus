@@ -48,7 +48,7 @@ class DefaultVideoParserImpl {
     private fun getVideo() {
         if (current >= parsers.size) {
             if (!interrupt){
-                callback.failed("解析失败")
+                callback.failed(null, "解析失败")
             }
             return
         }
@@ -63,6 +63,7 @@ class DefaultVideoParserImpl {
     }
 
     private fun snifferParser(parseBean: ParseBean) {
+        callback.notifyChange(parseBean)
         val snifferJob: SnifferEngine.SnifferJob = SnifferEngine.JX(
             GlobalActivityManager.getTopActivity() as BaseActivity<*>,
             parseBean,
@@ -74,13 +75,14 @@ class DefaultVideoParserImpl {
                         return
                     }
                     cancel()
-                    callback.success(parseBean, res)
+                    callback.success(parseBean!!, res!!)
                 }
 
                 override fun failed(parseBean: ParseBean?, errorInfo: String?) {
                     if (interrupt) {
                         return
                     }
+                    callback.failed(parseBean, "解析失败")
                     LogUtils.d("接口: [${parseBean?.name}]  嗅探失败  ${errorInfo}")
                     next()
                 }
@@ -92,6 +94,7 @@ class DefaultVideoParserImpl {
 
     private fun jsonParser(parseBean: ParseBean) {
         try {
+            callback.notifyChange(parseBean)
             val jsonObject = HttpUtil.get(parseBean.url + videoUrl, JSONObject::class.java)
             val result = jsonObject.getString("url")
             if (StringUtils.isEmpty(result)) {
@@ -103,6 +106,7 @@ class DefaultVideoParserImpl {
             cancel()
             callback.success(parseBean, result)
         } catch (e: Exception) {
+            callback.failed(parseBean, "解析失败")
             LogUtils.d("接口: [${parseBean.name}]  解析失败")
             e.printStackTrace()
             if (interrupt) {
@@ -122,7 +126,19 @@ class DefaultVideoParserImpl {
 
 
     interface Callback {
-        fun success(parseBean: ParseBean?, res: String?)
-        fun failed(errorInfo: String?)
+        /**
+         * 解析成功
+         */
+        fun success(parseBean: ParseBean?, res: String)
+
+        /**
+         * 解析失败
+         */
+        fun failed(parseBean: ParseBean?, errorInfo: String)
+
+        /**
+         * 解析通知
+         */
+        fun notifyChange(parseBean: ParseBean)
     }
 }

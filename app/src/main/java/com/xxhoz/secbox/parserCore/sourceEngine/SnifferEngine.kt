@@ -52,7 +52,7 @@ object SnifferEngine {
          val mWebView: WebView by lazy { WebView(activity) }
          var isInit = false
         // 启动协程
-        activity.runOnUiThread() {
+        activity.runOnUiThread {
             configWebViewSys(mWebView)
 //            val layoutParams = ViewGroup.LayoutParams(
 //                ViewGroup.LayoutParams.MATCH_PARENT,
@@ -105,18 +105,18 @@ object SnifferEngine {
 
             }
 
-            mWebView.setWebChromeClient(object : WebChromeClient() {
+            mWebView.webChromeClient = object : WebChromeClient() {
                 override fun onProgressChanged(view: WebView, newProgress: Int) {
                     super.onProgressChanged(view, newProgress)
                     if (newProgress == 100) {
                         // 取消超时回调
-                        timer.cancel()
+        //                        timer.cancel()
                         if (isError.get()) {
                             // 异常错误回调
-//                            callback.failed(parseBean,errorInfo.get())
+        //                            callback.failed(parseBean,errorInfo.get())
                             return
                         }
-//                        webviewDestory(mWebView)
+        //                        webviewDestory(mWebView)
                     }
                 }
 
@@ -151,7 +151,7 @@ object SnifferEngine {
                 ): Boolean {
                     return true
                 }
-            })
+            }
             isInit = true
             mWebView.loadUrl(parseBean.url + url)
         }
@@ -231,11 +231,7 @@ object SnifferEngine {
         settings.domStorageEnabled = true
         settings.javaScriptEnabled = true
         settings.mediaPlaybackRequiresUserGesture = false
-        if (BaseConfig.DEBUG) {
-            settings.blockNetworkImage = false
-        } else {
-            settings.blockNetworkImage = true
-        }
+        settings.blockNetworkImage = !BaseConfig.DEBUG
         settings.useWideViewPort = true
         settings.domStorageEnabled = true
         settings.javaScriptCanOpenWindowsAutomatically = true
@@ -248,7 +244,7 @@ object SnifferEngine {
         /* 添加webView配置 */
         //设置编码
         settings.defaultTextEncodingName = "utf-8"
-        settings.setUserAgentString(webView.settings.userAgentString)
+        settings.userAgentString = webView.settings.userAgentString
 //         settings.setUserAgentString(ANDROID_UA);
 //        webView.setBackgroundColor(Color.BLACK)
     }

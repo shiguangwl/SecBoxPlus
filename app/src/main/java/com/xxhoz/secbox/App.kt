@@ -32,22 +32,17 @@ class App : Application() {
             XKeyValue.init(this)
             GlobalActivityManager.init(this)
             // 初始化 Toast 框架
-            Toaster.init(this);
-            Toaster.setGravity(BOTTOM, 0, 200);
+            Toaster.init(this)
+            Toaster.setGravity(BOTTOM, 0, 200)
             Toaster.setView(R.layout.toast_custom_view)
             // 初始化播放器内核
             VideoViewManager.setConfig(
                 VideoViewConfig.newBuilder()
                 //使用MediaPlayer解码
                 .setPlayerFactory(ExoMediaPlayerFactory.create())
-                .build());
+                .build())
             // 设置 Json 解析容错监听
             GsonFactory.setJsonCallback { typeToken, fieldName, jsonToken ->
-                // 上报到 Bugly 错误列表中
-                LogUtils.e("GsonFactory类型解析异常：$typeToken#$fieldName，后台返回的类型为：$jsonToken")
-            }
-            // 设置 Json 解析容错监听
-            GsonFactory.setJsonCallback { typeToken, fieldName, jsonToken -> // Log.e("GsonFactory", "类型解析异常：" + typeToken + "#" + fieldName + "，后台返回的类型为：" + jsonToken);
                 LogUtils.e("类型解析异常：" + typeToken + "#" + fieldName + "，后台返回的类型为：" + jsonToken)
             }
             // 异常处理

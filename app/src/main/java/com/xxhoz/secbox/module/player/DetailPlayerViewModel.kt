@@ -83,9 +83,6 @@ class DetailPlayerViewModel : BaseViewModel() {
         currentChannel.value = 0
         // 默认选择第一个剧集
         currentEpisode.value = infoBean.preNum
-        // 默认选择第一个解析接口
-        val parseBeanList = SourceManger.getParseBeanList()
-
 
         SingleTask(viewModelScope.launch {
             try {
@@ -108,12 +105,10 @@ class DetailPlayerViewModel : BaseViewModel() {
 
                 pageState.postValue(PageState.NORMAL)
             } catch (e: GlobalException) {
-                LogUtils.d("获取数据失败: ${e.message}")
-                e.printStackTrace()
+                LogUtils.e("获取数据失败: ", e)
                 pageState.postValue(PageState.EMPTY)
             } catch (e: Exception) {
-                LogUtils.d("获取数据失败: ${e.message}")
-                e.printStackTrace()
+                LogUtils.e("获取数据失败: ", e)
                 pageState.postValue(PageState.LOAD_ERROR)
             }
         })
@@ -147,7 +142,7 @@ class DetailPlayerViewModel : BaseViewModel() {
                     currenSelectEposode.urlCode,
                     parseBeanList,
                     object : DefaultVideoParserImpl.Callback {
-                        override fun success(parseBean: ParseBean?, res: String?) {
+                        override fun success(parseBean: ParseBean?, res: String) {
                             parseBean?.let {
                                 LogUtils.d("[${it.name}] 解析成功")
                             }
@@ -160,9 +155,17 @@ class DetailPlayerViewModel : BaseViewModel() {
                             currentParseBean.postValue(parseBean)
                         }
 
-                        override fun failed(errorInfo: String?) {
-                            LogUtils.d("解析失败: ${errorInfo}")
+                        override fun failed(parseBean: ParseBean?, errorInfo: String) {
+                            if (parseBean != null) {
+                                LogUtils.d("当前路线解析失败: ${errorInfo}")
+                                return
+                            }
                             onStateVideoPlayerMsg("获取播放链接失败")
+                        }
+
+                        override fun notifyChange(parseBean: ParseBean) {
+                            Toaster.show("尝试接口: ${parseBean.name}")
+                            currentParseBean.postValue(parseBean)
                         }
                     })
             }
@@ -184,7 +187,7 @@ class DetailPlayerViewModel : BaseViewModel() {
     ) {
         val playLinkBean: PlayLinkBean? = spiderSource.value!!.playInfo(channelFlag, urlCode)
         if (playLinkBean == null) {
-            callback.failed("获取播放链接失败")
+            callback.failed(null, "获取播放链接失败")
             return
         }
         LogUtils.i("影视播放数据: ${playLinkBean}")
@@ -196,15 +199,8 @@ class DetailPlayerViewModel : BaseViewModel() {
             VideoParser!!.JX(
                 playLinkBean.url,
                 parseBeanList,
-                object : DefaultVideoParserImpl.Callback {
-                    override fun success(parseBean: ParseBean?, res: String?) {
-                        callback.success(parseBean,res)
-                    }
-
-                    override fun failed(errorInfo: String?) {
-                        callback.failed(errorInfo)
-                    }
-                })
+                callback
+            )
         } else if (playLinkBean.parse == 0) {
             // 直接播放
             callback.success(null, playLinkBean.url)
@@ -252,7 +248,7 @@ class DetailPlayerViewModel : BaseViewModel() {
         }
         if (danmu != null && isActive) {
             Toaster.show("弹幕正在装载")
-            danmuFile.postValue(danmu!!)
+            danmuFile.postValue(danmu)
         }
     }
 

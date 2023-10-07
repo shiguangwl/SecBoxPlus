@@ -32,7 +32,7 @@ import com.xxhoz.secbox.util.setImageUrl
 import java.io.File
 
 
-class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
+class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
     DanmuVideoPlayer.PlayerCallback {
 
     private lateinit var loadDanmuCallback: (File) -> Unit
@@ -101,11 +101,11 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
 
     private fun initView() {
 
-        viewBinding.button.setOnClickListener() {
-            episodeTab.setScrollPosition(7, 0F, true);
+        viewBinding.button.setOnClickListener {
+            episodeTab.setScrollPosition(7, 0F, true)
         }
         videoPlayer = viewBinding.danmakuPlayer
-        videoPlayer.actionCallback = this
+        videoPlayer.setActionCallback(this)
 
         channelTab = viewBinding.channelTab
         episodeTab = viewBinding.episodeTab
@@ -117,7 +117,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
             viewBinding.roundAngleImageView.setImageUrl(it.vod_pic)
             viewBinding.descText.text = removeHtmlAndWhitespace(it.vod_content)
             viewBinding.textView.text =
-                "${it.vod_year ?: "-"}  /  ${it.type_name ?: "-"}  /  ${it.vod_director ?: "-"}"
+                "${it.vod_year}  /  ${it.type_name}  /  ${it.vod_director}"
             viewBinding.currentSourceText.text = viewModel.spiderSource.value!!.sourceBean.name
         }
 
@@ -155,7 +155,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
         // 播放链接变化
         viewModel.playEntity.observe(this) {
             videoPlayer.setUp(it, position)
-            position = 0;
+            position = 0
         }
 
         viewModel.danmuFile.observe(this) {
@@ -184,7 +184,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
             }
         }
 
-        viewBinding.cureentJxText.setOnClickListener(){
+        viewBinding.cureentJxText.setOnClickListener {
 
             val parseBeanList = SourceManger.getParseBeanList()
             val indexOf = parseBeanList.indexOf(viewModel.currentParseBean.value)
@@ -215,7 +215,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
                 }
                 episodeTab.getTabAt(viewModel.currentEpisode.value!!)!!.select()
                 Handler(Looper.getMainLooper()).postDelayed({
-                    episodeTab.setScrollPosition(viewModel.currentEpisode.value!!, 0F, true);
+                    episodeTab.setScrollPosition(viewModel.currentEpisode.value!!, 0F, true)
                 }, 400)
             }
 
@@ -230,7 +230,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
         episodeTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 updateTabView(tab, true)
-                tab.setTag(System.currentTimeMillis())
+                tab.tag = System.currentTimeMillis()
                 epTabItemClick(tab)
                 videoPlayer.videoEpisodePopup.setPlayNum(tab.position + 1)
             }
@@ -245,7 +245,7 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
                     return
                 }
                 // 再次选择当前选项卡 行为:刷新重新加载
-                epTabItemClick(tab);
+                epTabItemClick(tab)
             }
         })
 
@@ -373,6 +373,8 @@ class DetailPlayerActivity() : BaseActivity<ActivityDetailPlayerBinding>(),
             super.onBackPressed()
         }
     }
+
+    override fun featureEnabled(): DanmuVideoPlayer.ViewState = DanmuVideoPlayer.ViewState()
 
     /**
      * 点击下一集
