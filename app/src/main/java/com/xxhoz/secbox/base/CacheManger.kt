@@ -112,11 +112,15 @@ object CacheManger {
      * @param cacheName 缓存名称
      */
     fun deleteCacheFile(cacheName: String) {
-        val cacheFile = File(cacheDir(), cacheName)
-        if (cacheFile.exists()) {
-            cacheFile.delete()
+        try {
+            val cacheFile = File(cacheDir(), cacheName)
+            if (cacheFile.exists()) {
+                cacheFile.delete()
+            }
+            deleteCacheItem(cacheName)
+        } catch (e: Exception) {
+            LogUtils.e("删除缓存文件异常:", e)
         }
-        deleteCacheItem(cacheName)
     }
 
 

@@ -21,6 +21,7 @@ import java.io.IOException
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.util.Locale
 
 object SourceManger {
 
@@ -68,7 +69,7 @@ object SourceManger {
             spider = safeJsonString(infoJson, "spider", "")
 
             // 远端站点源
-            for (opt in infoJson.get("sites").getAsJsonArray()) {
+            for (opt in infoJson.get("sites").asJsonArray) {
                 val obj = opt as JsonObject
                 val sb = SourceBean()
                 val siteKey = obj["key"].asString.trim()
@@ -76,8 +77,8 @@ object SourceManger {
                 sb.name = obj["name"].asString.trim()
                 sb.type = obj["type"].asInt
                 sb.api = obj["api"].asString.trim()
-                sb.setSearchable(safeJsonInt(obj, "searchable", 1))
-                sb.setQuickSearch(safeJsonInt(obj, "quickSearch", 1))
+                sb.searchable = safeJsonInt(obj, "searchable", 1)
+                sb.quickSearch = safeJsonInt(obj, "quickSearch", 1)
                 sb.filterable = safeJsonInt(obj, "filterable", 1)
                 sb.playerUrl = safeJsonString(obj, "playUrl", "")
                 sb.ext = safeJsonString(obj, "ext", "")
@@ -87,7 +88,7 @@ object SourceManger {
 
             // 设置解析flag
             val vipParseFlags = safeJsonStringList(infoJson, "flags")
-            sourceBeanList.values.forEach() {
+            sourceBeanList.values.forEach {
                 it.flags = vipParseFlags
             }
 
@@ -121,22 +122,24 @@ object SourceManger {
         }
 
         val jarFile = File(App.instance.filesDir, "/csp.jar")
+        // 兼容Android 14 https://developer.android.com/about/versions/14/behavior-changes-14?hl=zh-cn#safer-dynamic-code-loading
+        jarFile.setReadOnly()
         // md5不存在,或文件不存在,或md5不匹配则 下载最新文件
 
         if (isDownLoadJar(md5, jarFile)) {
             LogUtils.i("开始下载Jar包......")
             downloadJar(url, jarFile)
-        }else{
+        } else {
             LogUtils.i("使用缓存Jar包......")
         }
         val load = jarLoader.load(jarFile.absolutePath)
-        if (!load){
+        if (!load) {
             throw GlobalException.of("加载Jar包失败")
         }
     }
 
     private fun isDownLoadJar(md5: String?, jarFile: File) =
-        md5!!.isEmpty() || !jarFile.exists() || !(getFileMd5(jarFile).equals(md5.toLowerCase()))
+        md5!!.isEmpty() || !jarFile.exists() || !(getFileMd5(jarFile).equals(md5.lowercase(Locale.getDefault())))
 
 
     private fun downloadJar(url: String, cache: File) {
@@ -162,7 +165,7 @@ object SourceManger {
         return defaultVal
     }
 
-    private fun safeJsonStringList(obj: JsonObject, key: String?): ArrayList<String>? {
+    private fun safeJsonStringList(obj: JsonObject, key: String?): ArrayList<String> {
         val result = ArrayList<String>()
         try {
             if (obj.has(key)) {
@@ -233,7 +236,7 @@ object SourceManger {
             if (sourceBean == null) {
                 return null
             }
-            var spider: Spider? = null;
+            var spider: Spider? = null
             if (sourceBean.api.contains(".js")) {
                 spider = jsLoader.getSpider(sourceBean.key, sourceBean.api, sourceBean.ext,null)
             } else {
@@ -250,7 +253,7 @@ object SourceManger {
      */
     fun getSearchAbleList(): List<IBaseSource> {
         val list: MutableList<IBaseSource> = ArrayList()
-        sourceBeanList.values.forEach() {
+        sourceBeanList.values.forEach {
             if (it.isSearchable) {
                 val source = getSpiderSource(it.key)
                 source?.let {

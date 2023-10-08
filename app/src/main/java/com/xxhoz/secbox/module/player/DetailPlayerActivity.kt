@@ -159,7 +159,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
         }
 
         viewModel.danmuFile.observe(this) {
-            loadDanmuCallback(it)
+            loadDanmuCallback(it!!)
         }
 
         viewModel.pageState.observe(this) {

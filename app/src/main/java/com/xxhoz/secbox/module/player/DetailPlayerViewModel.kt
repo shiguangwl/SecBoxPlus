@@ -58,7 +58,7 @@ class DetailPlayerViewModel : BaseViewModel() {
     val stateVideoPlayerMsg = MutableLiveData<String>()
 
     // 弹幕文件
-    val danmuFile = MutableLiveData<File>()
+    val danmuFile = MutableLiveData<File?>()
 
     // 播放链接
     val playEntity = MutableLiveData<EpsodeEntity>()

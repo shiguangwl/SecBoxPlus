@@ -44,6 +44,9 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             navigationBarColor(R.color.white)
             navigationBarDarkIcon(true)
         }
+        if (!BaseConfig.DEBUG) {
+            umengInit()
+        }
         lifecycleScope.launch(Dispatchers.IO) {
             initData()
         }
@@ -57,9 +60,6 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
         if (!NetworkHelper.isNetworkConnect()) {
             Toaster.show("请检查网络连接")
             return
-        }
-        if(!BaseConfig.DEBUG){
-            umengInit()
         }
         try {
             // 加载config.json
@@ -123,7 +123,7 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
                     startActivity(intent)
             })
             popupView.isHideCancel = true
-            popupView.show();
+            popupView.show()
             return true
         }
         return  false
