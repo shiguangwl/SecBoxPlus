@@ -36,9 +36,13 @@ import java.util.regex.Pattern
 import kotlin.math.min
 
 class DetailPlayerViewModel : BaseViewModel() {
-    // TODO 占时兼容
-    var cureentPlayLinkBean: PlayLinkBean? = null
+    // 当前playInfo
+    var currentPlayLinkBean: PlayLinkBean? = null
 
+    // 当前播放的弹幕链接
+    var currentDanmuUrl: String = ""
+
+    // 弹幕PI
     val danmuSource = DefaultDanmuImpl(BaseConfig.DANMAKU_API)
 
     val playInfoBean: MutableLiveData<PlayInfoBean> = MutableLiveData()
@@ -178,7 +182,7 @@ class DetailPlayerViewModel : BaseViewModel() {
         })
     }
 
-    /** 解析接口
+    /** 解析接口,当为解析源调用解析逻辑直链则直接播放
      * @param channelFlag 当前线路数
      * @param urlCode 当前选中的剧集
      * @param parseBeanList 当前解析接口对象
@@ -192,7 +196,7 @@ class DetailPlayerViewModel : BaseViewModel() {
         callback: DefaultVideoParserImpl.Callback
     ) {
         val playLinkBean: PlayLinkBean? = spiderSource.value!!.playInfo(channelFlag, urlCode)
-        cureentPlayLinkBean = playLinkBean
+        currentPlayLinkBean = playLinkBean
         if (playLinkBean == null) {
             callback.failed(null, "获取播放链接失败")
             return
@@ -200,6 +204,7 @@ class DetailPlayerViewModel : BaseViewModel() {
         LogUtils.i("影视播放数据: ${playLinkBean}")
         onStateVideoPlayerMsg("资源加载中...")
         if (playLinkBean.parse == 1 || playLinkBean.jx == 1) {
+            currentDanmuUrl = playLinkBean.url
             // 解析嗅探播放链接
             VideoParser?.cancel()
             VideoParser = DefaultVideoParserImpl()
@@ -209,6 +214,7 @@ class DetailPlayerViewModel : BaseViewModel() {
                 callback
             )
         } else if (playLinkBean.parse == 0) {
+            currentDanmuUrl = ""
             // 直接播放
             callback.success(null, playLinkBean.url)
         }
@@ -220,27 +226,34 @@ class DetailPlayerViewModel : BaseViewModel() {
      */
     fun loadDanmaku() {
         SingleTask(getDanmakuJob, viewModelScope.launch {
-            // 当前线路的所有剧集
-            val currentChannelData = channelFlagsAndEpisodes.value!!.get(currentChannel.value!!)
-            // 当前选择的剧集的URL
-            val urlCode = currentChannelData.episodes.get(currentEpisode.value!!).urlCode
-            // 加载弹幕数据
-            loadDanmukuData(urlCode)
+//            // 当前线路的所有剧集
+//            val currentChannelData = channelFlagsAndEpisodes.value!!.get(currentChannel.value!!)
+//            // 当前选择的剧集的URL
+//            val urlCode = currentChannelData.episodes.get(currentEpisode.value!!).urlCode
+//            // 加载弹幕数据
+//            loadDanmukuData(urlCode)
+
+            if (StringUtils.isNotEmpty(currentDanmuUrl)) {
+                loadDanmukuData(currentDanmuUrl)
+            }
         })
     }
 
+    /**
+     * 加载弹幕数据
+     */
     private suspend fun CoroutineScope.loadDanmukuData(urlCode: String) {
         val danmu: File? = withContext(Dispatchers.IO) {
-            if (!isVideoPlatformURL(urlCode) && cureentPlayLinkBean?.danmaku == null) {
+            if (!isVideoPlatformURL(urlCode) && currentPlayLinkBean?.danmaku == null) {
                 return@withContext null
             }
             Toaster.show("后台加载弹幕资源中")
             var errorInfo = ""
             for (i in 0..3) {
                 try {
-                    if (cureentPlayLinkBean?.danmaku != null) {
+                    if (currentPlayLinkBean?.danmaku != null) {
                         return@withContext HttpUtil.downLoad(
-                            cureentPlayLinkBean!!.danmaku,
+                            currentPlayLinkBean!!.danmaku,
                             App.instance.filesDir.absolutePath + "/temp_danmu.xml"
                         )
                     } else {

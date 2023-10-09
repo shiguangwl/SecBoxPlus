@@ -16,7 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
-import com.hjq.toast.Toaster
 import com.lxj.xpopup.XPopup
 import com.lxj.xpopup.enums.PopupAnimation
 import com.xxhoz.constant.BaseConfig
@@ -109,7 +108,7 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
                     return@launch
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Toaster.show("数据源异常,请切换源")
+//                    Toaster.show("数据源异常,请切换源")
                     viewBinding.promptView.showNetworkError({
                         initData()
                     })
@@ -130,11 +129,11 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
 
     private fun initView() {
         // 搜索按钮
-        viewBinding.searchBtn.setOnClickListener() {
+        viewBinding.searchBtn.setOnClickListener {
             SearchActivity.startActivity(requireContext())
         }
         // 历史记录
-        viewBinding.historyBtn.setOnClickListener() {
+        viewBinding.historyBtn.setOnClickListener {
             HistoryActivity.startActivity(requireContext())
         }
         // 设置源显示
@@ -142,7 +141,7 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
         viewBinding.currentSourceText.text = (sourceName + "  ▼")
 
         // 源选择
-        viewBinding.currentSourceText.setOnClickListener() {
+        viewBinding.currentSourceText.setOnClickListener {
             XPopup.Builder(context)
                 .atView(viewBinding.tabLayout)
                 .hasShadowBg(false)
@@ -156,11 +155,11 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
         //Adapter
         viewBinding.viewPager.adapter =
             object :
-                FragmentStateAdapter(requireActivity().getSupportFragmentManager(), lifecycle) {
+                FragmentStateAdapter(requireActivity().supportFragmentManager, lifecycle) {
                 override fun createFragment(position: Int): Fragment {
                     if (position == 0) {
                         // 首页推荐
-                        return HomeFragment(homeVideoList);
+                        return HomeFragment(homeVideoList)
                     }
 
                     val classType: CategoryBean.ClassType = categoryInfo.`class`.get(position - 1)
@@ -230,8 +229,4 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
     @PageName
     override fun getPageName() = PageName.HOME
 
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        // 这里可以添加页面打点
-    }
 }
