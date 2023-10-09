@@ -114,7 +114,9 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
         // 详情变化
         viewModel.videoDetailBean.observe(this) {
             viewBinding.titleText.text = it.vod_name
-            viewBinding.roundAngleImageView.setImageUrl(it.vod_pic)
+            it.vod_pic.let {
+                viewBinding.roundAngleImageView.setImageUrl(it)
+            }
             viewBinding.descText.text = removeHtmlAndWhitespace(it.vod_content)
             viewBinding.textView.text =
                 "${it.vod_year}  /  ${it.type_name}  /  ${it.vod_director}"

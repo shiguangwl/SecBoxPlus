@@ -37,6 +37,7 @@ import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.UniversalAdapter
 import com.xxhoz.secbox.util.getActivity
 import com.xxhoz.secbox.util.setImageUrl
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -193,6 +194,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         searchJobs.clear()
 
         Toaster.show("开始搜索: ${query}")
+        viewBinding.viewLoading.visibility = View.VISIBLE
         sourceList.clear()
         resultItemList.clear()
         allResultItemList.clear()
@@ -204,14 +206,22 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         resultAdapter.notifyDataSetChanged()
 
         searchJobs.add(lifecycleScope.launch(Dispatchers.IO){
-//            val searchAbleList: List<IBaseSource> = SourceManger.getSearchAbleList()
+            val jobList: ArrayList<Deferred<Unit>> = ArrayList()
             val sourceBeanList = SourceManger.getSourceBeanList()
             for (sourceBean in sourceBeanList) {
                 val source = SourceManger.getSpiderSource(sourceBean.key)!!
                 // 多线程提高搜索速度
-                async {
+                val job: Deferred<Unit> = async {
                     asyncSearch(source, query)
                 }
+                jobList.add(job)
+            }
+
+            jobList.forEach {
+                it.await()
+            }
+            withContext(Dispatchers.Main) {
+                viewBinding.viewLoading.visibility = View.GONE
             }
         })
     }
@@ -238,8 +248,10 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
 
         withContext(Dispatchers.Main) {
             // 源列表添加
-            sourceList.add(iBaseSource.sourceBean.name)
-            sourceAdapter.notifyDataSetChanged()
+            if (searchVideo.size > 0) {
+                sourceList.add(iBaseSource.sourceBean.name)
+                sourceAdapter.notifyDataSetChanged()
+            }
 
             if (selectSourceKey.equals(ALL_DATA)) {
                 resultItemList.addAll(searchVideo)

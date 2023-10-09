@@ -198,12 +198,23 @@ class DanmuVideoPlayer : VideoView {
         standardVideoController.stopShowBufferSpeed()
         release()
         topTitleView.setTitle(epsodeEntity.videoName)
-        setUrl(epsodeEntity.videoUrl)
+
+
+        if (epsodeEntity.videoUrl.contains("bilivideo")) {
+            // TODO 占时兼容B站源
+            val headers = mapOf(
+                "Referer" to "https://www.bilibili.com",
+                "User-Agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36"
+            )
+            setUrl(epsodeEntity.videoUrl, headers)
+        } else {
+            setUrl(epsodeEntity.videoUrl)
+        }
         mCurrentPosition = position
         startPlay()
         standardVideoController.startShowBufferSpeed()
 
-        if (XKeyValue.getBoolean(Key.DANMAKU_STATE, true)){
+        if (XKeyValue.getBoolean(Key.DANMAKU_STATE, true)) {
             actionCallback.loadDanmaku(this::setDanmuStream)
         }
     }

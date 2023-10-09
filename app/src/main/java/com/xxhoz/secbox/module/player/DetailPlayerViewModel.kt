@@ -7,12 +7,14 @@ import com.hjq.toast.Toaster
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.parserCore.parserImpl.IBaseSource
+import com.xxhoz.secbox.App
 import com.xxhoz.secbox.base.BaseViewModel
 import com.xxhoz.secbox.bean.EpsodeEntity
 import com.xxhoz.secbox.bean.PlayInfoBean
 import com.xxhoz.secbox.bean.exception.GlobalException
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.constant.PageState
+import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.bean.PlayLinkBean
 import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
@@ -34,6 +36,8 @@ import java.util.regex.Pattern
 import kotlin.math.min
 
 class DetailPlayerViewModel : BaseViewModel() {
+    // TODO 占时兼容
+    var cureentPlayLinkBean: PlayLinkBean? = null
 
     val danmuSource = DefaultDanmuImpl(BaseConfig.DANMAKU_API)
 
@@ -188,13 +192,14 @@ class DetailPlayerViewModel : BaseViewModel() {
         callback: DefaultVideoParserImpl.Callback
     ) {
         val playLinkBean: PlayLinkBean? = spiderSource.value!!.playInfo(channelFlag, urlCode)
+        cureentPlayLinkBean = playLinkBean
         if (playLinkBean == null) {
             callback.failed(null, "获取播放链接失败")
             return
         }
         LogUtils.i("影视播放数据: ${playLinkBean}")
         onStateVideoPlayerMsg("资源加载中...")
-        if (playLinkBean.parse == 1) {
+        if (playLinkBean.parse == 1 || playLinkBean.jx == 1) {
             // 解析嗅探播放链接
             VideoParser?.cancel()
             VideoParser = DefaultVideoParserImpl()
@@ -226,14 +231,21 @@ class DetailPlayerViewModel : BaseViewModel() {
 
     private suspend fun CoroutineScope.loadDanmukuData(urlCode: String) {
         val danmu: File? = withContext(Dispatchers.IO) {
-            if (!isVideoPlatformURL(urlCode)) {
+            if (!isVideoPlatformURL(urlCode) && cureentPlayLinkBean?.danmaku == null) {
                 return@withContext null
             }
             Toaster.show("后台加载弹幕资源中")
             var errorInfo = ""
             for (i in 0..3) {
                 try {
-                    return@withContext danmuSource.getDanmaku(urlCode)
+                    if (cureentPlayLinkBean?.danmaku != null) {
+                        return@withContext HttpUtil.downLoad(
+                            cureentPlayLinkBean!!.danmaku,
+                            App.instance.filesDir.absolutePath + "/temp_danmu.xml"
+                        )
+                    } else {
+                        return@withContext danmuSource.getDanmaku(urlCode)
+                    }
                 } catch (e: SocketTimeoutException) {
                     LogUtils.d("弹幕加载超时,尝试从试")
                     errorInfo = "加载弹幕超时,请重试"
