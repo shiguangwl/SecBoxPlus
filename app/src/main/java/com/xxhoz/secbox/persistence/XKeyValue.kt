@@ -119,21 +119,6 @@ object XKeyValue {
         return from(key).decodeParcelable(key, T::class.java)
     }
 
-//    /**
-//     * 存储对象
-//     */
-//    fun <T> putObject(@Key key: String, value: T) {
-//        val json = GsonFactory.getSingletonGson().toJson(value)
-//        from(key).encode(key, json)
-//    }
-//
-//    /**
-//     * 获取对象
-//     */
-//    inline fun <reified T> getObject(@Key key: String): T? {
-//        val json = from(key).decodeString(key, null)
-//        return GsonFactory.getSingletonGson().fromJson(json, T::class.java)
-//    }
 
     /**
      * 存储对象列表
@@ -165,7 +150,7 @@ object XKeyValue {
             newList.add(0,value)
             putObjectList(key, newList)
         } else {
-            list.add(value)
+            list.add(0, value)
             putObjectList(key, list)
         }
     }

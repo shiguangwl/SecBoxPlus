@@ -64,7 +64,7 @@ object CacheManger {
         val cacheList = getCacheList()
         val cacheItem = cacheList.find { it.cacheName == cacheName }
         if (cacheItem != null) {
-            XKeyValue.addObjectList(Key.CACHE_FILE_LIST, cacheList)
+            XKeyValue.removeObjectList(Key.CACHE_FILE_LIST, cacheList)
         }
     }
 

@@ -13,6 +13,9 @@ import java.io.File
  */
 class DefaultDanmuImpl(private val danmuApi: String) : IDanmuInterface {
 
+    // 缓存有效时间
+    private val l = 1000L * 60 * 60 * 24
+
     /**
      * 加载弹幕
      * 大于500kb弹幕文件缓存24小时
@@ -36,6 +39,6 @@ class DefaultDanmuImpl(private val danmuApi: String) : IDanmuInterface {
             LogUtils.d("acheFile文件小于300kb不缓存")
             return cacheFile
         }
-        return CacheManger.cacheFile(fileName,cacheFile,60 * 60 * 24 * 1000)
+        return CacheManger.cacheFile(fileName, cacheFile, l)
     }
 }

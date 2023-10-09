@@ -63,6 +63,9 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
                 DanmuVideoPlayer.ViewState(false, true, false)
 
             override fun loadDanmaku(callBack: (File) -> Unit) {
+                if (isCustomSite) {
+                    return
+                }
                 SingleTask("DanmuJob", lifecycleScope.launch(Dispatchers.IO) {
                     val danmuFile: File? = withContext(Dispatchers.IO) {
 

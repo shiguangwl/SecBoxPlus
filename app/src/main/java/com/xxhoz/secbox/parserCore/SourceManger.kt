@@ -29,7 +29,8 @@ object SourceManger {
     private var parseBeanList: MutableList<ParseBean> = ArrayList()
 
     // spider源配置列表
-    private var sourceBeanList: HashMap<String, SourceBean> = HashMap()
+    private var sourceBeanMap: LinkedHashMap<String, SourceBean> = LinkedHashMap()
+    private var sourceBeanValueList: ArrayList<SourceBean> = ArrayList()
     private var sourceList: HashMap<String, IBaseSource> = HashMap()
 
     // jar包
@@ -43,7 +44,7 @@ object SourceManger {
      */
     fun loadSourceConfig(baseUrl: String) {
         parseBeanList = ArrayList()
-        sourceBeanList = HashMap()
+        sourceBeanMap = LinkedHashMap()
         sourceList = HashMap()
 
         // 加载站源配置
@@ -83,12 +84,12 @@ object SourceManger {
                 sb.playerUrl = safeJsonString(obj, "playUrl", "")
                 sb.ext = safeJsonString(obj, "ext", "")
                 sb.categories = safeJsonStringList(obj, "categories")
-                sourceBeanList[siteKey] = sb
+                sourceBeanMap[siteKey] = sb
             }
 
             // 设置解析flag
             val vipParseFlags = safeJsonStringList(infoJson, "flags")
-            sourceBeanList.values.forEach {
+            sourceBeanMap.values.forEach {
                 it.flags = vipParseFlags
             }
 
@@ -223,7 +224,7 @@ object SourceManger {
      * 获取所有soureBean列表
      */
     fun getSourceBeanList(): List<SourceBean> {
-        return sourceBeanList.values.toList()
+        return sourceBeanMap.values.toList()
     }
 
     /**
@@ -232,7 +233,7 @@ object SourceManger {
     fun getSpiderSource(key: String): IBaseSource? {
         // sourceList 获取指定key的value不存在则创建新的设置进并返回
         return sourceList.getOrPut(key) {
-            val sourceBean = sourceBeanList.get(key)
+            val sourceBean = sourceBeanMap.get(key)
             if (sourceBean == null) {
                 return null
             }
@@ -253,7 +254,7 @@ object SourceManger {
      */
     fun getSearchAbleList(): List<IBaseSource> {
         val list: MutableList<IBaseSource> = ArrayList()
-        sourceBeanList.values.forEach {
+        sourceBeanMap.values.forEach {
             if (it.isSearchable) {
                 val source = getSpiderSource(it.key)
                 source?.let {

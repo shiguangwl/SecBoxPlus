@@ -27,6 +27,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.SocketTimeoutException
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.math.min
@@ -253,7 +255,9 @@ class DetailPlayerViewModel : BaseViewModel() {
     }
 
 
-    fun isVideoPlatformURL(url: String?): Boolean {
+    fun isVideoPlatformURL(code: String?): Boolean {
+        val url = URLDecoder.decode(code, StandardCharsets.UTF_8.toString())
+
         // 定义匹配视频平台网址的正则表达式
         val regex =
             "https?://(www\\.)?(mgtv\\.com|bilibili\\.com|v\\.qq\\.com|v\\.youku\\.com|www\\.iqiyi\\.com)/.*"

@@ -80,14 +80,20 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         initView()
     }
 
+    override fun onResume() {
+        super.onResume()
+        // 选中的source
+        selectSourceKey = "全部显示"
+    }
+
     override fun onBackPressed() {
         searchJobs.forEach {
             it.cancel()
         }
         searchJobs.clear()
-        if (viewBinding.searchView.query.length == 0){
+        if (viewBinding.searchView.query.length == 0) {
             super.onBackPressed()
-        }else{
+        } else {
             viewBinding.searchView.setQuery("",false)
         }
     }
@@ -97,11 +103,11 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         loadSearchHistory()
         viewBinding.promptView.hide()
         // 返回
-        viewBinding.returnImage.setOnClickListener(){
-            onBackPressed();
+        viewBinding.returnImage.setOnClickListener {
+            onBackPressed()
         }
         // 搜索逻辑
-        viewBinding.searchView.setIconified(false);
+        viewBinding.searchView.isIconified = false
         viewBinding.searchView.queryHint = "输入搜索关键词"
 
         viewBinding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -134,7 +140,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         })
 
         // 清空历史记录
-        viewBinding.clearText.setOnClickListener() {
+        viewBinding.clearText.setOnClickListener {
             clearSearchHistory()
         }
 
@@ -145,13 +151,13 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             R.layout.item_search_result_source,
             object : UniversalAdapter.DataViewBind<String> {
                 override fun exec(data: String, view: View) {
-                    val bind = ItemSearchResultSourceBinding.bind(view!!)
+                    val bind = ItemSearchResultSourceBinding.bind(view)
                     bind.sourceText.background = AppCompatResources.getDrawable(getActivity()!!, R.color.white)
                     bind.sourceText.text = data
                     if (data.equals(selectSourceKey)){
                         bind.sourceText.background = AppCompatResources.getDrawable(getActivity()!!, R.color.theme_color)
                     }
-                    bind.sourceText.setOnClickListener() {
+                    bind.sourceText.setOnClickListener {
                         onClickSource(data)
                     }
                 }
@@ -165,11 +171,11 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             R.layout.item_search_movie_result_list,
             object : UniversalAdapter.DataViewBind<VideoBean> {
                 override fun exec(data: VideoBean, view: View) {
-                    val bind = ItemSearchMovieResultListBinding.bind(view!!)
+                    val bind = ItemSearchMovieResultListBinding.bind(view)
                     bind.picMovie.setImageUrl(data.vod_pic)
                     bind.titleMovie.text = data.vod_name
                     bind.sourceText.text = data.vod_remarks
-                    bind.root.setOnClickListener() {
+                    bind.root.setOnClickListener {
                         onClickResultItem(data)
                     }
                 }
@@ -212,7 +218,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
 
     private suspend fun asyncSearch(iBaseSource: IBaseSource, query: String) {
 
-        val searchVideo: List<VideoBean>? = try {
+        var searchVideo: List<VideoBean>? = try {
             iBaseSource.searchVideo(query)
         } catch (e: Exception) {
             LogUtils.e("${iBaseSource.sourceBean.name}=>搜索失败:" + iBaseSource.sourceBean)
@@ -227,13 +233,15 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         searchVideo.forEach {
             it.sourceBean = iBaseSource.sourceBean
         }
+        // 严格搜索模式
+        searchVideo = searchVideo.filter { it.vod_name.contains(query) }
 
         withContext(Dispatchers.Main) {
             // 源列表添加
             sourceList.add(iBaseSource.sourceBean.name)
             sourceAdapter.notifyDataSetChanged()
 
-            if (selectSourceKey.equals(ALL_DATA)){
+            if (selectSourceKey.equals(ALL_DATA)) {
                 resultItemList.addAll(searchVideo)
                 resultAdapter.notifyDataSetChanged()
             }
@@ -249,13 +257,13 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
      * 点击源列表
      */
     private fun onClickSource(data: String) {
-        Toaster.show("点击了源${data}")
+//        Toaster.show("点击了源${data}")
         selectSourceKey = data
         sourceAdapter.notifyDataSetChanged()
 
         resultItemList.clear()
         if (selectSourceKey.equals(ALL_DATA)){
-            allResultItemList.forEach(){
+            allResultItemList.forEach {
                 resultItemList.addAll(it.value)
             }
         }else{
@@ -308,7 +316,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
             textView.setTextColor(Color.parseColor("#3f3e3e"))
             textView.background = AppCompatResources.getDrawable(this, R.drawable.history_tag_bg)
-            textView.setOnClickListener(){
+            textView.setOnClickListener {
                 // 点击历史记录回调
                 viewBinding.searchView.setQuery(query,true)
             }

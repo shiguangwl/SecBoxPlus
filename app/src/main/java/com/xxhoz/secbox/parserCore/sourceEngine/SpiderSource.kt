@@ -23,17 +23,21 @@ class SpiderSource(override var sourceBean: SourceBean, var spider: Spider)  :
     override fun homeVideoList(): List<VideoBean>? {
         val result = ArrayList<VideoBean>()
         var homeVideoContent = spider.homeVideoContent()
-        if (homeVideoContent.length == 0){
+        if (homeVideoContent.length == 0) {
             homeVideoContent = spider.homeContent(true)
         }
-        if (homeVideoContent.length == 0){
-            return null;
+        if (homeVideoContent.length == 0) {
+            return null
         }
-        LogUtils.d(sourceBean.name +"首页数据String:${homeVideoContent}")
+        LogUtils.d(sourceBean.name + "首页数据String:${homeVideoContent}")
         val jsonobject = gson.fromJson(homeVideoContent, JSONObject::class.java)
-        val jsonArray = jsonobject.getJSONArray("list")
-        for (i in 0..jsonArray.length()-1) {
-            val item = gson.fromJson(jsonArray.get(i).toString(),VideoBean::class.java)
+        val jsonArray = try {
+            jsonobject.getJSONArray("list")
+        } catch (e: Exception) {
+            return null
+        }
+        for (i in 0..jsonArray.length() - 1) {
+            val item = gson.fromJson(jsonArray.get(i).toString(), VideoBean::class.java)
             result.add(item)
         }
         return result
@@ -53,9 +57,9 @@ class SpiderSource(override var sourceBean: SourceBean, var spider: Spider)  :
      * 获取分类数据
      */
     override fun categoryVideoList(tid: String, page: String, extend: HashMap<String, String>): CategoryPageBean {
-        var filter: Boolean = false;
+        var filter: Boolean = false
         if (extend.size > 0) {
-            filter = true;
+            filter = true
         }
         var categoryContent = spider.categoryContent(tid, page, filter, extend)
         LogUtils.d(sourceBean.name +"分类条件过滤数据String:${categoryContent}")
@@ -70,13 +74,13 @@ class SpiderSource(override var sourceBean: SourceBean, var spider: Spider)  :
         val videoDetail: String =  spider.detailContent(ids)
         LogUtils.d(sourceBean.name +"影视详情数据String:${videoDetail}")
         if (videoDetail.length == 0){
-            return null;
+            return null
         }
         val fromJson = gson.fromJson(videoDetail, JSONObject::class.java)
         val jsonArray = fromJson.getJSONArray("list")
         var videoDetailBean: VideoDetailBean = gson.fromJson(jsonArray.getJSONObject(0).toString(),
             VideoDetailBean::class.java)
-        return videoDetailBean;
+        return videoDetailBean
     }
 
 

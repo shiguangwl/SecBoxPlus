@@ -20,9 +20,11 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.xxhoz.constant.BaseConfig;
+import com.xxhoz.constant.Key;
 import com.xxhoz.secbox.R;
 import com.xxhoz.secbox.module.player.video.view.danma.BiliDanmukuParser;
 import com.xxhoz.secbox.module.player.video.view.danma.CenteredImageSpan;
+import com.xxhoz.secbox.persistence.XKeyValue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,7 +66,7 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
         super(context, attrs, defStyleAttr);
     }
 
-    private long lastTime = System.currentTimeMillis();
+    private final long lastTime = System.currentTimeMillis();
 
     {
         // 设置弹幕的最大显示行数
@@ -167,7 +169,7 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
                 hide();
                 break;
             case VideoView.STATE_BUFFERED:
-                show();
+                showDanmu();
                 if (isPrepared()){
                     seekTo(controlWrapper.getCurrentPosition());
                 }
@@ -176,7 +178,7 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
                 break;
             case VideoView.STATE_PLAYING:
                 if (isPrepared()) {
-                    show();
+                    showDanmu();
                     if (isPaused()){
                         resume();
                     }
@@ -191,6 +193,13 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
                 clear();
                 clearDanmakusOnScreen();
                 break;
+        }
+    }
+
+    public void showDanmu() {
+        boolean isOpen = XKeyValue.INSTANCE.getBoolean(Key.DANMAKU_STATE, true);
+        if (isOpen) {
+            show();
         }
     }
 
