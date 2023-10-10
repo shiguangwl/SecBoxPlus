@@ -84,12 +84,10 @@ object SnifferEngine {
 
                 override fun onLoadResource(view: WebView, url: String) {
                     LogUtils.d("Webview加载资源:" + url)
-                    if (isM3u8Url(url) || url.contains(".mp4") || url.contains(".flv")) {
-                        if (url.contains(".m3u8")){
-                            callback.success(parseBean, url)
-                            timer.cancel()
-                            webviewDestory(mWebView)
-                        }
+                    if (isAblePlayUrl(url)) {
+                        callback.success(parseBean, url)
+                        timer.cancel()
+                        webviewDestory(mWebView)
                     }
                     super.onLoadResource(view, url)
                 }
@@ -207,11 +205,12 @@ object SnifferEngine {
 
     }
 
-    fun isM3u8Url(url: String): Boolean {
+    fun isAblePlayUrl(url: String): Boolean {
         // 使用正则表达式来匹配m3u8链接的模式
-        val m3u8Pattern = """^https?://.*\.m3u8(\?.*)?$""".toRegex()
+        val m3u8Pattern = """^https?://.*\.(m3u8|mp4|flv)(\?.*)?$""".toRegex()
         return m3u8Pattern.matches(url)
     }
+
 
 
     open fun configWebViewSys(webView: WebView) {
@@ -247,6 +246,8 @@ object SnifferEngine {
         settings.userAgentString = webView.settings.userAgentString
 //         settings.setUserAgentString(ANDROID_UA);
 //        webView.setBackgroundColor(Color.BLACK)
+        // 禁音
+        webView.isSoundEffectsEnabled = false
     }
 
     // 访问回调
