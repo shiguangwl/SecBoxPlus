@@ -128,7 +128,7 @@ class DetailPlayerViewModel : BaseViewModel() {
     /**
      * 获取播放链接
      */
-    fun getPlayData() {
+    fun preparePlayData() {
         SingleTask(getUrlJob, viewModelScope.launch {
             onStateVideoPlayerMsg("资源加载中...")
             val currentChannelData = channelFlagsAndEpisodes.value!!.get(currentChannel.value!!)
@@ -160,7 +160,6 @@ class DetailPlayerViewModel : BaseViewModel() {
                             val epsodeEntity: EpsodeEntity = EpsodeEntity(
                                 currenSelectEposode.name, res
                             )
-                            onStateVideoPlayerMsg("资源准备中...")
                             playEntity.postValue(epsodeEntity)
                             currentParseBean.postValue(parseBean)
                         }
@@ -174,7 +173,8 @@ class DetailPlayerViewModel : BaseViewModel() {
                         }
 
                         override fun notifyChange(parseBean: ParseBean) {
-                            Toaster.show("尝试接口: ${parseBean.name}")
+//                            Toaster.show("尝试接口: ${parseBean.name}")
+                            onStateVideoPlayerMsg("尝试接口: ${parseBean.name}")
                             currentParseBean.postValue(parseBean)
                         }
                     })
@@ -202,7 +202,6 @@ class DetailPlayerViewModel : BaseViewModel() {
             return
         }
         LogUtils.i("影视播放数据: ${playLinkBean}")
-        onStateVideoPlayerMsg("资源加载中...")
         if (playLinkBean.parse == 1 || playLinkBean.jx == 1) {
             currentDanmuUrl = playLinkBean.url
             // 解析嗅探播放链接

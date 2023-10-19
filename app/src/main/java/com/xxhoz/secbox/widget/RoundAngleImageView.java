@@ -10,10 +10,12 @@ import androidx.appcompat.widget.AppCompatImageView;
 
 import com.xxhoz.secbox.R;
 
-public class RoundAngleImageView extends AppCompatImageView {
+import java.io.Serializable;
+
+public class RoundAngleImageView extends AppCompatImageView implements Serializable {
 
     float width, height;
-    private int defaultRadius = 0;
+    private final int defaultRadius = 0;
     private int leftTopRadius;
     private int rightTopRadius;
     private int rightBottomRadius;

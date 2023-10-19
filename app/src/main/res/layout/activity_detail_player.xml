@@ -109,6 +109,7 @@
                 android:layout_marginTop="8dp" />
 
         <com.xxhoz.secbox.widget.RoundAngleImageView
+                android:transitionName="shareVodPic"
                 android:background="?android:attr/selectableItemBackground"
                 app:img_left_top_radius="@dimen/item_radius"
                 app:img_right_top_radius="@dimen/item_radius"
@@ -197,13 +198,4 @@
 
 
 
-    <Button
-            android:visibility="invisible"
-            android:text="Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:textColor="@color/ThemeColor" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,13 +1,16 @@
 package com.xxhoz.secbox.module.search
 
 import android.annotation.SuppressLint
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.transition.Fade
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
+import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -19,10 +22,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.reflect.TypeToken
 import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.gson.factory.GsonFactory
-import com.hjq.toast.Toaster
 import com.xxhoz.constant.Key
 import com.xxhoz.parserCore.SourceManger
-import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.bean.PlayInfoBean
@@ -32,6 +33,7 @@ import com.xxhoz.secbox.databinding.ItemSearchMovieResultListBinding
 import com.xxhoz.secbox.databinding.ItemSearchResultSourceBinding
 import com.xxhoz.secbox.module.player.DetailPlayerActivity
 import com.xxhoz.secbox.module.start.StartViewModel
+import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.LogUtils
@@ -42,10 +44,11 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
+@SuppressLint("NotifyDataSetChanged")
 class SearchActivity : BaseActivity<ActivitySearchBinding>() {
 
     override fun getPageName(): String = PageName.SEARCH
@@ -57,6 +60,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     private lateinit var resultAdapter: UniversalAdapter<VideoBean>
     private var sourceList = ArrayList<String>()
     private var resultItemList = ArrayList<VideoBean>()
+
     // 所有搜索结果
     private var allResultItemList = HashMap<String, List<VideoBean>>()
     private var searchJobs: ArrayList<Job> = ArrayList()
@@ -64,11 +68,21 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     // 选中的source
     private var ALL_DATA = "全部显示"
     private var selectSourceKey = "全部显示"
-    companion object{
-        fun startActivity(context: Context){
+
+    companion object {
+        fun startActivity(context: Context) {
             val intent = Intent(context, SearchActivity::class.java)
-            context.startActivity(intent)
+            context.startActivity(
+                intent,
+                ActivityOptions.makeSceneTransitionAnimation(context.getActivity()).toBundle()
+            )
         }
+    }
+
+    override fun setContentView(view: View?) {
+        window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
+        window.enterTransition = Fade()
+        super.setContentView(view)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -131,9 +145,10 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                     val bind = ItemSearchMovieResultListBinding.bind(view)
                     bind.picMovie.setImageUrl(data.vod_pic)
                     bind.titleMovie.text = data.vod_name
-                    bind.sourceText.text = data.vod_remarks
+                    bind.statusText.text = data.vod_remarks
+                    bind.sourceText.text = data.sourceBean?.let { "来源: ${it.name}" } ?: "未知"
                     bind.root.setOnClickListener {
-                        onClickResultItem(data)
+                        onClickResultItem(data, view)
                     }
                 }
             })
@@ -211,42 +226,33 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             it.cancel()
         }
         searchJobs.clear()
-
-        Toaster.show("开始搜索: ${query}")
-        viewBinding.viewLoading.visibility = View.VISIBLE
         sourceList.clear()
         resultItemList.clear()
         allResultItemList.clear()
         addSearchHistory(query)
 
         sourceList.add(ALL_DATA)
-
         sourceAdapter.notifyDataSetChanged()
         resultAdapter.notifyDataSetChanged()
 
         searchJobs.add(lifecycleScope.launch(Dispatchers.IO){
             val jobList: ArrayList<Deferred<Unit>> = ArrayList()
-            val sourceBeanList = SourceManger.getSourceBeanList()
+            val sourceBeanList: List<SourceBean> = SourceManger.getSourceBeanList()
             for (sourceBean in sourceBeanList) {
-                val source = SourceManger.getSpiderSource(sourceBean.key)!!
+                if (!sourceBean.isSearchable) {
+                    continue
+                }
                 // 多线程提高搜索速度
                 val job: Deferred<Unit> = async {
-                    asyncSearch(source, query)
+                    asyncSearch(sourceBean, query)
                 }
                 jobList.add(job)
-            }
-
-            jobList.forEach {
-                it.await()
-            }
-            withContext(Dispatchers.Main) {
-                viewBinding.viewLoading.visibility = View.GONE
             }
         })
     }
 
-    private suspend fun asyncSearch(iBaseSource: IBaseSource, query: String) {
-
+    private suspend fun asyncSearch(sourceBean: SourceBean, query: String) {
+        val iBaseSource = SourceManger.getSpiderSource(sourceBean.key)!!
         var searchVideo: List<VideoBean>? = try {
             iBaseSource.searchVideo(query)
         } catch (e: Exception) {
@@ -269,12 +275,16 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             // 源列表添加
             if (searchVideo.size > 0) {
                 sourceList.add(iBaseSource.sourceBean.name)
-                sourceAdapter.notifyDataSetChanged()
+                sourceAdapter.notifyItemInserted(sourceList.size - 1)
             }
 
             if (selectSourceKey.equals(ALL_DATA)) {
-                resultItemList.addAll(searchVideo)
-                resultAdapter.notifyDataSetChanged()
+                searchVideo.forEach {
+                    resultItemList.add(it)
+                    resultAdapter.notifyItemInserted(resultItemList.size - 1)
+                    delay(150)
+                }
+
             }
             allResultItemList.put(iBaseSource.sourceBean.name, searchVideo)
             if (viewBinding.promptView.isShowing()) {
@@ -307,7 +317,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     /**
      * 点击搜索结果
      */
-    private fun onClickResultItem(data: VideoBean) {
+    private fun onClickResultItem(data: VideoBean, view: View) {
         val playInfoBean: PlayInfoBean = PlayInfoBean(
             data.sourceBean!!.key,
             data,
@@ -317,7 +327,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         searchJobs.forEach {
             it.cancel()
         }
-        DetailPlayerActivity.startActivity(this, playInfoBean)
+        DetailPlayerActivity.startActivity(this, playInfoBean, view.findViewById(R.id.pic_movie))
     }
 
     val gson = GsonFactory.getSingletonGson()

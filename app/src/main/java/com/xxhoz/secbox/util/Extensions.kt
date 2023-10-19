@@ -74,6 +74,16 @@ fun ImageView.setImageUrl(url: String) {
         .into(this)
 }
 
+fun ImageView.setImageUrlNoLoading(url: String) {
+    val options: RequestOptions = RequestOptions()
+        .error(R.color.bg_image)
+    Glide.with(context)
+        .applyDefaultRequestOptions(options)
+        .load(url)
+        .transition(DrawableTransitionOptions.withCrossFade())
+        .into(this)
+}
+
 val String?.nullSafeValue: String
     get() = this ?: ""
 

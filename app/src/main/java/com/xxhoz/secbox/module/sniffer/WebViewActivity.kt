@@ -373,6 +373,10 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
         videoPlayer.setUp(EpsodeEntity("", parseRsult), 0)
         videoPlayer.startFullScreen()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+        if (popupView.isShow) {
+            popupView.dismiss()
+        }
     }
 
     private fun snifferPlay(currentUrl: String) {

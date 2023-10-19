@@ -52,11 +52,11 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener 
 
     private var mediator: TabLayoutMediator? = null
 
-    private lateinit var categoryInfo: CategoryBean
-    private lateinit var homeVideoList: List<VideoBean>
+    private var fragmentList = ArrayList<TabFragmentItem>()
 
-//    private val viewModel: HomeViewModel by viewModels()
+    data class TabFragmentItem(val title: String, val fragment: Fragment)
 
+    //    private val viewModel: HomeViewModel by viewModels()
     override val inflater: (LayoutInflater, container: ViewGroup?, attachToRoot: Boolean) -> FragmentHomeTabBinding
         get() = FragmentHomeTabBinding::inflate
 
@@ -70,12 +70,6 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener 
         initView()
         // 数据加载
         initData()
-        // 监听数据源的变化
-        XEventBus.observe(viewLifecycleOwner, EventName.SOURCE_CHANGE) { message: String ->
-            LogUtils.i("监听到数据变化: " + message)
-            initView()
-            initData()
-        }
     }
 
     /**
@@ -84,32 +78,46 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener 
     private fun showNotice() {
         val notificationMsgPopup = NotificationMsgPopup(requireContext())
         notificationMsgPopup.setMsg(BaseConfig.NOTION)
-        XPopup.Builder(context)
-            .isDestroyOnDismiss(true)
-            .popupAnimation(PopupAnimation.TranslateFromTop)
-            .asCustom(notificationMsgPopup)
-            .show()
+        XPopup.Builder(context).isDestroyOnDismiss(true)
+            .popupAnimation(PopupAnimation.TranslateFromTop).asCustom(notificationMsgPopup).show()
     }
 
 
     private fun initData() {
-        SingleTask(lifecycleScope.launch{
+        SingleTask(lifecycleScope.launch {
             viewBinding.promptView.showLoading()
-            val currentSource: IBaseSource? = withContext(Dispatchers.IO){ BaseConfig.getCurrentSource() }
+            val currentSource: IBaseSource? =
+                withContext(Dispatchers.IO) { BaseConfig.getCurrentSource() }
             currentSource?.run {
                 try {
                     // 获取首页数据
-                    homeVideoList = withContext(Dispatchers.IO){ homeVideoList() } ?: throw GlobalException.of("首页数据为空")
+                    val homeVideoList: List<VideoBean> =
+                        withContext(Dispatchers.IO) { homeVideoList() } ?: throw GlobalException.of(
+                            "首页数据为空"
+                        )
+                    fragmentList.add(TabFragmentItem("主页", HomeFragment(homeVideoList)))
+
                     // 获取分类数据
-                    categoryInfo = withContext(Dispatchers.IO){ categoryInfo() } ?: throw GlobalException.of("分类数据为空")
+                    val categoryInfo: CategoryBean =
+                        withContext(Dispatchers.IO) { categoryInfo() } ?: throw GlobalException.of(
+                            "分类数据为空"
+                        )
+                    categoryInfo.`class`.forEach {
+                        val filters: List<CategoryBean.Filter>? =
+                            categoryInfo.filters?.get(it.type_id)
+                        fragmentList.add(
+                            TabFragmentItem(
+                                it.type_name, HomeFilterFragment(it, filters)
+                            )
+                        )
+                    }
 
                 } catch (e: GlobalException) {
                     LogUtils.d("数据源异常:" + e.message)
                     viewBinding.promptView.showEmpty()
                     return@launch
                 } catch (e: Exception) {
-                    e.printStackTrace()
-//                    Toaster.show("数据源异常,请切换源")
+                    LogUtils.e("数据源异常,请切换源", e)
                     viewBinding.promptView.showNetworkError({
                         initData()
                     })
@@ -140,10 +148,15 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener 
         // 设置源显示
         val sourceName: String? = BaseConfig.getCurrentSource()?.sourceBean?.name
         viewBinding.currentSourceText.text = getString(
-            R.string.formatted_source_text,
-            sourceName,
-            getString(R.string.downward_triangle)
+            R.string.formatted_source_text, sourceName, getString(R.string.downward_triangle)
         )
+
+        // 监听数据源的变化
+        XEventBus.observe(viewLifecycleOwner, EventName.SOURCE_CHANGE) { message: String ->
+            LogUtils.i("监听到数据变化: " + message)
+            initView()
+            initData()
+        }
     }
 
     override fun onClick(view: View?) {
@@ -157,11 +170,8 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener 
             }
 
             R.id.current_source_text -> {
-                XPopup.Builder(context)
-                    .atView(viewBinding.tabLayout)
-                    .hasShadowBg(false)
-                    .asCustom(BottomSheetSource(requireContext()))
-                    .show()
+                XPopup.Builder(context).atView(viewBinding.tabLayout).hasShadowBg(false)
+                    .asCustom(BottomSheetSource(requireContext())).show()
             }
         }
     }
@@ -169,28 +179,18 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener 
     private fun initViewFragments() {
         //Adapter
         viewBinding.viewPager.adapter =
-            object :
-                FragmentStateAdapter(requireActivity().supportFragmentManager, lifecycle) {
+            object : FragmentStateAdapter(requireActivity().supportFragmentManager, lifecycle) {
                 override fun createFragment(position: Int): Fragment {
-                    if (position == 0) {
-                        // 首页推荐
-                        return HomeFragment(homeVideoList)
-                    }
-
-                    val classType: CategoryBean.ClassType = categoryInfo.`class`.get(position - 1)
-                    val filters: List<CategoryBean.Filter>? =
-                        categoryInfo.filters?.get(classType.type_id)
-                    // 分类页
-                    return HomeFilterFragment(classType, filters)
+                    return fragmentList.get(position).fragment
                 }
 
                 override fun getItemCount(): Int {
-                    return categoryInfo.`class`.size + 1
+                    return fragmentList.size
                 }
             }
         //viewPager 页面切换监听监听
         viewBinding.viewPager.registerOnPageChangeCallback(changeCallback)
-//        viewBinding.viewPager.offscreenPageLimit = 20
+        viewBinding.viewPager.offscreenPageLimit = 20
         // tab样式
         mediator = TabLayoutMediator(
             viewBinding.tabLayout, viewBinding.viewPager
@@ -201,20 +201,13 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener 
             states[1] = intArrayOf()
             val colors = intArrayOf(activeColor, normalColor)
             val colorStateList = ColorStateList(states, colors)
-            tabView.text = getCateGoryNameById(position)
+            tabView.text = fragmentList.get(position).title
             tabView.textSize = normalSize.toFloat()
             tabView.setTextColor(colorStateList)
             tab.customView = tabView
         }
         //要执行这一句才是真正将两者绑定起来
         mediator!!.attach()
-    }
-
-    private fun getCateGoryNameById(position: Int): String {
-        if (position == 0) {
-            return "首页"
-        }
-        return categoryInfo.`class`.get(position - 1).type_name
     }
 
     private val changeCallback: OnPageChangeCallback = object : OnPageChangeCallback() {

@@ -170,16 +170,16 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
                 break;
             case VideoView.STATE_BUFFERED:
                 showDanmu();
-                if (isPrepared()){
+                if (isPrepared()) {
                     seekTo(controlWrapper.getCurrentPosition());
                 }
                 break;
             case VideoView.STATE_PREPARING:
                 break;
             case VideoView.STATE_PLAYING:
+                showDanmu();
                 if (isPrepared()) {
-                    showDanmu();
-                    if (isPaused()){
+                    if (isPaused()) {
                         resume();
                     }
                 }

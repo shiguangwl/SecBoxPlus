@@ -85,7 +85,9 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
                 SourceManger.loadSourceConfig(BaseConfig.BASE_SOURCE_URL)
             }
 
-            MainActivity.startActivity(getActivity()!!)
+            runOnUiThread {
+                MainActivity.startActivity(getActivity()!!)
+            }
         }catch (e:Exception){
             Toaster.showLong(e.message)
             e.printStackTrace()

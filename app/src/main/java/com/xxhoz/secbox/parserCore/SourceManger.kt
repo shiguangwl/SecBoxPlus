@@ -217,7 +217,9 @@ object SourceManger {
      * 获取解析接口列表
      */
     fun getParseBeanList(): MutableList<ParseBean> {
-        return parseBeanList
+        return MutableList(parseBeanList.size) {
+            parseBeanList[it]
+        }
     }
 
     /**
@@ -255,11 +257,14 @@ object SourceManger {
     fun getSearchAbleList(): List<IBaseSource> {
         val list: MutableList<IBaseSource> = ArrayList()
         sourceBeanMap.values.forEach {
-            if (it.isSearchable) {
-                val source = getSpiderSource(it.key)
-                source?.let {
-                    list.add(source)
+            try {
+                if (it.isSearchable) {
+                    val source = getSpiderSource(it.key)
+                    source?.let {
+                        list.add(source)
+                    }
                 }
+            } catch (_: Exception) {
             }
         }
         return list

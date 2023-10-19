@@ -56,7 +56,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding> {
                 .setItemDecoration(GridItemDecoration(activity, HOME_SPAN_COUNT))
                 .setOnItemClickListener(object : XRecyclerView.OnItemClickListener {
                     override fun onItemClick(parent: RecyclerView, view: View, viewData: BaseViewData<*>, position: Int, id: Long) {
-                        onVideoItemClick(viewData)
+                        onVideoItemClick(viewData, view)
                     }
                 })
                 .setOnItemChildViewClickListener(object : XRecyclerView.OnItemChildViewClickListener {
@@ -81,20 +81,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding> {
     /**
      * 条目点击
      */
-    private fun onVideoItemClick(viewData: BaseViewData<*>) {
+    private fun onVideoItemClick(viewData: BaseViewData<*>, view: View) {
         val playInfoBean: PlayInfoBean = PlayInfoBean(
             XKeyValue.getString(Key.CURRENT_SOURCE_KEY, DefaultSourceKey),
             viewData.value as VideoBean,
             0
         )
-        DetailPlayerActivity.startActivity(requireContext(), playInfoBean)
+        DetailPlayerActivity.startActivity(requireContext(), playInfoBean, view)
     }
 
     @PageName
     override fun getPageName() = PageName.HOME
 
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        // 这里可以添加页面打点
-    }
 }

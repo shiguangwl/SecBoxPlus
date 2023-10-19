@@ -1,12 +1,15 @@
 package com.xxhoz.secbox.module.player
 
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.transition.Fade
 import android.view.LayoutInflater
 import android.view.View
+import android.view.Window
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.annotation.MainThread
@@ -28,12 +31,15 @@ import com.xxhoz.secbox.module.player.video.DanmuVideoPlayer
 import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
 import com.xxhoz.secbox.persistence.XKeyValue
+import com.xxhoz.secbox.util.StringUtils
+import com.xxhoz.secbox.util.getActivity
 import com.xxhoz.secbox.util.setImageUrl
+import com.xxhoz.secbox.widget.RoundAngleImageView
 import java.io.File
 
 
 class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
-    DanmuVideoPlayer.PlayerCallback {
+    DanmuVideoPlayer.PlayerCallback, View.OnClickListener {
 
     private lateinit var loadDanmuCallback: (File) -> Unit
     private val viewModel: DetailPlayerViewModel by viewModels()
@@ -43,6 +49,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
 
     private lateinit var videoPlayer: DanmuVideoPlayer
 
+    var shareVodPicView: RoundAngleImageView? = null
     private var position = 0L
     override fun getPageName() = PageName.DETAIL_PLAYER
     override val inflater: (inflater: LayoutInflater) -> ActivityDetailPlayerBinding
@@ -51,7 +58,11 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
     val gson = GsonFactory.getSingletonGson()
 
     companion object {
-        fun startActivity(context: Context, playInfoBean: PlayInfoBean) {
+        fun startActivity(
+            context: Context,
+            playInfoBean: PlayInfoBean,
+            tvSharedElement: View? = null
+        ) {
             val intent = Intent(context, DetailPlayerActivity::class.java)
             val bundle = Bundle()
 
@@ -71,13 +82,36 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
                 break
             }
 
-
             bundle.putSerializable("playInfoBean", playInfo)
+//            if (tvSharedElement != null){
+//                bundle.putSerializable("shareVodPicView",(tvSharedElement as RoundAngleImageView))
+//            }
             intent.putExtras(bundle)
-            context.startActivity(intent)
+            if (tvSharedElement == null) {
+                context.startActivity(
+                    intent,
+                    ActivityOptions.makeSceneTransitionAnimation(context.getActivity()).toBundle()
+                )
+            } else {
+                context.startActivity(
+                    intent,
+                    ActivityOptions.makeSceneTransitionAnimation(
+                        context.getActivity(),
+                        tvSharedElement,
+                        "shareVodPic"
+                    ).toBundle()
+                )
+            }
+
+
         }
     }
 
+    override fun setContentView(view: View?) {
+        window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
+        window.enterTransition = Fade()
+        super.setContentView(view)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,38 +131,129 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
         val playInfoBean = intent.getSerializableExtra("playInfoBean") as PlayInfoBean
         viewModel.initData(playInfoBean)
         position = playInfoBean.position
+//        shareVodPicView= intent.getSerializableExtra("shareVodPicView",RoundAngleImageView::class.java)
     }
 
+
     private fun initView() {
-
-        viewBinding.button.setOnClickListener {
-            episodeTab.setScrollPosition(7, 0F, true)
-        }
         videoPlayer = viewBinding.danmakuPlayer
-        videoPlayer.setActionCallback(this)
-
         channelTab = viewBinding.channelTab
         episodeTab = viewBinding.episodeTab
+        // 设置播放器回调
+        videoPlayer.setActionCallback(this)
+
+        viewBinding.cureentJxText.setOnClickListener(this)
+        // 监听数据变化
+        observeValueChange()
+
+        // 切换线路逻辑
+        channelTab.addOnTabSelectedListener(onChannelTabClick())
+
+        // 选集逻辑
+        episodeTab.addOnTabSelectedListener(onEpisodeTabClick())
 
 
+    }
+
+
+    override fun onClick(view: View?) {
+        when (view?.id) {
+            R.id.cureent_jx_text -> {
+                val parseBeanList = SourceManger.getParseBeanList()
+                val indexOf = parseBeanList.indexOf(viewModel.currentParseBean.value)
+                XPopup.Builder(this)
+                    .isDestroyOnDismiss(true)
+                    .asCenterList(
+                        "选择首选接口", parseBeanList.map { it.name }.toTypedArray(),
+                        null, indexOf
+                    ) { position, text ->
+                        val parseBean: ParseBean = parseBeanList.get(position)
+                        viewModel.currentParseBean.value = parseBean
+                        viewModel.preparePlayData()
+                    }
+                    .show()
+            }
+        }
+    }
+
+    private fun onEpisodeTabClick() = object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab) {
+            updateTabView(tab, true)
+            tab.tag = System.currentTimeMillis()
+            epTabItemClick(tab)
+            videoPlayer.videoEpisodePopup.setPlayNum(tab.position + 1)
+        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab) {
+            updateTabView(tab, false)
+        }
+
+        override fun onTabReselected(tab: TabLayout.Tab) {
+            // 点击间隔限制2秒
+            if ((System.currentTimeMillis() - tab.tag as Long) < 2000) {
+                return
+            }
+            // 再次选择当前选项卡 行为:刷新重新加载
+            epTabItemClick(tab)
+        }
+
+        fun epTabItemClick(tab: TabLayout.Tab) {
+            viewModel.currentEpisode.value = tab.position
+            viewModel.preparePlayData()
+        }
+    }
+
+    private fun onChannelTabClick() = object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab) {
+            viewModel.currentChannel.value = tab.position
+            // 渲染剧集列表
+            renderEpisodesTab(viewModel.channelFlagsAndEpisodes.value!!)
+            // 如果切换的资源集数不够则播放最后一集
+            val tabCount = episodeTab.tabCount
+            if (viewModel.currentEpisode.value != 0 && viewModel.currentEpisode.value!! >= tabCount) {
+                viewModel.currentEpisode.value = tabCount - 1
+            }
+            episodeTab.getTabAt(viewModel.currentEpisode.value!!)!!.select()
+            Handler(Looper.getMainLooper()).postDelayed({
+                episodeTab.setScrollPosition(viewModel.currentEpisode.value!!, 0F, true)
+            }, 400)
+        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab) {
+        }
+
+        override fun onTabReselected(tab: TabLayout.Tab) {
+        }
+    }
+
+    /**
+     * 观察数据变化
+     */
+    private fun observeValueChange() {
         // 详情变化
         viewModel.videoDetailBean.observe(this) {
             viewBinding.titleText.text = it.vod_name
-            it.vod_pic.let {
+            if (shareVodPicView == null) it.vod_pic.let {
                 viewBinding.roundAngleImageView.setImageUrl(it)
+            } else {
+                viewBinding.roundAngleImageView.setImageDrawable(shareVodPicView!!.drawable)
             }
+
             viewBinding.descText.text = removeHtmlAndWhitespace(it.vod_content)
-            viewBinding.textView.text =
-                "${it.vod_year}  /  ${it.type_name}  /  ${it.vod_director}"
+            "${strFormat(it.vod_year)}  /  ${strFormat(it.type_name)}  /  ${strFormat(it.vod_director)}".also {
+                viewBinding.textView.text = it
+            }
             viewBinding.currentSourceText.text = viewModel.spiderSource.value!!.sourceBean.name
         }
 
         // 线路和剧集变化
         viewModel.channelFlagsAndEpisodes.observe(this) {
-            renderChannelsTab(it)
-//            renderEpisodesTab(it)
+            channelTab.removeAllTabs()
+            // 初始化 线路列表
+            for (channel in it) {
+                channelTab.addTab(channelTab.newTab().setText(channel.channelFlag))
+            }
         }
-
 
         // 当前解析接口
         viewModel.currentParseBean.observe(this) {
@@ -136,7 +261,11 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
                 viewBinding.cureentJxText.visibility = View.GONE
             } else {
                 viewBinding.cureentJxText.visibility = View.VISIBLE
-                viewBinding.cureentJxText.text = it.name  + " ▼"
+                viewBinding.cureentJxText.text = getString(
+                    R.string.formatted_source_text,
+                    it.name,
+                    getString(R.string.downward_triangle)
+                )
             }
         }
 
@@ -176,81 +305,6 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
                 }
             }
         }
-
-        viewBinding.cureentJxText.setOnClickListener {
-
-            val parseBeanList = SourceManger.getParseBeanList()
-            val indexOf = parseBeanList.indexOf(viewModel.currentParseBean.value)
-            XPopup.Builder(this)
-                .isDestroyOnDismiss(true)
-                .asCenterList(
-                    "选择首选接口", parseBeanList.map { it.name }.toTypedArray(),
-                    null, indexOf
-                ) { position, text ->
-                    val parseBean: ParseBean = parseBeanList.get(position)
-                    viewModel.currentParseBean.value = parseBean
-                    Toaster.show("选择: $text")
-                    viewModel.getPlayData()
-                }
-                .show()
-        }
-
-        // 切换线路逻辑
-        channelTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                viewModel.currentChannel.value = tab.position
-                // 渲染剧集列表
-                renderEpisodesTab(viewModel.channelFlagsAndEpisodes.value!!)
-                // 如果切换的资源集数不够则播放最后一集
-                val tabCount = episodeTab.tabCount
-                if (viewModel.currentEpisode.value != 0 && viewModel.currentEpisode.value!! >= tabCount) {
-                    viewModel.currentEpisode.value = tabCount - 1
-                }
-                episodeTab.getTabAt(viewModel.currentEpisode.value!!)!!.select()
-                Handler(Looper.getMainLooper()).postDelayed({
-                    episodeTab.setScrollPosition(viewModel.currentEpisode.value!!, 0F, true)
-                }, 400)
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab) {
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab) {
-            }
-        })
-
-        // 选集逻辑
-        episodeTab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                updateTabView(tab, true)
-                tab.tag = System.currentTimeMillis()
-                epTabItemClick(tab)
-                videoPlayer.videoEpisodePopup.setPlayNum(tab.position + 1)
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab) {
-                updateTabView(tab, false)
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab) {
-                // 点击间隔限制2秒
-                if ((System.currentTimeMillis() - tab.tag as Long) < 2000) {
-                    return
-                }
-                // 再次选择当前选项卡 行为:刷新重新加载
-                epTabItemClick(tab)
-            }
-        })
-
-    }
-
-
-    /**
-     * 剧集列表点击事件
-     */
-    private fun epTabItemClick(tab: TabLayout.Tab) {
-        viewModel.currentEpisode.value = tab.position
-        viewModel.getPlayData()
     }
 
 
@@ -276,15 +330,6 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
         }
     }
 
-
-    @MainThread
-    private fun renderChannelsTab(channelFlagsAndEpisodes: List<VideoDetailBean.ChannelEpisodes>) {
-        channelTab.removeAllTabs()
-        // 初始化 线路列表
-        for (channel in channelFlagsAndEpisodes) {
-            channelTab.addTab(channelTab.newTab().setText(channel.channelFlag))
-        }
-    }
 
     /**
      * 加载 当前线路的剧集列表
@@ -323,9 +368,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
     }
 
     override fun onDestroy() {
-        if (videoPlayer.currentPosition != 0L && viewModel.videoDetailBean.value != null) {
-            saveHistory()
-        }
+        saveHistory()
         videoPlayer.release()
         super.onDestroy()
     }
@@ -334,6 +377,9 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
      * 保存播放历史记录
      */
     private fun saveHistory() {
+        if (videoPlayer.currentPosition == 0L || viewModel.videoDetailBean.value == null) {
+            return
+        }
         // 保存播放记录
         var playInfoBeans: ArrayList<PlayInfoBean>? =
             XKeyValue.getObjectList<PlayInfoBean>(Key.PLAY_History)
@@ -402,7 +448,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
     }
 
     /**
-     * 弹幕加载事假
+     * 弹幕加载事件回调
      */
     override fun loadDanmaku(callBack: (File) -> Unit) {
         this.loadDanmuCallback = callBack
@@ -417,4 +463,10 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
         return noWhitespace.trim() // 去除字符串两端的空格
     }
 
+    fun strFormat(str: String?): String {
+        if (str == null || StringUtils.isEmpty(str) || str.equals("null")) {
+            return "-"
+        }
+        return str
+    }
 }

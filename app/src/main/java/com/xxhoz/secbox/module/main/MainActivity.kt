@@ -1,11 +1,15 @@
 package com.xxhoz.secbox.module.main
 
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.transition.Explode
 import android.view.LayoutInflater
+import android.view.View
+import android.view.Window
 import androidx.activity.viewModels
 import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.toast.Toaster
@@ -20,6 +24,7 @@ import com.xxhoz.secbox.module.home.TabHomeFragment
 import com.xxhoz.secbox.module.mine.MineFragment
 import com.xxhoz.secbox.module.sniffer.SnifferFragment
 import com.xxhoz.secbox.util.GlobalActivityManager
+import com.xxhoz.secbox.util.getActivity
 import com.xxhoz.secbox.widget.NavigationView
 import com.xxhoz.secbox.widget.TabIndicatorView
 
@@ -39,14 +44,25 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     companion object{
         fun startActivity(context: Context) {
             val intent = Intent(context, MainActivity::class.java)
-            context.startActivity(intent)
+            context.startActivity(
+                intent,
+                ActivityOptions.makeSceneTransitionAnimation(context.getActivity()).toBundle()
+            )
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initSystemBar()
         updateTitle()
         initTabs()
+    }
+
+
+    override fun setContentView(view: View?) {
+        window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
+        window.enterTransition = Explode()
+        super.setContentView(view)
     }
 
     @PageName

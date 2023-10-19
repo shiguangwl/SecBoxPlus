@@ -86,7 +86,7 @@
                         android:id="@+id/item_history"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:setting_item_icon="@drawable/history_icon"
+                        app:setting_item_icon="@drawable/icon_history"
                         app:setting_item_title="@string/setting_item_history" />
 
                 <com.xxhoz.secbox.widget.SettingItemView

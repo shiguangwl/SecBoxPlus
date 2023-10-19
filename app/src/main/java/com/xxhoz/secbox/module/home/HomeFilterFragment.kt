@@ -47,14 +47,16 @@ class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilte
     }
 
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onResume() {
+        super.onResume()
+        if (isLoading) {
+            return
+        }
         viewBinding.loadPromptView.showLoading()
         initView()
         viewBinding.loadPromptView.hide()
         isLoading = true
     }
-
 
 
     @MainThread
@@ -89,7 +91,7 @@ class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilte
                             0
                         )
                         LogUtils.i("条目点击: ${playInfoBean}")
-                        DetailPlayerActivity.startActivity(context!!, playInfoBean)
+                        DetailPlayerActivity.startActivity(context!!, playInfoBean, view)
                     }
                 })
                 .setOnItemChildViewClickListener(object : XRecyclerView.OnItemChildViewClickListener {

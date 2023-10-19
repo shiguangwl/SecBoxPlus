@@ -246,7 +246,6 @@ object SnifferEngine {
         settings.userAgentString = webView.settings.userAgentString
 //         settings.setUserAgentString(ANDROID_UA);
 //        webView.setBackgroundColor(Color.BLACK)
-        // 禁音
         webView.isSoundEffectsEnabled = false
     }
 
