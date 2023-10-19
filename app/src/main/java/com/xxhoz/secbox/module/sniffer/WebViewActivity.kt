@@ -3,6 +3,7 @@ package com.xxhoz.secbox.module.sniffer
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
@@ -369,9 +370,9 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
 
 
     private fun startPlay(parseRsult: String) {
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        videoPlayer.startFullScreen()
         videoPlayer.setUp(EpsodeEntity("", parseRsult), 0)
+        videoPlayer.startFullScreen()
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     }
 
     private fun snifferPlay(currentUrl: String) {
@@ -437,8 +438,6 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
     }
 
 
-
-
     fun isM3u8Url(url: String): Boolean {
         // 使用正则表达式来匹配m3u8链接的模式
         val m3u8Pattern = """^https?://.*\.m3u8(\?.*)?$""".toRegex()
@@ -446,12 +445,22 @@ class WebViewActivity : BaseActivity<ActivityWebViewBinding>() {
     }
 
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            // 退出全屏销毁播放器
+            videoPlayer.release()
+        }
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (popupView.isShow) {
             return true
         }
 
-        if (videoPlayer.isFullScreen) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && videoPlayer.isFullScreen) {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             videoPlayer.stopFullScreen()
             videoPlayer.release()

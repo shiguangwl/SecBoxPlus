@@ -129,15 +129,6 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
 //            renderEpisodesTab(it)
         }
 
-//        // 选择线路
-//        viewModel.currentChannel.observe(this){
-//
-//        }
-//
-//        // 选择剧集
-//        viewModel.currentEpisode.observe(this){
-//
-//        }
 
         // 当前解析接口
         viewModel.currentParseBean.observe(this) {

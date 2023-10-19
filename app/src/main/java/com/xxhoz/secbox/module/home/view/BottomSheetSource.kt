@@ -18,7 +18,9 @@ import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.UniversalAdapter
 
-
+/**
+ * 首页选着站源
+ */
 class BottomSheetSource(context: Context) : BottomPopupView(context) {
     override fun getImplLayoutId(): Int {
         return R.layout.sheet_bottom_sourace_layout
@@ -31,6 +33,7 @@ class BottomSheetSource(context: Context) : BottomPopupView(context) {
         val sourceBeanList: List<SourceBean> = SourceManger.getSourceBeanList()
         val currentSource: IBaseSource? = BaseConfig.getCurrentSource()
         recyclerViewChooseSource.layoutManager = GridLayoutManager(context, 2)
+
         recyclerViewChooseSource.adapter = UniversalAdapter(
             sourceBeanList,
             R.layout.item_select_source,
@@ -42,7 +45,7 @@ class BottomSheetSource(context: Context) : BottomPopupView(context) {
                         bind.root.setBackgroundColor(ContextCompat.getColor(context,R.color.theme_color))
                     }
                     bind.sourceItemText.text = data.name
-                    view.setOnClickListener(){
+                    view.setOnClickListener {
                         selectItem(data)
                     }
                 }

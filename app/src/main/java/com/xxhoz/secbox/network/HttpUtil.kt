@@ -11,6 +11,7 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
@@ -36,7 +37,7 @@ object HttpUtil {
 
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
-                return null;
+                return null
             }
 
             return response.body?.bytes()
@@ -71,14 +72,42 @@ object HttpUtil {
                 if (clazz == String::class.java){
                     return responseBody as T
                 }
-                LogUtils.d("网络请求URL:" + url+ "  响应内容: "+ responseBody )
+                LogUtils.d("网络请求URL:" + url + "  响应内容: " + responseBody)
                 return gson.fromJson(responseBody, clazz)
             }
         } catch (e: Exception) {
             LogUtils.e("网络请求错误URL:" + url)
             e.printStackTrace()
-            throw e;
+            throw e
         }
+    }
+
+
+    /**
+     * 发起HTTP GET请求，获取指定URL的响应并将其反序列化为给定类型的对象。
+     *
+     * @param url 请求的URL字符串
+     * @param clazz 反序列化响应数据时要使用的类（通常是一个数据模型类）
+     * @param retryCount 重试次数，用于在请求失败时重试请求（至少会执行一次请求）
+     * @return 返回反序列化后的对象
+     * @throws Exception 如果在所有重试尝试后仍然无法成功获取响应，则抛出异常
+     */
+    fun <T> getWithRetry(url: String, clazz: Class<T>, retryCount: Int): T {
+        var lastException: Exception? = null
+
+        for (retryAttempt in 0 until retryCount) {
+            try {
+                return get(url, clazz)
+            } catch (e: Exception) {
+                lastException = e
+            }
+        }
+
+        // 如果所有重试都失败，则抛出异常
+        lastException?.let {
+            throw it
+        }
+            ?: throw RuntimeException("No exception occurred during retry, but the request still failed.")
     }
 
     fun <T> post(url: String, body: RequestBody, clazz: Class<T>): T? {
@@ -181,7 +210,8 @@ object HttpUtil {
                 // 解压 Deflate 数据
                 val inflater = Inflater(true)
                 val inflaterInputStream = InflaterInputStream(ByteArrayInputStream(originalBody?.bytes()), inflater)
-                val uncompressedBody = ResponseBody.create(originalBody?.contentType(), inflaterInputStream.readBytes())
+                val uncompressedBody =
+                    inflaterInputStream.readBytes().toResponseBody(originalBody?.contentType())
 
                 // 创建一个新的响应
                 return originalResponse.newBuilder()

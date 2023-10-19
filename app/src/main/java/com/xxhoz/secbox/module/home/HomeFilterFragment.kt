@@ -33,7 +33,7 @@ class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilte
 
     val conditionView: ConditionTabView by lazy { viewBinding.conditionView }
 
-    val itemListView: XRecyclerView by lazy() { viewBinding.itemListView }
+    val itemListView: XRecyclerView by lazy { viewBinding.itemListView }
 
     private val viewModel: HomeFilterViewModel by viewModels()
 
@@ -78,8 +78,8 @@ class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilte
                 .setViewModel(viewModel)
                 .setPullRefreshEnable(true)
                 .setPullUploadMoreEnable(true)
-                .setLayoutManager(GridLayoutManager(activity, HomeFilterFragment.HOME_SPAN_COUNT))
-                .setItemDecoration(GridItemDecoration(activity, HomeFilterFragment.HOME_SPAN_COUNT))
+                .setLayoutManager(GridLayoutManager(activity, HOME_SPAN_COUNT))
+                .setItemDecoration(GridItemDecoration(activity, HOME_SPAN_COUNT))
                 .setOnItemClickListener(object : XRecyclerView.OnItemClickListener {
                     override fun onItemClick(parent: RecyclerView, view: View, viewData: BaseViewData<*>, position: Int, id: Long) {
 
@@ -106,8 +106,4 @@ class HomeFilterFragment(val category: CategoryBean.ClassType, val categoryFilte
     @PageName
     override fun getPageName() = PageName.FILTER
 
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        // 这里可以添加页面打点
-    }
 }

@@ -7,16 +7,16 @@
         android:translationZ="@dimen/item_translation_z">
 
     <com.xxhoz.secbox.widget.RoundAngleImageView
-        android:id="@+id/iv_cover"
-        android:layout_width="0dp"
-        android:layout_height="150dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/bg_video_item_cover"
-        app:img_left_top_radius="@dimen/item_radius"
-        app:img_right_top_radius="@dimen/item_radius"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/iv_cover"
+            android:layout_width="0dp"
+            android:layout_height="170dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/bg_video_item_cover"
+            app:img_left_top_radius="@dimen/item_radius"
+            app:img_right_top_radius="@dimen/item_radius"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <View
             android:layout_width="0dp"

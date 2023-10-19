@@ -1,5 +1,6 @@
 package com.xxhoz.secbox.module.search
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -103,11 +104,72 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         // 加载历史记录
         loadSearchHistory()
         viewBinding.promptView.hide()
+
         // 返回
-        viewBinding.returnImage.setOnClickListener {
-            onBackPressed()
-        }
+        viewBinding.returnImage.setOnClickListener { onBackPressed() }
+
         // 搜索逻辑
+        setupSearchView()
+
+        // 清空历史记录
+        viewBinding.clearText.setOnClickListener { clearSearchHistory() }
+
+        // 左边 搜索源
+        setupSourceList()
+
+        // 右边 搜索结果
+        setupResultList()
+    }
+
+    private fun setupResultList() {
+        viewBinding.resultVideoList.layoutManager = LinearLayoutManager(this)
+        resultAdapter = UniversalAdapter(
+            resultItemList,
+            R.layout.item_search_movie_result_list,
+            object : UniversalAdapter.DataViewBind<VideoBean> {
+                override fun exec(data: VideoBean, view: View) {
+                    val bind = ItemSearchMovieResultListBinding.bind(view)
+                    bind.picMovie.setImageUrl(data.vod_pic)
+                    bind.titleMovie.text = data.vod_name
+                    bind.sourceText.text = data.vod_remarks
+                    bind.root.setOnClickListener {
+                        onClickResultItem(data)
+                    }
+                }
+            })
+        viewBinding.resultVideoList.adapter = resultAdapter
+    }
+
+    private fun setupSourceList() {
+        viewBinding.resultSourceList.layoutManager = LinearLayoutManager(this)
+        sourceAdapter = UniversalAdapter(
+            sourceList,
+            R.layout.item_search_result_source,
+            object : UniversalAdapter.DataViewBind<String> {
+                @SuppressLint("ResourceType")
+                override fun exec(data: String, view: View) {
+                    val bind = ItemSearchResultSourceBinding.bind(view)
+                    bind.sourceText.background =
+                        AppCompatResources.getDrawable(getActivity()!!, R.color.white)
+                    bind.sourceText.setTextColor(Color.parseColor(getString(R.color.font_color)))
+                    bind.sourceText.text = data
+                    if (data.equals(selectSourceKey)) {
+                        bind.sourceText.background =
+                            AppCompatResources.getDrawable(
+                                getActivity()!!,
+                                R.color.background_color
+                            )
+                        bind.sourceText.setTextColor(Color.parseColor(getString(R.color.background_color1)))
+                    }
+                    bind.sourceText.setOnClickListener {
+                        onClickSource(data)
+                    }
+                }
+            })
+        viewBinding.resultSourceList.adapter = sourceAdapter
+    }
+
+    private fun setupSearchView() {
         viewBinding.searchView.isIconified = false
         viewBinding.searchView.queryHint = "输入搜索关键词"
 
@@ -139,49 +201,6 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                 return true
             }
         })
-
-        // 清空历史记录
-        viewBinding.clearText.setOnClickListener {
-            clearSearchHistory()
-        }
-
-        // 左边 搜索源
-        viewBinding.resultSourceList.layoutManager = LinearLayoutManager(this)
-        sourceAdapter = UniversalAdapter(
-            sourceList,
-            R.layout.item_search_result_source,
-            object : UniversalAdapter.DataViewBind<String> {
-                override fun exec(data: String, view: View) {
-                    val bind = ItemSearchResultSourceBinding.bind(view)
-                    bind.sourceText.background = AppCompatResources.getDrawable(getActivity()!!, R.color.white)
-                    bind.sourceText.text = data
-                    if (data.equals(selectSourceKey)){
-                        bind.sourceText.background = AppCompatResources.getDrawable(getActivity()!!, R.color.theme_color)
-                    }
-                    bind.sourceText.setOnClickListener {
-                        onClickSource(data)
-                    }
-                }
-            })
-        viewBinding.resultSourceList.adapter = sourceAdapter
-
-        // 右边 搜索结果
-        viewBinding.resultVideoList.layoutManager = LinearLayoutManager(this)
-        resultAdapter = UniversalAdapter(
-            resultItemList,
-            R.layout.item_search_movie_result_list,
-            object : UniversalAdapter.DataViewBind<VideoBean> {
-                override fun exec(data: VideoBean, view: View) {
-                    val bind = ItemSearchMovieResultListBinding.bind(view)
-                    bind.picMovie.setImageUrl(data.vod_pic)
-                    bind.titleMovie.text = data.vod_name
-                    bind.sourceText.text = data.vod_remarks
-                    bind.root.setOnClickListener {
-                        onClickResultItem(data)
-                    }
-                }
-            })
-        viewBinding.resultVideoList.adapter = resultAdapter
     }
 
     /**

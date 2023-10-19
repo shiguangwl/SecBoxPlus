@@ -70,11 +70,18 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             }
             // 加载数据源配置
             try {
-                SourceManger.loadSourceConfig(XKeyValue.getString(Key.CURRENT_SOURCE_URL,BaseConfig.BASE_SOURCE_URL))
-            }catch (e:Exception){
+                SourceManger.loadSourceConfig(
+                    XKeyValue.getString(
+                        Key.CURRENT_SOURCE_URL,
+                        BaseConfig.BASE_SOURCE_URL
+                    )
+                )
+            } catch (e: GlobalException) {
+                Toaster.showLong(e.message)
+            } catch (e: Exception) {
                 // 切换默认源
                 Toaster.show("加载数据源配置失败,尝试切换默认源")
-                XKeyValue.putString(Key.CURRENT_SOURCE_URL,BaseConfig.BASE_SOURCE_URL)
+                XKeyValue.putString(Key.CURRENT_SOURCE_URL, BaseConfig.BASE_SOURCE_URL)
                 SourceManger.loadSourceConfig(BaseConfig.BASE_SOURCE_URL)
             }
 
@@ -89,11 +96,10 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
      * 加载配置文件
      */
     private fun configInit() {
-        // 配置加载
         val configBean = try {
-            HttpUtil.get(BaseConfig.CONFIG_JSON, ConfigBean::class.java)
+            HttpUtil.getWithRetry(BaseConfig.CONFIG_JSON, ConfigBean::class.java, 3)
         } catch (e: Exception) {
-            throw GlobalException.of("加载配置失败"+e.message)
+            throw GlobalException.of("网络错误:加载配置失败" + e.message)
         }
 
         LogUtils.i("加载配置成功: $configBean")

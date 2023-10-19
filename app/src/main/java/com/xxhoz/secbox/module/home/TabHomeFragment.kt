@@ -2,13 +2,13 @@ package com.xxhoz.secbox.module.home
 
 //import com.xxhoz.secbox.module.home.view.BottomSheetSource
 import BottomSheetSource
-import android.R
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -20,6 +20,7 @@ import com.lxj.xpopup.XPopup
 import com.lxj.xpopup.enums.PopupAnimation
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.parserImpl.IBaseSource
+import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseFragment
 import com.xxhoz.secbox.bean.exception.GlobalException
 import com.xxhoz.secbox.constant.EventName
@@ -41,7 +42,7 @@ import kotlinx.coroutines.withContext
 /**
  * 首页
  */
-class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
+class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener {
 
     private val activeColor = Color.parseColor("#ff678f")
     private val normalColor = Color.parseColor("#666666")
@@ -115,11 +116,11 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
                     return@launch
                 }
 
-                if (isActive){
+                if (isActive) {
                     // 初始化tab选项卡
                     initViewFragments()
-                    // 首页顶部信息
-                    showNotice()
+                    // 首页顶部公告信息
+//                    showNotice()
                 }
                 viewBinding.promptView.hide()
             }
@@ -129,26 +130,40 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
 
     private fun initView() {
         // 搜索按钮
-        viewBinding.searchBtn.setOnClickListener {
-            SearchActivity.startActivity(requireContext())
-        }
+        viewBinding.searchBtn.setOnClickListener(this)
         // 历史记录
-        viewBinding.historyBtn.setOnClickListener {
-            HistoryActivity.startActivity(requireContext())
-        }
-        // 设置源显示
-        val sourceName: String? = BaseConfig.getCurrentSource()?.sourceBean?.name
-        viewBinding.currentSourceText.text = (sourceName + "  ▼")
+        viewBinding.historyBtn.setOnClickListener(this)
 
         // 源选择
-        viewBinding.currentSourceText.setOnClickListener {
-            XPopup.Builder(context)
-                .atView(viewBinding.tabLayout)
-                .hasShadowBg(false)
-                .asCustom(BottomSheetSource(requireContext()))
-                .show()
-        }
+        viewBinding.currentSourceText.setOnClickListener(this)
 
+        // 设置源显示
+        val sourceName: String? = BaseConfig.getCurrentSource()?.sourceBean?.name
+        viewBinding.currentSourceText.text = getString(
+            R.string.formatted_source_text,
+            sourceName,
+            getString(R.string.downward_triangle)
+        )
+    }
+
+    override fun onClick(view: View?) {
+        when (view?.id) {
+            R.id.search_btn -> {
+                SearchActivity.startActivity(requireContext())
+            }
+
+            R.id.history_btn -> {
+                HistoryActivity.startActivity(requireContext())
+            }
+
+            R.id.current_source_text -> {
+                XPopup.Builder(context)
+                    .atView(viewBinding.tabLayout)
+                    .hasShadowBg(false)
+                    .asCustom(BottomSheetSource(requireContext()))
+                    .show()
+            }
+        }
     }
 
     private fun initViewFragments() {
@@ -175,14 +190,14 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>() {
             }
         //viewPager 页面切换监听监听
         viewBinding.viewPager.registerOnPageChangeCallback(changeCallback)
-        viewBinding.viewPager.offscreenPageLimit = 20
+//        viewBinding.viewPager.offscreenPageLimit = 20
         // tab样式
         mediator = TabLayoutMediator(
             viewBinding.tabLayout, viewBinding.viewPager
         ) { tab, position -> //这里可以自定义TabView
             val tabView = TextView(getActivity())
             val states = arrayOfNulls<IntArray>(2)
-            states[0] = intArrayOf(R.attr.state_selected)
+            states[0] = intArrayOf(android.R.attr.state_selected)
             states[1] = intArrayOf()
             val colors = intArrayOf(activeColor, normalColor)
             val colorStateList = ColorStateList(states, colors)

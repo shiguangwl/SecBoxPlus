@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.lxj.xpopup.impl.PartShadowPopupView
 import com.lxj.xpopup.util.XPopupUtils
 import com.xxhoz.secbox.R
+import com.xxhoz.secbox.R.id.recycler_data_view
 
 /**
  * Description: 自定义局部阴影弹窗
@@ -19,7 +20,7 @@ class CustomPartShadowPopupView(context: Context,val ccallback:(rc:RecyclerView)
 
     override fun onCreate() {
         super.onCreate()
-        val recyclerDatView = findViewById<View>(R.id.recycler_data_view) as RecyclerView
+        val recyclerDatView = findViewById<View>(recycler_data_view) as RecyclerView
         ccallback(recyclerDatView)
     }
 
