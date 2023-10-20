@@ -52,7 +52,7 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener 
 
     private var mediator: TabLayoutMediator? = null
 
-    private var fragmentList = ArrayList<TabFragmentItem>()
+    private lateinit var fragmentList: ArrayList<TabFragmentItem>
 
     data class TabFragmentItem(val title: String, val fragment: Fragment)
 
@@ -84,6 +84,7 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener 
 
 
     private fun initData() {
+        fragmentList = ArrayList()
         SingleTask(lifecycleScope.launch {
             viewBinding.promptView.showLoading()
             val currentSource: IBaseSource? =
