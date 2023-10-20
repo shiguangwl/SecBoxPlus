@@ -7,7 +7,7 @@ import android.view.View
 import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.ImageView
-import com.xxhoz.secbox.R
+import com.xxhoz.danmuplayer.R
 import xyz.doikki.videoplayer.controller.ControlWrapper
 import xyz.doikki.videoplayer.controller.IControlComponent
 import xyz.doikki.videoplayer.player.VideoView
@@ -19,7 +19,8 @@ import xyz.doikki.videoplayer.player.VideoViewManager
 class PrepareView : FrameLayout, IControlComponent {
     private lateinit var mControlWrapper: ControlWrapper
     private var mThumb: ImageView
-//    private var bufferingState: TextView
+
+    //    private var bufferingState: TextView
     private var mStartPlay: ImageView
     private var mLoading: View
     private var mNetWarning: FrameLayout
@@ -40,7 +41,7 @@ class PrepareView : FrameLayout, IControlComponent {
 //        bufferingState = findViewById(R.id.buffering_state)
         mNetWarning = findViewById(R.id.net_warning_layout)
         findViewById<View>(R.id.status_btn).setOnClickListener {
-            mNetWarning.setVisibility(GONE)
+            mNetWarning.visibility = GONE
             VideoViewManager.instance().setPlayOnMobileNetwork(true)
             mControlWrapper.start()
         }
@@ -57,7 +58,7 @@ class PrepareView : FrameLayout, IControlComponent {
         mControlWrapper = controlWrapper
     }
 
-    override fun getView(): View? {
+    override fun getView(): View {
         return this
     }
 

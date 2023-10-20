@@ -30,6 +30,7 @@ class TopTitleView : FrameLayout, IControlComponent {
     private var mBatteryReceiver: BatteryReceiver? = null
     private var mIsRegister = false //是否注册BatteryReceiver
     lateinit private var throwingScreen: ImageView
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(

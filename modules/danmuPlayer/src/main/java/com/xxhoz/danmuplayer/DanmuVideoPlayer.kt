@@ -1,24 +1,24 @@
-package com.xxhoz.secbox.module.player.video
+package com.xxhoz.danmuplayer
 
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.util.AttributeSet
 import android.view.Gravity
-import com.hjq.toast.Toaster
-import com.xxhoz.constant.Key
-import com.xxhoz.secbox.bean.EpsodeEntity
-import com.xxhoz.secbox.module.player.popup.VideoEpisodePopup
-import com.xxhoz.secbox.module.player.popup.VideoSpeedPopup
+import com.xxhoz.danmuplayer.popup.VideoEpisodePopup
+import com.xxhoz.danmuplayer.popup.VideoSpeedPopup
+import com.xxhoz.danmuplayer.view.SecDanmakuView
+
 import com.xxhoz.secbox.module.player.video.view.BottomControlView
 import com.xxhoz.secbox.module.player.video.view.ErrorView
-import com.xxhoz.secbox.module.player.video.view.SecDanmakuView
-import com.xxhoz.secbox.persistence.XKeyValue
-import com.xxhoz.secbox.util.LogUtils
+
 
 import xyz.doikki.videocontroller.component.CompleteView
 import xyz.doikki.videocontroller.component.GestureView
 import xyz.doikki.videocontroller.component.TopTitleView
+import xyz.doikki.videoplayer.exo.ExoMediaPlayerFactory
 import xyz.doikki.videoplayer.player.VideoView
+import xyz.doikki.videoplayer.player.VideoViewConfig
+import xyz.doikki.videoplayer.player.VideoViewManager
 import java.io.File
 
 /**
@@ -26,6 +26,19 @@ import java.io.File
  */
 
 class DanmuVideoPlayer : VideoView {
+
+    companion object {
+        init {
+            // 初始化播放器内核
+            VideoViewManager.setConfig(
+                VideoViewConfig.newBuilder()
+                    //使用MediaPlayer解码
+                    .setPlayerFactory(ExoMediaPlayerFactory.create())
+                    .build()
+            )
+        }
+    }
+
 
     lateinit var topTitleView: TopTitleView
 
@@ -51,7 +64,7 @@ class DanmuVideoPlayer : VideoView {
         val popup = VideoSpeedPopup(context)
         popup.setSpeedChangeListener {
             speed = it
-            Toaster.show("切换播放速度:${it}")
+//            Toaster.show("切换播放速度:${it}")
         }
         popup
     }
@@ -95,7 +108,7 @@ class DanmuVideoPlayer : VideoView {
                 val errorView: ErrorView = ErrorView(getContext())
                 errorView.setOnRetryListener {
                     actionCallback.retryClick()
-                    if (actionCallback == null){
+                    if (actionCallback == null) {
                         // 如果没设置回调则直接退出
                         activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
                         stopFullScreen()
@@ -106,7 +119,7 @@ class DanmuVideoPlayer : VideoView {
                 topTitleView = TopTitleView(getContext())
                 // 底部
                 bottomControlView =
-                    BottomControlView(getContext(), XKeyValue.getBoolean(Key.DANMAKU_STATE, true))
+                    BottomControlView(getContext(), true)
                 // 手势控制
                 val gestureView = GestureView(getContext())
                 // 弹幕组件
@@ -159,21 +172,21 @@ class DanmuVideoPlayer : VideoView {
 
                 // 弹幕
                 bottomControlView.setDanmuBtnListener {
-                    if (it){
-                        XKeyValue.putBoolean(Key.DANMAKU_STATE, true)
-                        if (vDanmakuView.isPrepared) {
-                            vDanmakuView.show()
-                            LogUtils.d("弹幕已加载,直接显示")
-                        }else{
-                            // 加载弹幕
-                            LogUtils.d("执行加载弹幕回调逻辑")
-                            actionCallback.loadDanmaku(@DanmuVideoPlayer ::setDanmuStream)
-                        }
-                    }else{
-                        XKeyValue.putBoolean(Key.DANMAKU_STATE, false)
-                        // 关闭弹幕
-                        vDanmakuView.hide()
-                    }
+//                    if (it){
+//                        XKeyValue.putBoolean(Key.DANMAKU_STATE, true)
+//                        if (vDanmakuView.isPrepared) {
+//                            vDanmakuView.show()
+//                            LogUtils.d("弹幕已加载,直接显示")
+//                        }else{
+//                            // 加载弹幕
+//                            LogUtils.d("执行加载弹幕回调逻辑")
+//                            actionCallback.loadDanmaku(@DanmuVideoPlayer ::setDanmuStream)
+//                        }
+//                    }else{
+//                        XKeyValue.putBoolean(Key.DANMAKU_STATE, false)
+//                        // 关闭弹幕
+//                        vDanmakuView.hide()
+//                    }
                 }
             }
         }
@@ -193,7 +206,7 @@ class DanmuVideoPlayer : VideoView {
     /**
      * 设置播放数据
      */
-    fun setUp(epsodeEntity: EpsodeEntity,position: Long) {
+    fun setUp(epsodeEntity: EpsodeEntity, position: Long) {
         vDanmakuView.release()
         standardVideoController.stopShowBufferSpeed()
         release()
@@ -214,9 +227,9 @@ class DanmuVideoPlayer : VideoView {
         startPlay()
         standardVideoController.startShowBufferSpeed()
 
-        if (XKeyValue.getBoolean(Key.DANMAKU_STATE, true)) {
-            actionCallback.loadDanmaku(this::setDanmuStream)
-        }
+//        if (XKeyValue.getBoolean(Key.DANMAKU_STATE, true)) {
+//            actionCallback.loadDanmaku(this::setDanmuStream)
+//        }
     }
 
     /**

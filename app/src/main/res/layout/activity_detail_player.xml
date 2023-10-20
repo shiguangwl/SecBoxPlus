@@ -15,7 +15,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:id="@+id/controller_view" />
 
-    <com.xxhoz.secbox.module.player.video.DanmuVideoPlayer
+    <com.xxhoz.danmuplayer.DanmuVideoPlayer
             android:id="@+id/danmaku_player"
             android:layout_width="match_parent"
             android:layout_height="220dp"

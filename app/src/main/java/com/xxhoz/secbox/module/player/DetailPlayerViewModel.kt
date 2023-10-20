@@ -5,11 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.hjq.toast.Toaster
 import com.xxhoz.constant.BaseConfig
+import com.xxhoz.danmuplayer.EpsodeEntity
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.App
 import com.xxhoz.secbox.base.BaseViewModel
-import com.xxhoz.secbox.bean.EpsodeEntity
 import com.xxhoz.secbox.bean.PlayInfoBean
 import com.xxhoz.secbox.bean.exception.GlobalException
 import com.xxhoz.secbox.constant.PageName

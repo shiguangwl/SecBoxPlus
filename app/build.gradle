@@ -105,6 +105,7 @@ dependencies {
 
     // 数据抓取爬虫
     implementation ("org.jsoup:jsoup:${versions.jsoup}")
+    implementation project(path: ':modules:danmuPlayer')
 
     // 单元测试
     testImplementation("junit:junit:${versions.junit}")

@@ -19,15 +19,15 @@ import com.hjq.gson.factory.GsonFactory
 import com.hjq.toast.Toaster
 import com.lxj.xpopup.XPopup
 import com.xxhoz.constant.Key
+import com.xxhoz.danmuplayer.DanmuVideoPlayer
+import com.xxhoz.danmuplayer.EpsodeEntity
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
-import com.xxhoz.secbox.bean.EpsodeEntity
 import com.xxhoz.secbox.bean.PlayInfoBean
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.constant.PageState
 import com.xxhoz.secbox.databinding.ActivityDetailPlayerBinding
-import com.xxhoz.secbox.module.player.video.DanmuVideoPlayer
 import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
 import com.xxhoz.secbox.persistence.XKeyValue

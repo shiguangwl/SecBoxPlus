@@ -1,6 +1,6 @@
 rootProject.name = "SecBoxPlus"
 include ':app'
-
+include(":modules:danmuPlayer")
 
 //初始化阶段开始时间
 long beginOfSetting = System.currentTimeMillis()
