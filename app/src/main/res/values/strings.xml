@@ -26,9 +26,7 @@
     <string name="load_more_no_more">没有更多数据了</string>
 
     <string name="setting_item_history">播放记录</string>
-    <string name="setting_item_collection">我的收藏</string>
     <string name="setting_item_subscribe">订阅管理</string>
-    <string name="setting_item_setting">设置</string>
     <string name="setting_item_about">关于</string>
     <string name="setting_item_clearCache">清理缓存</string>
     <string name="press_again_exit_app">再按一次返回键退出程序</string>
