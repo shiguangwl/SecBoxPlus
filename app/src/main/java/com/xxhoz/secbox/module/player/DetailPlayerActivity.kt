@@ -137,6 +137,8 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
 
     private fun initView() {
         videoPlayer = viewBinding.danmakuPlayer
+        videoPlayer.danmuState = XKeyValue.getBoolean(Key.DANMAKU_STATE, true)
+
         channelTab = viewBinding.channelTab
         episodeTab = viewBinding.episodeTab
         // 设置播放器回调
@@ -451,8 +453,17 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
      * 弹幕加载事件回调
      */
     override fun loadDanmaku(callBack: (File) -> Unit) {
+        XKeyValue.putBoolean(Key.DANMAKU_STATE, true)
         this.loadDanmuCallback = callBack
-        viewModel.loadDanmaku()
+        if (videoPlayer.danmuIsPrepared()) {
+            videoPlayer.danmuShow()
+        } else {
+            viewModel.loadDanmaku()
+        }
+    }
+
+    override fun closeDanmuKu() {
+        XKeyValue.putBoolean(Key.DANMAKU_STATE, false)
     }
 
     fun removeHtmlAndWhitespace(input: String): String {

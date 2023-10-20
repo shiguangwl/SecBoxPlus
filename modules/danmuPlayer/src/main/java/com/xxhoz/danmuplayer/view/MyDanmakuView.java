@@ -18,6 +18,7 @@ import android.view.animation.Animation;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.xxhoz.danmuplayer.BuildConfig;
 import com.xxhoz.danmuplayer.view.danma.BiliDanmukuParser;
 import com.xxhoz.danmuplayer.view.danma.CenteredImageSpan;
 
@@ -37,31 +38,32 @@ import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.IDataSource;
-import master.flame.danmaku.ui.widget.DanmakuView;
 import xyz.doikki.videoplayer.controller.ControlWrapper;
 import xyz.doikki.videoplayer.controller.IControlComponent;
 import xyz.doikki.videoplayer.player.VideoView;
 import xyz.doikki.videoplayer.util.PlayerUtils;
 
-public class SecDanmakuView extends DanmakuView implements IControlComponent {
-
+/**
+ * @author NanYu
+ */
+public class MyDanmakuView extends master.flame.danmaku.ui.widget.DanmakuView implements IControlComponent {
+    // 弹幕是否显示
+    private Boolean danmuState = true;
     private final DanmakuContext mContext;
     private ControlWrapper controlWrapper;
     private int playState;
 
-    public SecDanmakuView(@NonNull Context context) {
+    public MyDanmakuView(@NonNull Context context) {
         super(context);
     }
 
-    public SecDanmakuView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public MyDanmakuView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public SecDanmakuView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public MyDanmakuView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
-
-    private final long lastTime = System.currentTimeMillis();
 
     {
         // 设置弹幕的最大显示行数
@@ -79,8 +81,7 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
         overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_BOTTOM, true);
 
         mContext = DanmakuContext.create();
-        mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3)
-                .setDuplicateMergingEnabled(false) //是否启用合并重复弹幕
+        mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false) //是否启用合并重复弹幕
                 .setScrollSpeedFactor(1.8f)//设置弹幕滚动速度系数,只对滚动弹幕有效
                 .setScaleTextSize(0.8f)  // 设置缩放字体大小
                 .setMaximumLines(maxLinesPair) //设置最大显示行数
@@ -90,7 +91,7 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
             @Override
             public void prepared() {
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    if (playState == VideoView.STATE_PLAYING) {
+                    if (playState == VideoView.STATE_PLAYING || playState == VideoView.STATE_BUFFERED || playState == VideoView.STATE_PREPARING) {
                         seekTo(controlWrapper.getCurrentPosition());
                         show();
                     }
@@ -125,8 +126,10 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
 
             }
         });
-        // showFPS(BaseConfig.INSTANCE.getDEBUG());
-        showFPS(true);
+        // 判断是否为debug模式，如果是则显示fps
+        if (BuildConfig.DEBUG) {
+            showFPS(true);
+        }
         enableDanmakuDrawingCache(true);
     }
 
@@ -165,18 +168,14 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
                 hide();
                 break;
             case VideoView.STATE_BUFFERED:
+            case VideoView.STATE_PREPARING:
+            case VideoView.STATE_PLAYING:
                 showDanmu();
                 if (isPrepared()) {
-                    seekTo(controlWrapper.getCurrentPosition());
-                }
-                break;
-            case VideoView.STATE_PREPARING:
-                break;
-            case VideoView.STATE_PLAYING:
-                if (isPrepared()) {
-                    showDanmu();
                     if (isPaused()) {
                         resume();
+                    } else {
+                        seekTo(controlWrapper.getCurrentPosition());
                     }
                 }
                 break;
@@ -193,10 +192,9 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
     }
 
     public void showDanmu() {
-        // boolean isOpen = XKeyValue.INSTANCE.getBoolean(Key.DANMAKU_STATE, true);
-        // if (isOpen) {
-        show();
-        // }
+        if (danmuState) {
+            show();
+        }
     }
 
     @Override
@@ -323,4 +321,14 @@ public class SecDanmakuView extends DanmakuView implements IControlComponent {
             // 禁用描边绘制
         }
     }
+
+    public Boolean getDanmuState() {
+        return danmuState;
+    }
+
+    public void setDanmuState(Boolean danmuState) {
+        this.danmuState = danmuState;
+    }
+
+
 }

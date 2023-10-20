@@ -7,7 +7,8 @@ import com.xxhoz.danmuplayer.R
 import xyz.doikki.videocontroller.component.VodControlView
 import xyz.doikki.videoplayer.player.VideoView
 
-class BottomControlView(context: Context, var danmuState: Boolean) : VodControlView(context) {
+class BottomControlView(context: Context, private var danmuState: Boolean) :
+    VodControlView(context) {
 
     private var nextVod: ImageView
     private var changeEposde: TextView
@@ -53,7 +54,11 @@ class BottomControlView(context: Context, var danmuState: Boolean) : VodControlV
         }
     }
 
+    /**
+     * 弹幕状态修改
+     */
     fun changeDanmuState(danmuState: Boolean) {
+        this.danmuState = danmuState
         if (danmuState) {
             danmuBtn.setImageResource(R.drawable.icon_danmu_open)
         } else {
@@ -61,22 +66,33 @@ class BottomControlView(context: Context, var danmuState: Boolean) : VodControlV
         }
     }
 
+    /**
+     * 下一集
+     */
     fun setNextVodListener(listener: OnClickListener) {
         nextVod.setOnClickListener(listener)
     }
 
+    /**
+     * 选集
+     */
     fun setChangeEposdeListener(listener: OnClickListener) {
         changeEposde.setOnClickListener(listener)
     }
 
+    /**
+     * 倍速
+     */
     fun setChangeSpeedListener(listener: OnClickListener) {
         changeSpeed.setOnClickListener(listener)
     }
 
+    /**
+     * 点击弹幕切换状态
+     */
     fun setDanmuBtnListener(listener: (danmuState: Boolean) -> Unit) {
         danmuBtn.setOnClickListener {
-            danmuState = !danmuState
-            changeDanmuState(danmuState)
+            changeDanmuState(!danmuState)
             listener(danmuState)
         }
     }

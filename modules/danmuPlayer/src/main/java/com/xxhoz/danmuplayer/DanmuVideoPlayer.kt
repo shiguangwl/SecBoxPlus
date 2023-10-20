@@ -1,17 +1,14 @@
 package com.xxhoz.danmuplayer
 
+
 import android.content.Context
-import android.content.pm.ActivityInfo
 import android.util.AttributeSet
 import android.view.Gravity
 import com.xxhoz.danmuplayer.popup.VideoEpisodePopup
 import com.xxhoz.danmuplayer.popup.VideoSpeedPopup
-import com.xxhoz.danmuplayer.view.SecDanmakuView
-
+import com.xxhoz.danmuplayer.view.MyDanmakuView
 import com.xxhoz.secbox.module.player.video.view.BottomControlView
 import com.xxhoz.secbox.module.player.video.view.ErrorView
-
-
 import xyz.doikki.videocontroller.component.CompleteView
 import xyz.doikki.videocontroller.component.GestureView
 import xyz.doikki.videocontroller.component.TopTitleView
@@ -42,13 +39,23 @@ class DanmuVideoPlayer : VideoView {
 
     lateinit var topTitleView: TopTitleView
 
-    private lateinit var vDanmakuView: SecDanmakuView
+    private lateinit var myDanmakuView: MyDanmakuView
 
     lateinit var standardVideoController: StandardVideoController
 
     var episodes: ArrayList<EpsodeEntity>? = null
 
     private lateinit var bottomControlView: BottomControlView
+
+    // 弹幕开启状态 默认True
+    var danmuState = true
+        set(value) {
+            myDanmakuView.danmuState = value
+            bottomControlView.changeDanmuState(value)
+
+            field = value
+        }
+
 
     val videoEpisodePopup: VideoEpisodePopup by lazy {
         val popup = VideoEpisodePopup(context, episodes)
@@ -108,23 +115,17 @@ class DanmuVideoPlayer : VideoView {
                 val errorView: ErrorView = ErrorView(getContext())
                 errorView.setOnRetryListener {
                     actionCallback.retryClick()
-                    if (actionCallback == null) {
-                        // 如果没设置回调则直接退出
-                        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                        stopFullScreen()
-                        release()
-                    }
                 }
                 // 顶部
                 topTitleView = TopTitleView(getContext())
                 // 底部
                 bottomControlView =
-                    BottomControlView(getContext(), true)
+                    BottomControlView(getContext(), danmuState)
                 // 手势控制
                 val gestureView = GestureView(getContext())
                 // 弹幕组件
-                vDanmakuView =
-                    SecDanmakuView(
+                myDanmakuView =
+                    MyDanmakuView(
                         context
                     )
                 addControlComponent(completeView)
@@ -133,7 +134,7 @@ class DanmuVideoPlayer : VideoView {
                 addControlComponent(topTitleView)
                 addControlComponent(bottomControlView)
                 addControlComponent(gestureView)
-                addControlComponent(vDanmakuView)
+                addControlComponent(myDanmakuView)
 
                 setEnableInNormal(true)
                 // 投屏
@@ -172,21 +173,18 @@ class DanmuVideoPlayer : VideoView {
 
                 // 弹幕
                 bottomControlView.setDanmuBtnListener {
-//                    if (it){
-//                        XKeyValue.putBoolean(Key.DANMAKU_STATE, true)
-//                        if (vDanmakuView.isPrepared) {
-//                            vDanmakuView.show()
-//                            LogUtils.d("弹幕已加载,直接显示")
-//                        }else{
-//                            // 加载弹幕
-//                            LogUtils.d("执行加载弹幕回调逻辑")
-//                            actionCallback.loadDanmaku(@DanmuVideoPlayer ::setDanmuStream)
-//                        }
-//                    }else{
-//                        XKeyValue.putBoolean(Key.DANMAKU_STATE, false)
-//                        // 关闭弹幕
-//                        vDanmakuView.hide()
-//                    }
+                    if (it) {
+                        danmuState = true
+                        // 加载弹幕
+                        actionCallback.loadDanmaku {
+                            myDanmakuView.loadDanmuStream(it)
+                        }
+                    } else {
+                        danmuState = false
+                        // 关闭弹幕
+                        myDanmakuView.hide()
+                        actionCallback.closeDanmuKu()
+                    }
                 }
             }
         }
@@ -194,7 +192,7 @@ class DanmuVideoPlayer : VideoView {
         controller.addDefaultControlComponent()
         // 设置控制器
         setVideoController(controller)
-        //        setScreenScaleType(SCREEN_SCALE_DEFAULT)
+//        setScreenScaleType(SCREEN_SCALE_MATCH_PARENT)
 
         standardVideoController = controller
     }
@@ -207,29 +205,21 @@ class DanmuVideoPlayer : VideoView {
      * 设置播放数据
      */
     fun setUp(epsodeEntity: EpsodeEntity, position: Long) {
-        vDanmakuView.release()
+        myDanmakuView.release()
         standardVideoController.stopShowBufferSpeed()
         release()
         topTitleView.setTitle(epsodeEntity.videoName)
 
-
-        if (epsodeEntity.videoUrl.contains("bilivideo")) {
-            // TODO 占时兼容B站源
-            val headers = mapOf(
-                "Referer" to "https://www.bilibili.com",
-                "User-Agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36"
-            )
-            setUrl(epsodeEntity.videoUrl, headers)
-        } else {
-            setUrl(epsodeEntity.videoUrl)
-        }
+        setUrl(epsodeEntity.videoUrl)
         mCurrentPosition = position
         startPlay()
         standardVideoController.startShowBufferSpeed()
 
-//        if (XKeyValue.getBoolean(Key.DANMAKU_STATE, true)) {
-//            actionCallback.loadDanmaku(this::setDanmuStream)
-//        }
+        if (danmuState) {
+            actionCallback.loadDanmaku {
+                myDanmakuView.loadDanmuStream(it)
+            }
+        }
     }
 
     /**
@@ -243,11 +233,17 @@ class DanmuVideoPlayer : VideoView {
         standardVideoController.setLoadingMsg(msg)
     }
 
-    /**
-     * 加载弹幕数据
-     */
-    private fun setDanmuStream(stream: File) {
-        vDanmakuView.loadDanmuStream(stream)
+
+    fun danmuIsPrepared(): Boolean {
+        return myDanmakuView.isPrepared
+    }
+
+    fun danmuShow() {
+        myDanmakuView.show()
+    }
+
+    fun danmuHide() {
+        myDanmakuView.hide()
     }
 
     interface PlayerCallback {
@@ -255,8 +251,15 @@ class DanmuVideoPlayer : VideoView {
         fun nextClick()
         fun throwingScreenClick()
         fun selectPartsClick(position: Int)
+
+        // 重试回调
         fun retryClick()
+
+        // 加载弹幕回调
         fun loadDanmaku(callBack: (File) -> Unit)
+
+        // 关闭弹幕回调
+        fun closeDanmuKu()
     }
 
     /**

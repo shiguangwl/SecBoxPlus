@@ -20,4 +20,8 @@ open class SimpleVideoCallback : DanmuVideoPlayer.PlayerCallback {
 
     override fun loadDanmaku(callBack: (File) -> Unit) {
     }
+
+    override fun closeDanmuKu() {
+
+    }
 }
