@@ -4,6 +4,7 @@
     <application>
         <activity
                 android:name="com.xxhoz.secboxbrowser.SnifferWebViewActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
                 android:exported="false" />
     </application>
 

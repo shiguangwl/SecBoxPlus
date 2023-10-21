@@ -192,7 +192,7 @@ class SnifferWebViewActivity : AppCompatActivity(), View.OnClickListener, TaskMa
         goHome.setOnClickListener(this)
         mediaNum.setOnClickListener(this)
 
-        webView.setOnTouchListener { v, event ->
+        webView.setOnTouchListener { _, event ->
             // 当触摸事件发生时，让 EditText 失去焦点
             if (event.action == MotionEvent.ACTION_DOWN) {
                 textUrl.clearFocus()
@@ -203,7 +203,7 @@ class SnifferWebViewActivity : AppCompatActivity(), View.OnClickListener, TaskMa
             return@setOnTouchListener false
         }
         // 地址输入栏获取与失去焦点处理
-        textUrl.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
+        textUrl.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 if (webView.url.equals(homeUrl)) {
                     textUrl.setText("")
@@ -228,7 +228,7 @@ class SnifferWebViewActivity : AppCompatActivity(), View.OnClickListener, TaskMa
         }
 
         // 监听键盘回车搜索
-        textUrl.setOnKeyListener { view, keyCode, keyEvent ->
+        textUrl.setOnKeyListener { _, keyCode, keyEvent ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && keyEvent.action == KeyEvent.ACTION_DOWN) {
                 // 执行搜索
                 btnStart.callOnClick()
