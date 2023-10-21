@@ -53,3 +53,4 @@ gradle.taskGraph.beforeTask {Task task ->
 gradle.buildFinished {
     println "执行阶段总耗时：${System.currentTimeMillis() - beginOfTaskExecute}"
 }
+include ':modules:snifferWebview'

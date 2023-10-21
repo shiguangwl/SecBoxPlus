@@ -16,6 +16,7 @@ import com.xxhoz.secbox.databinding.FragmentSnifferBinding
 import com.xxhoz.secbox.databinding.ItemCustomBtnBinding
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.StringUtils
+import com.xxhoz.secboxbrowser.SnifferWebViewActivity
 
 
 /**
@@ -34,20 +35,11 @@ class SnifferFragment : BaseFragment<FragmentSnifferBinding>() {
 
     private fun initView() {
         viewBinding.run {
-            bilibiliLogo.setOnClickListener {
-                WebViewActivity.startActivity(requireContext(), "http://www.bilibili.com/anime")
-            }
-            tenxunLogo.setOnClickListener {
-                WebViewActivity.startActivity(requireContext(), "http://v.qq.com")
-            }
-            aiqiyiLogo.setOnClickListener {
-                WebViewActivity.startActivity(requireContext(), "http://iqiyi.com")
-            }
-            youkuLogo.setOnClickListener {
-                WebViewActivity.startActivity(requireContext(), "http://www.youku.com")
+            topBtn.setOnClickListener {
+                SnifferWebViewActivity.startActivity(requireContext(), "https://secbox.xxhoz.com")
             }
 
-            floatBtn.setOnClickListener() {
+            floatBtn.setOnClickListener {
                 XPopup.Builder(context).asInputConfirm(
                     "添加站点", "使用@分隔站点和域名\n如: 哔哩哔哩@http://bilibili.com"
                 ) { text ->
@@ -114,11 +106,10 @@ class SnifferFragment : BaseFragment<FragmentSnifferBinding>() {
         button.tag = it
         button.text = it.siteName
         button.setOnClickListener {
-            WebViewActivity.startActivity(
+            // 自定义站点
+            SnifferWebViewActivity.startActivity(
                 requireContext(),
-                (it.getTag() as CustomSiteBean).siteUrl,
-                WebViewActivity.PHONE_AGENT,
-                true
+                (it.tag as CustomSiteBean).siteUrl
             )
         }
         button.setOnLongClickListener {
@@ -126,7 +117,7 @@ class SnifferFragment : BaseFragment<FragmentSnifferBinding>() {
                 "删除", "是否删除当前站点?"
             ) {
                 viewBinding.customSourceBox.removeAllViews()
-                XKeyValue.removeObjectList(Key.CUSTOM_SITE, it.getTag() as CustomSiteBean)
+                XKeyValue.removeObjectList(Key.CUSTOM_SITE, it.tag as CustomSiteBean)
                 loadCustomSite()
             }.show()
 
@@ -139,8 +130,4 @@ class SnifferFragment : BaseFragment<FragmentSnifferBinding>() {
     @PageName
     override fun getPageName() = PageName.SNIFFER
 
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        // 这里可以添加页面打点
-    }
 }

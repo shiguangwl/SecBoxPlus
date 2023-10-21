@@ -321,7 +321,7 @@
 -verbose
 -printmapping proguardMapping.txt
 #未混淆的类和成员
--printseeds seeds.txt
+#-printseeds seeds.txt
 #列出从apk中删除的代码
 -printusage unused.txt
 
