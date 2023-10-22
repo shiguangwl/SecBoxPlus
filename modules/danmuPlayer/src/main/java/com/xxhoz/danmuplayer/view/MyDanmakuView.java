@@ -91,7 +91,7 @@ public class MyDanmakuView extends master.flame.danmaku.ui.widget.DanmakuView im
             @Override
             public void prepared() {
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    if (playState == VideoView.STATE_PLAYING || playState == VideoView.STATE_BUFFERED || playState == VideoView.STATE_PREPARING) {
+                    if (playState == VideoView.STATE_BUFFERED || playState == VideoView.STATE_PLAYING) {
                         seekTo(controlWrapper.getCurrentPosition());
                         show();
                     }
@@ -168,7 +168,13 @@ public class MyDanmakuView extends master.flame.danmaku.ui.widget.DanmakuView im
                 hide();
                 break;
             case VideoView.STATE_BUFFERED:
+                if (isPrepared()) {
+                    showDanmu();
+                    seekTo(controlWrapper.getCurrentPosition());
+                }
+                break;
             case VideoView.STATE_PREPARING:
+                break;
             case VideoView.STATE_PLAYING:
                 showDanmu();
                 if (isPrepared()) {

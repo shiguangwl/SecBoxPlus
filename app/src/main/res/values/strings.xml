@@ -30,7 +30,7 @@
     <string name="setting_item_about">关于</string>
     <string name="setting_item_clearCache">清理缓存</string>
     <string name="press_again_exit_app">再按一次返回键退出程序</string>
-    <string name="page_sniffer">解析</string>
+    <string name="page_sniffer">发现</string>
     <string name="about_text">但幕影视旨在学习探索安卓音视频开发相关技术,app内所链接资源均来自网页检索和分类，app不制作、不上传任何内容,仅做链接和显示,若侵犯了您的权益,请即时邮件timeho@qq.com告知,我将第一时间处理。\n\n 但幕影视所有资源均搜集自网络各资源采集站,本身不存储任何影片资源,仅提供了数据链接和显示,请不要将下载的影片用于学习交流之外的其他用途，并在24小时内删除。</string>
 
     <string name="downward_triangle">"▼"</string>

@@ -123,16 +123,18 @@ object SourceManger {
         }
 
         val jarFile = File(App.instance.filesDir, "/csp.jar")
-        // 兼容Android 14 https://developer.android.com/about/versions/14/behavior-changes-14?hl=zh-cn#safer-dynamic-code-loading
-        jarFile.setReadOnly()
         // md5不存在,或文件不存在,或md5不匹配则 下载最新文件
-
         if (isDownLoadJar(md5, jarFile)) {
             LogUtils.i("开始下载Jar包......")
+            if (jarFile.exists()) {
+                jarFile.delete()
+            }
             downloadJar(url, jarFile)
         } else {
             LogUtils.i("使用缓存Jar包......")
         }
+        // 兼容Android 14 https://developer.android.com/about/versions/14/behavior-changes-14?hl=zh-cn#safer-dynamic-code-loading
+        jarFile.setReadOnly()
         val load = jarLoader.load(jarFile.absolutePath)
         if (!load) {
             throw GlobalException.of("加载Jar包失败")
