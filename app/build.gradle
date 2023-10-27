@@ -17,6 +17,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
+            //noinspection ChromeOsAbiSupport
             abiFilters "armeabi-v7a"
         }
     }
@@ -41,6 +42,12 @@ android {
             manifestPlaceholders = [
                     networkSecurityConfig: "@xml/network_security_config"
             ]
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    def formattedDate = new Date().format("-yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+                    outputFileName = "但幕影视v" + build_versions.app_version_name + formattedDate + ".apk"
+                }
+            }
         }
     }
 

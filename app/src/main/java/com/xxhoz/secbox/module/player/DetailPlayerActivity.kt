@@ -30,6 +30,7 @@ import com.xxhoz.secbox.constant.PageState
 import com.xxhoz.secbox.databinding.ActivityDetailPlayerBinding
 import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
+import com.xxhoz.secbox.persistence.CRUD
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.StringUtils
 import com.xxhoz.secbox.util.getActivity
@@ -382,30 +383,22 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
         if (videoPlayer.currentPosition == 0L || viewModel.videoDetailBean.value == null) {
             return
         }
-        // 保存播放记录
-        var playInfoBeans: ArrayList<PlayInfoBean>? =
-            XKeyValue.getObjectList<PlayInfoBean>(Key.PLAY_History)
-        if (playInfoBeans == null) {
-            playInfoBeans = ArrayList()
-        }
-        val item: PlayInfoBean? = viewModel.playInfoBean.value
+        val crud = CRUD<PlayInfoBean>(Key.PLAY_History)
+        // 当前播放信息
+        val item: PlayInfoBean = viewModel.playInfoBean.value!!
+        item.position = videoPlayer.currentPosition
+        item.preNum = viewModel.currentEpisode.value!!
 
+        // 播放记录
+        val playInfoBeans: ArrayList<PlayInfoBean> = crud.list()
         // 查找是否有当前记录 删除
         for (i in playInfoBeans.indices) {
-            if (
-                (playInfoBeans[i].videoBean.vod_id == item!!.videoBean.vod_id) &&
-                (playInfoBeans[i].sourceKey == item.sourceKey)
-            )
-                playInfoBeans.removeAt(i)
-            break
+            if ((playInfoBeans[i].videoBean.vod_id == item.videoBean.vod_id) && (playInfoBeans[i].sourceKey == item.sourceKey)) {
+                crud.remove(playInfoBeans[i])
+                break
+            }
         }
-
-        if (item != null) {
-            item.position = videoPlayer.currentPosition
-            item.preNum = viewModel.currentEpisode.value!!
-            playInfoBeans.add(0, item)
-        }
-        XKeyValue.putObjectList(Key.PLAY_History, playInfoBeans)
+        crud.add(item, 0)
     }
 
 

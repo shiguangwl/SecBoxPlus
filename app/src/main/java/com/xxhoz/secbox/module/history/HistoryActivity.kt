@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hjq.toast.Toaster
+import com.lxj.xpopup.XPopup
 import com.xxhoz.constant.Key
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
@@ -16,8 +17,10 @@ import com.xxhoz.secbox.databinding.ActivityHistoryBinding
 import com.xxhoz.secbox.databinding.ItemHistoryVideoBinding
 import com.xxhoz.secbox.module.player.DetailPlayerActivity
 import com.xxhoz.secbox.parserCore.bean.VideoBean
+import com.xxhoz.secbox.persistence.CRUD
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.UniversalAdapter
+import com.xxhoz.secbox.util.getActivity
 import com.xxhoz.secbox.util.setImageUrl
 import java.util.Formatter
 import java.util.Locale
@@ -28,34 +31,17 @@ class HistoryActivity : BaseActivity<ActivityHistoryBinding>() {
     override val inflater: (inflater: LayoutInflater) -> ActivityHistoryBinding
         get() = ActivityHistoryBinding::inflate
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-//        immersionBar {
-//            transparentStatusBar()
-//            statusBarDarkFont(true)
-//            navigationBarColor(R.color.white)
-//            navigationBarDarkIcon(true)
-//        }
-
+    override fun onResume() {
+        super.onResume()
         initView()
     }
 
 
-    private val playInfoBeans: ArrayList<PlayInfoBean>
-        get() {
-            var playInfoBeans =
-                XKeyValue.getObjectList<PlayInfoBean>(Key.PLAY_History)
-            if (playInfoBeans == null || playInfoBeans.isEmpty()) {
-                playInfoBeans = ArrayList()
-            }
-            return playInfoBeans
-        }
-
     fun initView() {
-        viewBinding.returnImageview.setOnClickListener() {
+        viewBinding.returnImageview.setOnClickListener {
             finish()
         }
-        viewBinding.clearAllTextview.setOnClickListener() {
+        viewBinding.clearAllTextview.setOnClickListener {
             // 清空数据
             XKeyValue.clearObjectList(Key.PLAY_History)
             initView()
@@ -64,7 +50,7 @@ class HistoryActivity : BaseActivity<ActivityHistoryBinding>() {
 
         viewBinding.playHistoryRecyclerView.layoutManager = LinearLayoutManager(this)
         universalAdapter = UniversalAdapter(
-            playInfoBeans,
+            CRUD<PlayInfoBean>(Key.PLAY_History).list(),
             R.layout.item_history_video,
             object : UniversalAdapter.DataViewBind<PlayInfoBean> {
                 override fun exec(data: PlayInfoBean, view: View) {
@@ -81,8 +67,18 @@ class HistoryActivity : BaseActivity<ActivityHistoryBinding>() {
                     itemView.sourceNameText.text = videoBean.vod_remarks
 
                     itemView.currentPositionTextView.text = "观看至:" + stringForTime(data.position)
-                    itemView.root.setOnClickListener() {
+                    itemView.root.setOnClickListener {
                         DetailPlayerActivity.startActivity(this@HistoryActivity, data)
+                    }
+                    itemView.root.setOnLongClickListener {
+                        XPopup.Builder(getActivity()).asConfirm(
+                            "确认", "是否删除当前记录?"
+                        ) {
+                            // 删除当前记录
+                            CRUD<PlayInfoBean>(Key.PLAY_History).remove(data)
+                            initView()
+                        }.show()
+                        return@setOnLongClickListener true
                     }
                 }
             })
