@@ -16,7 +16,7 @@ import com.xxhoz.secbox.base.list.base.BaseViewData
 import com.xxhoz.secbox.bean.PlayInfoBean
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeBinding
-import com.xxhoz.secbox.module.player.DetailPlayerActivity
+import com.xxhoz.secbox.module.detail.DetailPlayerActivity
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.widget.GridItemDecoration

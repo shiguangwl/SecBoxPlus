@@ -1,6 +1,5 @@
 package com.xxhoz.secbox.module.home
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,7 @@ import com.xxhoz.secbox.base.list.base.BaseViewData
 import com.xxhoz.secbox.bean.PlayInfoBean
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeFilterBinding
-import com.xxhoz.secbox.module.player.DetailPlayerActivity
+import com.xxhoz.secbox.module.detail.DetailPlayerActivity
 import com.xxhoz.secbox.parserCore.bean.CategoryBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 import com.xxhoz.secbox.persistence.XKeyValue

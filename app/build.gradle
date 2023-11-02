@@ -98,20 +98,20 @@ dependencies {
     implementation 'com.github.li-xiaojun:XPopup:2.9.19'
 
     // 吐司框架
-    implementation ("com.github.getActivity:Toaster:${versions.toaster}")
+    implementation("com.github.getActivity:Toaster:${versions.toaster}")
 
     //  Flex布局
     implementation 'com.google.android:flexbox:1.0.0'
 
-    // 弹幕
-    implementation ("com.github.ctiao:DanmakuFlameMaster:0.9.25")
-    // 播放器
-    implementation 'xyz.doikki.android.dkplayer:dkplayer-java:3.3.7'
-    implementation 'xyz.doikki.android.dkplayer:dkplayer-ui:3.3.7'
-    implementation 'xyz.doikki.android.dkplayer:player-exo:3.3.7'
+//    // 弹幕
+//    implementation ("com.github.ctiao:DanmakuFlameMaster:0.9.25")
+//    // 播放器
+//    implementation 'xyz.doikki.android.dkplayer:dkplayer-java:3.3.7'
+//    implementation 'xyz.doikki.android.dkplayer:dkplayer-ui:3.3.7'
+//    implementation 'xyz.doikki.android.dkplayer:player-exo:3.3.7'
 
     // 数据抓取爬虫
-    implementation ("org.jsoup:jsoup:${versions.jsoup}")
+    implementation("org.jsoup:jsoup:${versions.jsoup}")
     implementation project(path: ':modules:danmuPlayer')
     implementation project(path: ':modules:snifferWebview')
 

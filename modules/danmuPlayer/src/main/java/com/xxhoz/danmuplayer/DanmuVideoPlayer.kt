@@ -7,8 +7,8 @@ import android.view.Gravity
 import com.xxhoz.danmuplayer.popup.VideoEpisodePopup
 import com.xxhoz.danmuplayer.popup.VideoSpeedPopup
 import com.xxhoz.danmuplayer.view.MyDanmakuView
-import com.xxhoz.secbox.module.player.video.view.BottomControlView
-import com.xxhoz.secbox.module.player.video.view.ErrorView
+import com.xxhoz.secbox.module.detail.video.view.BottomControlView
+import com.xxhoz.secbox.module.detail.video.view.ErrorView
 import xyz.doikki.videocontroller.component.CompleteView
 import xyz.doikki.videocontroller.component.GestureView
 import xyz.doikki.videocontroller.component.TopTitleView

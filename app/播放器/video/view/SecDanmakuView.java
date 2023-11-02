@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player.video.view;
+package com.xxhoz.secbox.module.detail.video.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -22,8 +22,8 @@ import androidx.core.content.ContextCompat;
 import com.xxhoz.constant.BaseConfig;
 import com.xxhoz.constant.Key;
 import com.xxhoz.secbox.R;
-import com.xxhoz.secbox.module.player.video.view.danma.BiliDanmukuParser;
-import com.xxhoz.secbox.module.player.video.view.danma.CenteredImageSpan;
+import com.xxhoz.secbox.module.detail.video.view.danma.BiliDanmukuParser;
+import com.xxhoz.secbox.module.detail.video.view.danma.CenteredImageSpan;
 import com.xxhoz.secbox.persistence.XKeyValue;
 
 import java.io.File;

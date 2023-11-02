@@ -31,7 +31,7 @@ import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.ActivitySearchBinding
 import com.xxhoz.secbox.databinding.ItemSearchMovieResultListBinding
 import com.xxhoz.secbox.databinding.ItemSearchResultSourceBinding
-import com.xxhoz.secbox.module.player.DetailPlayerActivity
+import com.xxhoz.secbox.module.detail.DetailPlayerActivity
 import com.xxhoz.secbox.module.start.StartViewModel
 import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
@@ -172,9 +172,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                         bind.sourceText.background =
                             AppCompatResources.getDrawable(
                                 getActivity()!!,
-                                R.color.background_color
+                                R.color.text_color_blue
                             )
-                        bind.sourceText.setTextColor(Color.parseColor(getString(R.color.background_color1)))
+                        bind.sourceText.setTextColor(Color.parseColor(getString(R.color.test_color_blue1)))
                     }
                     bind.sourceText.setOnClickListener {
                         onClickSource(data)

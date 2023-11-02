@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- 底层背景色 -->
+    <color name="background_color">#f4f4f4</color>
+    <!-- 内容背景色 -->
+    <color name="content_background_color">#ffffff</color>
+    <!-- 引用背景色 -->
+    <color name="quote_background_color">#dedede</color>
+    <!-- 标题背景色 -->
+    <color name="title_background_color">#34A2DA</color>
+    <!-- 标题强调色 -->
+    <color name="title_emphasis_color">#1785C6</color>
+    <!-- 文字色 -->
+    <color name="text_color_black">#000000</color>
+    <color name="text_color_white">#ffffff</color>
+    <color name="text_color_gray">#888888</color>
+    <color name="text_emphasis_color">#FF5733</color>
+    <color name="text_color_blue">#E3F8F1</color>
+    <color name="test_color_blue1">#10B8A3</color>
+    <!-- 特殊色  禁用的颜色、无法编辑的颜色-->
+    <color name="disabled_color">#CCCCCC</color>
+    <color name="non_editable_color">#FF0000</color>
+    <!-- 标签色 -->
+    <color name="button_primary">#007BFF</color>
+    <color name="button_secondary">#6C757D</color>
+    <color name="button_success">#28A745</color>
+    <color name="button_danger">#DC3545</color>
+    <color name="button_warning">#FFC107</color>
+
+
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
@@ -66,6 +94,4 @@
     <color name="bg_window">#FFFFFFFF</color>
     <color name="bg_image">#0A000000</color>
     <color name="black5">#0D000000</color>
-    <color name="background_color">#E3F8F1</color>
-    <color name="background_color1">#10B8A3</color>
 </resources>

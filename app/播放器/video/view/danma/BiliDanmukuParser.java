@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.xxhoz.secbox.module.player.video.view.danma;
+package com.xxhoz.secbox.module.detail.video.view.danma;
 
 import android.graphics.Color;
 import android.text.TextUtils;

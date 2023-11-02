@@ -2,7 +2,6 @@ package com.xxhoz.secbox.module.history
 
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,7 +14,7 @@ import com.xxhoz.secbox.bean.PlayInfoBean
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.ActivityHistoryBinding
 import com.xxhoz.secbox.databinding.ItemHistoryVideoBinding
-import com.xxhoz.secbox.module.player.DetailPlayerActivity
+import com.xxhoz.secbox.module.detail.DetailPlayerActivity
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 import com.xxhoz.secbox.persistence.CRUD
 import com.xxhoz.secbox.persistence.XKeyValue

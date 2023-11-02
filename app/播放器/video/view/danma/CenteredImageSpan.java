@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player.video.view.danma;
+package com.xxhoz.secbox.module.detail.video.view.danma;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;

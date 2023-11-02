@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player.video.view;
+package com.xxhoz.secbox.module.detail.video.view;
 
 import android.content.Context;
 import android.net.TrafficStats;

@@ -25,7 +25,7 @@
             app:tabIndicatorFullWidth="false"
             app:tabMinWidth="10dp"
             app:tabPadding="-1dp"
-            app:tabIndicatorColor="@color/background_color1"
+            app:tabIndicatorColor="@color/test_color_blue1"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             app:tabRippleColor="@android:color/transparent"

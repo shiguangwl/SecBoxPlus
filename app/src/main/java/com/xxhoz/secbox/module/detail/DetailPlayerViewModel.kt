@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player
+package com.xxhoz.secbox.module.detail
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData

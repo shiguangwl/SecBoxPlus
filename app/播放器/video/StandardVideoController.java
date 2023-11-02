@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player.video;
+package com.xxhoz.secbox.module.detail.video;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -18,7 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.xxhoz.secbox.R;
-import com.xxhoz.secbox.module.player.video.view.NetworkSpeedUtil;
+import com.xxhoz.secbox.module.detail.video.view.NetworkSpeedUtil;
 
 import xyz.doikki.videoplayer.controller.GestureVideoController;
 import xyz.doikki.videoplayer.player.VideoView;

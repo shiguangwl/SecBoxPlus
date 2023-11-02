@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player.popup;
+package com.xxhoz.secbox.module.detail.popup;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;

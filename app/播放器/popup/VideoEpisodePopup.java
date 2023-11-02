@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.module.player.popup;
+package com.xxhoz.secbox.module.detail.popup;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.xxhoz.secbox.R;
 import com.xxhoz.secbox.bean.EpsodeEntity;
-import com.xxhoz.secbox.module.player.popup.view.VideoEpisodeAdapter;
+import com.xxhoz.secbox.module.detail.popup.view.VideoEpisodeAdapter;
 import com.xxhoz.secbox.util.DipAndPx;
 
 import java.util.List;
