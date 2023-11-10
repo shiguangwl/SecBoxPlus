@@ -79,6 +79,7 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             } catch (e: GlobalException) {
                 Toaster.showLong(e.message)
             } catch (e: Exception) {
+                LogUtils.e("数据源加载错误:", e)
                 // 切换默认源
                 Toaster.show("加载数据源配置失败,尝试切换默认源")
                 XKeyValue.putString(Key.CURRENT_SOURCE_URL, BaseConfig.BASE_SOURCE_URL)

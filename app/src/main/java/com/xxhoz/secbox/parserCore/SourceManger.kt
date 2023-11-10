@@ -30,7 +30,7 @@ object SourceManger {
 
     // spider源配置列表
     private var sourceBeanMap: LinkedHashMap<String, SourceBean> = LinkedHashMap()
-    private var sourceBeanValueList: ArrayList<SourceBean> = ArrayList()
+//    private var sourceBeanValueList: ArrayList<SourceBean> = ArrayList()
     private var sourceList: HashMap<String, IBaseSource> = HashMap()
 
     // jar包
@@ -39,10 +39,14 @@ object SourceManger {
     private val jarLoader = JarLoader()
     private val jsLoader = JsLoader()
 
+    private lateinit var baseUrlPath: String
     /**
      * 初始化资源
      */
     fun loadSourceConfig(baseUrl: String) {
+        // 获取URL 最后一个目录
+        this.baseUrlPath = baseUrl.substring(0, baseUrl.lastIndexOf("/") + 1)
+
         parseBeanList = ArrayList()
         sourceBeanMap = LinkedHashMap()
         sourceList = HashMap()
@@ -53,6 +57,17 @@ object SourceManger {
         loadJar()
     }
 
+
+    /**
+     * 相对路径补全为绝对路径
+     */
+    private fun getAbsolutePath(path: String): String {
+        return if (path.startsWith("./")) {
+            baseUrlPath + path.substring(2)
+        } else {
+            path
+        }
+    }
 
     /**
      * 加载配置文件
@@ -68,7 +83,6 @@ object SourceManger {
 
         try {// spider
             spider = safeJsonString(infoJson, "spider", "")
-
             // 远端站点源
             for (opt in infoJson.get("sites").asJsonArray) {
                 val obj = opt as JsonObject
@@ -77,7 +91,7 @@ object SourceManger {
                 sb.key = siteKey
                 sb.name = obj["name"].asString.trim()
                 sb.type = obj["type"].asInt
-                sb.api = obj["api"].asString.trim()
+                sb.api = getAbsolutePath(obj["api"].asString.trim())
                 sb.searchable = safeJsonInt(obj, "searchable", 1)
                 sb.quickSearch = safeJsonInt(obj, "quickSearch", 1)
                 sb.filterable = safeJsonInt(obj, "filterable", 1)
@@ -125,7 +139,7 @@ object SourceManger {
         val jarFile = File(App.instance.filesDir, "/csp.jar")
         // md5不存在,或文件不存在,或md5不匹配则 下载最新文件
         if (isDownLoadJar(md5, jarFile)) {
-            LogUtils.i("开始下载Jar包......")
+            LogUtils.i("开始下载Jar包......${url}")
             if (jarFile.exists()) {
                 jarFile.delete()
             }
@@ -160,9 +174,9 @@ object SourceManger {
         return defaultVal
     }
 
-    private fun safeJsonString(obj: JsonObject, key: String?, defaultVal: String?): String? {
+    private fun safeJsonString(obj: JsonObject, key: String?, defaultVal: String): String {
         try {
-            return if (obj.has(key)) obj.getAsJsonPrimitive(key).asString.trim { it <= ' ' } else defaultVal
+            return getAbsolutePath(if (obj.has(key)) obj.getAsJsonPrimitive(key).asString.trim { it <= ' ' } else defaultVal)
         } catch (th: Throwable) {
         }
         return defaultVal
@@ -243,7 +257,7 @@ object SourceManger {
             }
             var spider: Spider? = null
             if (sourceBean.api.contains(".js")) {
-                spider = jsLoader.getSpider(sourceBean.key, sourceBean.api, sourceBean.ext,null)
+                spider = jsLoader.getSpider(sourceBean.key, sourceBean.api, sourceBean.ext, null)
             } else {
                 spider = jarLoader.getSpider(sourceBean.key, sourceBean.api, sourceBean.ext)
             }
@@ -253,22 +267,22 @@ object SourceManger {
     }
 
 
-    /**
-     * 获取所有支持搜索的源
-     */
-    fun getSearchAbleList(): List<IBaseSource> {
-        val list: MutableList<IBaseSource> = ArrayList()
-        sourceBeanMap.values.forEach {
-            try {
-                if (it.isSearchable) {
-                    val source = getSpiderSource(it.key)
-                    source?.let {
-                        list.add(source)
-                    }
-                }
-            } catch (_: Exception) {
-            }
-        }
-        return list
-    }
+//    /**
+//     * 获取所有支持搜索的源
+//     */
+//    fun getSearchAbleList(): List<IBaseSource> {
+//        val list: MutableList<IBaseSource> = ArrayList()
+//        sourceBeanMap.values.forEach {
+//            try {
+//                if (it.isSearchable) {
+//                    val source = getSpiderSource(it.key)
+//                    source?.let {
+//                        list.add(source)
+//                    }
+//                }
+//            } catch (_: Exception) {
+//            }
+//        }
+//        return list
+//    }
 }
