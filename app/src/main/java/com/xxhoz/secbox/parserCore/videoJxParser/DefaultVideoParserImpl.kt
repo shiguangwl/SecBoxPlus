@@ -1,6 +1,9 @@
 package com.xxhoz.secbox.parserCore.videoJxParser
 
 import androidx.annotation.WorkerThread
+import androidx.lifecycle.lifecycleScope
+import com.xxhoz.m3u8library.utils.M3u8Client
+import com.xxhoz.secbox.App
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.secbox.parserCore.bean.ParseBean
@@ -8,6 +11,10 @@ import com.xxhoz.secbox.parserCore.sourceEngine.SnifferEngine
 import com.xxhoz.secbox.util.GlobalActivityManager
 import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.StringUtils
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 class DefaultVideoParserImpl {
@@ -75,7 +82,7 @@ class DefaultVideoParserImpl {
                         return
                     }
                     cancel()
-                    callback.success(parseBean!!, res!!)
+                    reportSuccess(parseBean, res)
                 }
 
                 override fun failed(parseBean: ParseBean?, errorInfo: String?) {
@@ -104,7 +111,7 @@ class DefaultVideoParserImpl {
                 return
             }
             cancel()
-            callback.success(parseBean, result)
+            reportSuccess(parseBean, result)
         } catch (e: Exception) {
             callback.failed(parseBean, "解析失败")
             LogUtils.d("接口: [${parseBean.name}]  解析失败")
@@ -124,6 +131,36 @@ class DefaultVideoParserImpl {
         getVideo()
     }
 
+
+    /*
+     * 解析成功
+     */
+    private fun reportSuccess(parseBean: ParseBean?, res: String?) {
+
+        try {
+            val activity = GlobalActivityManager.getTopActivity() as BaseActivity<*>
+            activity.SingleTask("temp_m3u8", activity.lifecycleScope.launch(IO) {
+                // 下载m3u8文件
+                val cacheFile = HttpUtil.downLoad(
+                    res!!, App.instance.filesDir.absolutePath + "/temp.m3u8"
+                ).absolutePath
+
+                withContext(Main) {
+                    val duration: Double = M3u8Client.create(cacheFile, res).getDuration()
+                    if (duration <= 180) {
+                        // 解析结果小于3分钟大概率为失败广告
+                        callback.failed(parseBean!!, "解析失败 Code: 1001")
+                    } else {
+                        callback.success(parseBean!!, cacheFile)
+                    }
+
+                }
+            })
+        } catch (e: Exception) {
+            LogUtils.e("解析失败 Code: 1002", e)
+            callback.failed(parseBean!!, "解析失败 Code: 1002")
+        }
+    }
 
     interface Callback {
         /**

@@ -66,7 +66,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     private var searchJobs: ArrayList<Job> = ArrayList()
 
     // 选中的source
-    private var ALL_DATA = "全部显示"
+    private val ALL_DATA = "全部显示"
     private var selectSourceKey = "全部显示"
 
     companion object {
@@ -99,7 +99,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     override fun onResume() {
         super.onResume()
         // 选中的source
-        selectSourceKey = "全部显示"
+        selectSourceKey = ALL_DATA
     }
 
     override fun onBackPressed() {

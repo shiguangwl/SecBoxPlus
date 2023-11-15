@@ -67,7 +67,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
             val intent = Intent(context, DetailPlayerActivity::class.java)
             val bundle = Bundle()
 
-            // 查找播放记录
+            // 获取播放记录,继续上次播放进度
             var playInfo = playInfoBean
             var playInfoBeans: ArrayList<PlayInfoBean>? =
                 XKeyValue.getObjectList<PlayInfoBean>(Key.PLAY_History)
