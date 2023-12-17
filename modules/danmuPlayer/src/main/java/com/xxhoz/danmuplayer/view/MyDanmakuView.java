@@ -49,6 +49,11 @@ import xyz.doikki.videoplayer.util.PlayerUtils;
 public class MyDanmakuView extends master.flame.danmaku.ui.widget.DanmakuView implements IControlComponent {
     // 弹幕是否显示
     private Boolean danmuState = true;
+
+    public DanmakuContext getmContext() {
+        return mContext;
+    }
+
     private final DanmakuContext mContext;
     private ControlWrapper controlWrapper;
     private int playState;
@@ -64,6 +69,8 @@ public class MyDanmakuView extends master.flame.danmaku.ui.widget.DanmakuView im
     public MyDanmakuView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
+
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     {
         // 设置弹幕的最大显示行数
@@ -83,14 +90,14 @@ public class MyDanmakuView extends master.flame.danmaku.ui.widget.DanmakuView im
         mContext = DanmakuContext.create();
         mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false) //是否启用合并重复弹幕
                 .setScrollSpeedFactor(1.8f)//设置弹幕滚动速度系数,只对滚动弹幕有效
-                .setScaleTextSize(0.8f)  // 设置缩放字体大小
+                .setScaleTextSize(0.9f)  // 设置缩放字体大小
                 .setMaximumLines(maxLinesPair) //设置最大显示行数
                 .preventOverlapping(overlappingEnablePair); //设置防弹幕重叠，null为允许重叠
 
         setCallback(new DrawHandler.Callback() {
             @Override
             public void prepared() {
-                new Handler(Looper.getMainLooper()).post(() -> {
+                handler.post(() -> {
                     if (playState == VideoView.STATE_BUFFERED || playState == VideoView.STATE_PLAYING) {
                         seekTo(controlWrapper.getCurrentPosition());
                         show();
@@ -101,18 +108,12 @@ public class MyDanmakuView extends master.flame.danmaku.ui.widget.DanmakuView im
 
             @Override
             public void updateTimer(DanmakuTimer timer) {
-                // new Handler(Looper.getMainLooper()).post(() -> {
-                //     timer.update(controlWrapper.getCurrentPosition());
-                // });
-
-                // System.out.println(System.currentTimeMillis() -  lastTime);
-                // lastTime = System.currentTimeMillis();
-                //
                 float speed = controlWrapper.getSpeed();
                 if (speed != 1) {
-                    // 弹幕倍速
-                    float v = timer.lastInterval() * (speed - 1);
-                    timer.add((long) v);
+                    // timer.add((long) (timer.lastInterval() * (speed - 1)));
+                    handler.post(() -> {
+                        timer.update(controlWrapper.getCurrentPosition());
+                    });
                 }
             }
 

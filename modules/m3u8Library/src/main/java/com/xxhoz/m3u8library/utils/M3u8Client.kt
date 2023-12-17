@@ -1,8 +1,7 @@
 package com.xxhoz.m3u8library.utils
 
 import android.util.Log
-import java.io.BufferedReader
-import java.io.FileReader
+import java.io.File
 import java.math.BigDecimal
 
 
@@ -20,16 +19,13 @@ class M3u8Client private constructor(val path: String, val baseUrl: String?) {
     private val tsList: ArrayList<tsItem> = ArrayList()
 
     // m3u8文件总时长
-    private var duration: BigDecimal = BigDecimal(0)
+    private var durations: BigDecimal = BigDecimal(0)
 
     init {
         try {
             // 加载m3u8文件
-            BufferedReader(FileReader(path)).use { reader ->
-                var line: String = ""
-                while (reader.readLine().also { line = it } != null) {
-                    fileArray.add(line)
-                }
+            File(path).bufferedReader().useLines { lines ->
+                fileArray.addAll(lines)
             }
 
             // 解析ts片段列表
@@ -43,11 +39,12 @@ class M3u8Client private constructor(val path: String, val baseUrl: String?) {
                         url = baseUrl.substring(0, baseUrl.lastIndexOf("/") + 1) + line.substring(2)
                         fileArray[i + 1] = url
                     }
+                    Log.d(TAG, "TS片段:$url 时长:$duration")
                     tsList.add(tsItem(url, duration))
-                    duration.plus(duration)
+                    durations = durations.plus(BigDecimal.valueOf(duration))
                 }
             }
-
+            Log.i(TAG, "成功加载M3U8文件 TS片段数:${tsList.size}  时长:${durations.toDouble()}")
         } catch (e: Exception) {
             Log.e(TAG, "加载M3U8文件错误", e)
             throw e
@@ -65,7 +62,7 @@ class M3u8Client private constructor(val path: String, val baseUrl: String?) {
      * @return 时长秒
      */
     fun getDuration(): Double {
-        return duration.toDouble()
+        return durations.toDouble()
     }
 
 

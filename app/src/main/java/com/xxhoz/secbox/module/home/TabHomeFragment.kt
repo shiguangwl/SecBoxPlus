@@ -60,12 +60,12 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener 
     override val inflater: (LayoutInflater, container: ViewGroup?, attachToRoot: Boolean) -> FragmentHomeTabBinding
         get() = FragmentHomeTabBinding::inflate
 
-    companion object {
-        private const val HOME_SPAN_COUNT = 3
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        init()
+    }
+
+    private fun init() {
         // 基本事件监听
         initView()
         // 数据加载
@@ -154,9 +154,8 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener 
 
         // 监听数据源的变化
         XEventBus.observe(viewLifecycleOwner, EventName.SOURCE_CHANGE) { message: String ->
-            LogUtils.i("监听到数据变化: " + message)
-            initView()
-            initData()
+            LogUtils.i("监听到数据变化SOURCE_CHANGE: " + message)
+            init()
         }
     }
 

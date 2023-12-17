@@ -59,6 +59,12 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
     val gson = GsonFactory.getSingletonGson()
 
     companion object {
+        /**
+         * 播放页
+         * @param context
+         * @param playInfoBean 播放信息
+         * @param tvSharedElement 共享图片View
+         */
         fun startActivity(
             context: Context,
             playInfoBean: PlayInfoBean,
@@ -84,9 +90,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
             }
 
             bundle.putSerializable("playInfoBean", playInfo)
-//            if (tvSharedElement != null){
-//                bundle.putSerializable("shareVodPicView",(tvSharedElement as RoundAngleImageView))
-//            }
+
             intent.putExtras(bundle)
             if (tvSharedElement == null) {
                 context.startActivity(
@@ -167,7 +171,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
                 XPopup.Builder(this)
                     .isDestroyOnDismiss(true)
                     .asCenterList(
-                        "选择首选接口", parseBeanList.map { it.name }.toTypedArray(),
+                        "切换播放线路", parseBeanList.map { it.name }.toTypedArray(),
                         null, indexOf
                     ) { position, text ->
                         val parseBean: ParseBean = parseBeanList.get(position)
@@ -235,17 +239,25 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
     private fun observeValueChange() {
         // 详情变化
         viewModel.videoDetailBean.observe(this) {
+            // 影视标题
             viewBinding.titleText.text = it.vod_name
+            // 图片
             if (shareVodPicView == null) it.vod_pic.let {
                 viewBinding.roundAngleImageView.setImageUrl(it)
             } else {
                 viewBinding.roundAngleImageView.setImageDrawable(shareVodPicView!!.drawable)
             }
-
+            // 设置影视详细信息
             viewBinding.descText.text = removeHtmlAndWhitespace(it.vod_content)
-            "${strFormat(it.vod_year)}  /  ${strFormat(it.type_name)}  /  ${strFormat(it.vod_director)}".also {
+            // 设置相关信息
+            "${strFormat(it.vod_year)}  /  ${strFormat(it.type_name)}  /  ${strFormat(it.vod_director)} / ${
+                strFormat(
+                    it.vod_actor
+                )
+            }".also {
                 viewBinding.textView.text = it
             }
+            // 当前播放源
             viewBinding.currentSourceText.text = viewModel.spiderSource.value!!.sourceBean.name
         }
 
@@ -266,7 +278,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
                 viewBinding.cureentJxText.visibility = View.VISIBLE
                 viewBinding.cureentJxText.text = getString(
                     R.string.formatted_source_text,
-                    it.name,
+                    "线路:" + it.name,
                     getString(R.string.downward_triangle)
                 )
             }
@@ -402,6 +414,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
     }
 
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (!videoPlayer.onBackPressed()) {
             super.onBackPressed()

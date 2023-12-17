@@ -101,6 +101,7 @@ class DetailPlayerViewModel : BaseViewModel() {
                     withContext(Dispatchers.IO) { SourceManger.getSpiderSource(sourceKey) }
                         ?: throw Exception("获取数据源失败")
 
+                LogUtils.d("infoBean.videoBean.vod_id:" + infoBean.videoBean.vod_id)
                 val videoDetail =
                     withContext(Dispatchers.IO) { spiderSource.videoDetail(listOf(infoBean.videoBean.vod_id)) }
                         ?: throw GlobalException.of("获取详情失败")

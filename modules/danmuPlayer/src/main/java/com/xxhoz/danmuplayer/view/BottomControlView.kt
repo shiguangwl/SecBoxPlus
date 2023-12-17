@@ -15,9 +15,15 @@ class BottomControlView(context: Context, private var danmuState: Boolean) :
     private var changeSpeed: TextView
     private var fullScreen: ImageView
     private var danmuBtn: ImageView
+    private var danmuSettingBtn: ImageView
 
+    // 是否显示下一集控件
     private var next: Boolean = true
+
+    // 是否显示弹幕控件
     private var danmu: Boolean = true
+
+    // 是否显示选集控件
     private var eposde: Boolean = true
 
     init {
@@ -25,6 +31,7 @@ class BottomControlView(context: Context, private var danmuState: Boolean) :
         changeEposde = findViewById(R.id.change_epsode)
         changeSpeed = findViewById(R.id.change_speed)
         danmuBtn = findViewById(R.id.danmu_control)
+        danmuSettingBtn = findViewById(R.id.danmu_setting)
         fullScreen = findViewById(R.id.fullscreen)
         changeDanmuState(danmuState)
     }
@@ -41,12 +48,16 @@ class BottomControlView(context: Context, private var danmuState: Boolean) :
             VideoView.PLAYER_NORMAL -> {
                 changeEposde.visibility = GONE
                 changeSpeed.visibility = GONE
+                danmuSettingBtn.visibility = GONE
                 fullScreen.visibility = VISIBLE
             }
 
             VideoView.PLAYER_FULL_SCREEN -> {
                 if (eposde) {
                     changeEposde.visibility = VISIBLE
+                }
+                if (danmu) {
+                    danmuSettingBtn.visibility = VISIBLE
                 }
                 changeSpeed.visibility = VISIBLE
                 fullScreen.visibility = GONE
@@ -88,13 +99,20 @@ class BottomControlView(context: Context, private var danmuState: Boolean) :
     }
 
     /**
-     * 点击弹幕切换状态
+     * 点击弹幕切换状态回调
      */
     fun setDanmuBtnListener(listener: (danmuState: Boolean) -> Unit) {
         danmuBtn.setOnClickListener {
             changeDanmuState(!danmuState)
             listener(danmuState)
         }
+    }
+
+    /**
+     * 点击弹幕设置回调
+     */
+    fun setDanmuSettingBtnListener(listener: OnClickListener) {
+        danmuSettingBtn.setOnClickListener(listener)
     }
 
     /**
@@ -109,6 +127,7 @@ class BottomControlView(context: Context, private var danmuState: Boolean) :
         this.next = next
         nextVod.visibility = if (next) VISIBLE else GONE
         danmuBtn.visibility = if (danmu) VISIBLE else GONE
+        danmuSettingBtn.visibility = if (danmu) VISIBLE else GONE
         changeEposde.visibility = if (eposde) VISIBLE else GONE
     }
 }

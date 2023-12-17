@@ -4,11 +4,17 @@ package com.xxhoz.danmuplayer
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
+import com.xxhoz.danmuplayer.config.DmSettingContext
+import com.xxhoz.danmuplayer.popup.DmSetting
+import com.xxhoz.danmuplayer.popup.DmSettingConfig
+import com.xxhoz.danmuplayer.popup.VideoDanmuSettingPopup
 import com.xxhoz.danmuplayer.popup.VideoEpisodePopup
 import com.xxhoz.danmuplayer.popup.VideoSpeedPopup
 import com.xxhoz.danmuplayer.view.MyDanmakuView
 import com.xxhoz.secbox.module.detail.video.view.BottomControlView
 import com.xxhoz.secbox.module.detail.video.view.ErrorView
+import master.flame.danmaku.danmaku.model.BaseDanmaku
+import master.flame.danmaku.danmaku.model.IDisplayer
 import xyz.doikki.videocontroller.component.CompleteView
 import xyz.doikki.videocontroller.component.GestureView
 import xyz.doikki.videocontroller.component.TopTitleView
@@ -17,6 +23,7 @@ import xyz.doikki.videoplayer.player.VideoView
 import xyz.doikki.videoplayer.player.VideoViewConfig
 import xyz.doikki.videoplayer.player.VideoViewManager
 import java.io.File
+
 
 /**
  * 包含弹幕的播放器
@@ -64,6 +71,12 @@ class DanmuVideoPlayer : VideoView {
                 actionCallback.selectPartsClick(position)
             }
         }
+        popup
+    }
+
+
+    val videoDanmuSettingPopup: VideoDanmuSettingPopup by lazy {
+        val popup = VideoDanmuSettingPopup(context)
         popup
     }
 
@@ -186,6 +199,29 @@ class DanmuVideoPlayer : VideoView {
                         actionCallback.closeDanmuKu()
                     }
                 }
+
+                val dmSettingContext = DmSettingContext(context)
+                val dmSetting = dmSettingContext.loadDmSetting()
+                updateDmConfig(dmSetting)
+                // 使用默认配置
+                videoDanmuSettingPopup.setConfigValue(DmSettingConfig(), dmSetting)
+                // 弹幕配置修改回调
+                videoDanmuSettingPopup.setChangeCallback {
+                    // 持久化配置
+                    updateDmConfig(it)
+                    dmSettingContext.saveDmSetting(it)
+                }
+                // 弹幕设置
+                bottomControlView.setDanmuSettingBtnListener {
+
+                    videoDanmuSettingPopup.showAtLocation(
+                        activity.window.decorView,
+                        Gravity.RIGHT,
+                        0,
+                        0
+                    )
+                }
+
             }
         }
         // 初始化默认控制器
@@ -197,10 +233,40 @@ class DanmuVideoPlayer : VideoView {
         standardVideoController = controller
     }
 
-
     /**
-     * 设置播放数据
+     * 更新弹幕配置
      */
+    private fun updateDmConfig(danmuSetting: DmSetting) {
+        val mContext = myDanmakuView.getmContext()
+        // 设置弹幕的最大显示行数
+        val maxLinesPair = HashMap<Int, Int>()
+        // TYPE_SCROLL_RL 从右至左滚动弹幕
+        // TYPE_SCROLL_LR 从左至右滚动弹幕
+        // TYPE_FIX_TOP 顶端固定弹幕
+        // TYPE_FIX_BOTTOM 底端固定弹幕
+        maxLinesPair[BaseDanmaku.TYPE_SCROLL_RL] = danmuSetting.maximumLines // 滚动弹幕最大显示行数
+        // 设置是否禁止重叠
+        val overlappingEnablePair = HashMap<Int, Boolean>()
+        overlappingEnablePair[BaseDanmaku.TYPE_SCROLL_LR] = true
+        overlappingEnablePair[BaseDanmaku.TYPE_FIX_BOTTOM] = true
+
+        mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3f)
+            .setDuplicateMergingEnabled(false) //是否启用合并重复弹幕
+            .setScrollSpeedFactor(danmuSetting.scrollSpeed) //设置弹幕滚动速度系数,只对滚动弹幕有效
+            .setScaleTextSize(danmuSetting.scaleTextSize) // 设置缩放字体大小
+            .setMaximumLines(maxLinesPair) //设置最大显示行数
+            .preventOverlapping(overlappingEnablePair) //设置防弹幕重叠，null为允许重叠
+
+        //调用重绘
+        myDanmakuView.invalidate()
+    }
+
+
+    override fun release() {
+        myDanmakuView.release()
+        super.release()
+    }
+
     /**
      * 设置播放数据
      */

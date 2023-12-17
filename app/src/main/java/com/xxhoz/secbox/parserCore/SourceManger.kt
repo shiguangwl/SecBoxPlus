@@ -23,6 +23,9 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.Locale
 
+/**
+ * 负责加载解析源配置文件
+ */
 object SourceManger {
 
     // 解析器配置列表
@@ -31,7 +34,7 @@ object SourceManger {
     // spider源配置列表
     private var sourceBeanMap: LinkedHashMap<String, SourceBean> = LinkedHashMap()
 //    private var sourceBeanValueList: ArrayList<SourceBean> = ArrayList()
-    private var sourceList: HashMap<String, IBaseSource> = HashMap()
+private var sourceList: HashMap<String, IBaseSource> = HashMap()
 
     // jar包
     private var spider: String? = null
@@ -40,8 +43,10 @@ object SourceManger {
     private val jsLoader = JsLoader()
 
     private lateinit var baseUrlPath: String
+
     /**
-     * 初始化资源
+     * 初始化资源,加载站源配置,加载JAR包
+     * @param baseUrl 配置文件链接
      */
     fun loadSourceConfig(baseUrl: String) {
         // 获取URL 最后一个目录

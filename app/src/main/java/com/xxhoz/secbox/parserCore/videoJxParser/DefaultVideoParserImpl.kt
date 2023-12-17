@@ -17,6 +17,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
+/**
+ * 轮训解析
+ */
 class DefaultVideoParserImpl {
 
     private var current = 0
@@ -30,6 +33,12 @@ class DefaultVideoParserImpl {
     private var interrupt: Boolean = false
 
     val snifferJobs = ArrayList<SnifferEngine.SnifferJob>()
+
+    /**
+     * @param videoUrl 视频地址
+     * @param parsers 解析接口列表
+     * @param callback 解析回调
+     */
     fun JX(videoUrl: String, parsers: List<ParseBean>, callback: Callback) {
         this.interrupt = false
         this.videoUrl = videoUrl
@@ -69,6 +78,9 @@ class DefaultVideoParserImpl {
         }
     }
 
+    /**
+     * 嗅探解析
+     */
     private fun snifferParser(parseBean: ParseBean) {
         callback.notifyChange(parseBean)
         val snifferJob: SnifferEngine.SnifferJob = SnifferEngine.JX(
@@ -99,6 +111,9 @@ class DefaultVideoParserImpl {
         snifferJobs.add(snifferJob)
     }
 
+    /**
+     * JSON解析
+     */
     private fun jsonParser(parseBean: ParseBean) {
         try {
             callback.notifyChange(parseBean)
@@ -126,6 +141,7 @@ class DefaultVideoParserImpl {
     /**
      * 执行下一个解析
      */
+    @WorkerThread
     private fun next() {
         current++
         getVideo()
@@ -133,23 +149,48 @@ class DefaultVideoParserImpl {
 
 
     /*
-     * 解析成功
+     * 解析成功后的操作
+     * TODO 待优化
      */
     private fun reportSuccess(parseBean: ParseBean?, res: String?) {
+        if (res == null) {
+            return
+        }
 
         try {
             val activity = GlobalActivityManager.getTopActivity() as BaseActivity<*>
             activity.SingleTask("temp_m3u8", activity.lifecycleScope.launch(IO) {
+
                 // 下载m3u8文件
-                val cacheFile = HttpUtil.downLoad(
-                    res!!, App.instance.filesDir.absolutePath + "/temp.m3u8"
-                ).absolutePath
+                val cacheFile = try {
+                    if (!res.contains(".mp4")) {
+                        // 如果不是mp4多半是m3u8格式
+                        HttpUtil.downLoad(
+                            res,
+                            App.instance.filesDir.absolutePath + "/temp.m3u8"
+                        ).absolutePath
+                    } else {
+                        ""
+                    }
+                } catch (e: Exception) {
+                    LogUtils.d("下载M3U8失败,使用源url," + e.message)
+                    ""
+                }
+
 
                 withContext(Main) {
-                    val duration: Double = M3u8Client.create(cacheFile, res).getDuration()
+                    if (StringUtils.isEmpty(cacheFile)) {
+                        callback.success(parseBean!!, cacheFile!!)
+                        return@withContext
+                    }
+                    val duration: Double = M3u8Client.create(cacheFile!!, res).getDuration()
                     if (duration <= 180) {
                         // 解析结果小于3分钟大概率为失败广告
-                        callback.failed(parseBean!!, "解析失败 Code: 1001")
+                        LogUtils.i("解析失败 [${parseBean!!.name}] Code: 1001 解析结果小于3分钟大概率为失败广告")
+                        callback.failed(parseBean, "解析失败 Code: 1001")
+                        withContext(IO) {
+                            next()
+                        }
                     } else {
                         callback.success(parseBean!!, cacheFile)
                     }
