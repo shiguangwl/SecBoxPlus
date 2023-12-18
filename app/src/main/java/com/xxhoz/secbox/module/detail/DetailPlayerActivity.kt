@@ -250,7 +250,7 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
             // 设置影视详细信息
             viewBinding.descText.text = removeHtmlAndWhitespace(it.vod_content)
             // 设置相关信息
-            "${strFormat(it.vod_year)}  /  ${strFormat(it.type_name)}  /  ${strFormat(it.vod_director)} / ${
+            "${strFormat(it.vod_year)}  /  ${strFormat(it.type_name)}  ${strFormat(it.vod_director)} \n主演: ${
                 strFormat(
                     it.vod_actor
                 )

@@ -75,7 +75,6 @@
 
 
                 <com.xxhoz.secbox.widget.SettingItemView
-                        android:visibility="gone"
                         android:id="@+id/item_subscribe"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

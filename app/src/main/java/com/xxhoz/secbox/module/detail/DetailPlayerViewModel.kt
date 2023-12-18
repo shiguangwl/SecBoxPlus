@@ -138,12 +138,12 @@ class DetailPlayerViewModel : BaseViewModel() {
                 episodes.get(min(currentEpisode.value!!, episodes.size))
 
             val parseBeanList = SourceManger.getParseBeanList()
-            // 将currentParseBean移到第一项
+
             if (currentParseBean.value != null) {
                 val index = parseBeanList.indexOf(currentParseBean.value!!)
-                if (index > 0) {
-                    parseBeanList.removeAt(index)
-                    parseBeanList.add(0, currentParseBean.value!!)
+                // 将index之前的所有项移到数组后面
+                for (i in 0 until index) {
+                    parseBeanList.add(parseBeanList.removeAt(0))
                 }
             }
 

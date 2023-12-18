@@ -23,7 +23,7 @@
 
 
             <ImageView
-                    android:src="@drawable/logo_banner"
+                    android:src="@drawable/logo_background"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/top_btn"

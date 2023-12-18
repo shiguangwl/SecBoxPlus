@@ -190,10 +190,12 @@ public class StandardVideoController extends GestureVideoController implements V
         switch (playState) {
             //调用release方法会回到此状态
             case VideoView.STATE_IDLE:
+                fullscreenView.setBackground(getResources().getDrawable(R.drawable.preview_bg));
                 mLockButton.setSelected(false);
                 mLoadingView.setVisibility(GONE);
                 break;
             case VideoView.STATE_PLAYING:
+                fullscreenView.setBackground(null);
                 mLoadingView.setVisibility(GONE);
                 break;
             case VideoView.STATE_PAUSED:

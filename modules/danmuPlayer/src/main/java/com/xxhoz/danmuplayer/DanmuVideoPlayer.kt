@@ -129,6 +129,10 @@ class DanmuVideoPlayer : VideoView {
                 errorView.setOnRetryListener {
                     actionCallback.retryClick()
                 }
+                // 封面预览
+//                val prepareView = PrepareView(context)
+//                prepareView.setBackgroundResource(R.drawable.preview_bg)
+//                prepareView.setClickStart()
                 // 顶部
                 topTitleView = TopTitleView(getContext())
                 // 底部
@@ -143,7 +147,7 @@ class DanmuVideoPlayer : VideoView {
                     )
                 addControlComponent(completeView)
                 addControlComponent(errorView)
-                //                addControlComponent(prepareView)
+//                addControlComponent(prepareView)
                 addControlComponent(topTitleView)
                 addControlComponent(bottomControlView)
                 addControlComponent(gestureView)
@@ -229,7 +233,6 @@ class DanmuVideoPlayer : VideoView {
         // 设置控制器
         setVideoController(controller)
 //        setScreenScaleType(SCREEN_SCALE_MATCH_PARENT)
-
         standardVideoController = controller
     }
 
@@ -275,9 +278,8 @@ class DanmuVideoPlayer : VideoView {
         standardVideoController.stopShowBufferSpeed()
         release()
         topTitleView.setTitle(epsodeEntity.videoName)
-
         setUrl(epsodeEntity.videoUrl)
-        mCurrentPosition = position
+        skipPositionWhenPlay(position.toInt())
         startPlay()
         standardVideoController.startShowBufferSpeed()
 

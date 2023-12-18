@@ -180,11 +180,12 @@ class DefaultVideoParserImpl {
 
                 withContext(Main) {
                     if (StringUtils.isEmpty(cacheFile)) {
-                        callback.success(parseBean!!, cacheFile!!)
+                        callback.success(parseBean!!, res)
                         return@withContext
                     }
+                    // TODO 分P待优化
                     val duration: Double = M3u8Client.create(cacheFile!!, res).getDuration()
-                    if (duration <= 180) {
+                    if (duration.toInt() != 0 && duration <= 180) {
                         // 解析结果小于3分钟大概率为失败广告
                         LogUtils.i("解析失败 [${parseBean!!.name}] Code: 1001 解析结果小于3分钟大概率为失败广告")
                         callback.failed(parseBean, "解析失败 Code: 1001")

@@ -6,6 +6,7 @@
 
 
     <View
+            android:background="@drawable/preview_bg"
             android:id="@+id/fullscreenView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

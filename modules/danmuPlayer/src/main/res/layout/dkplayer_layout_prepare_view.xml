@@ -11,9 +11,10 @@
             android:scaleType="centerCrop" />
 
     <ImageView
+            android:visibility="invisible"
             android:id="@+id/start_play"
-            android:layout_width="@dimen/dkplayer_play_btn_size"
-            android:layout_height="@dimen/dkplayer_play_btn_size"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_gravity="center"
             android:background="@drawable/dkplayer_shape_play_bg"
             android:padding="@dimen/dkplayer_default_spacing"
@@ -21,13 +22,13 @@
 
     <ProgressBar
             android:id="@+id/loading"
-            android:layout_width="@dimen/dkplayer_play_btn_size"
-            android:layout_height="@dimen/dkplayer_play_btn_size"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_gravity="center"
             android:indeterminateDrawable="@drawable/dkplayer_progress_loading"
             android:indeterminateDuration="2000"
             android:visibility="gone"
-            tools:visibility="visible" />
+            tools:visibility="invisible" />
 
     <FrameLayout
             android:id="@+id/net_warning_layout"

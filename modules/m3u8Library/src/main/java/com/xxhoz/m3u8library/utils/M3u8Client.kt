@@ -39,7 +39,7 @@ class M3u8Client private constructor(val path: String, val baseUrl: String?) {
                         url = baseUrl.substring(0, baseUrl.lastIndexOf("/") + 1) + line.substring(2)
                         fileArray[i + 1] = url
                     }
-                    Log.d(TAG, "TS片段:$url 时长:$duration")
+//                    Log.d(TAG, "TS片段:$url 时长:$duration")
                     tsList.add(tsItem(url, duration))
                     durations = durations.plus(BigDecimal.valueOf(duration))
                 }
