@@ -4,23 +4,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.Guideline
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/guideline2"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_begin="26dp" />
 
-
-
-<!--            android:background="@drawable/ic_title_bg"-->
-    <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/tab_layout"
-            app:layout_constraintTop_toTopOf="parent" />
     <TextView
             android:id="@+id/current_source_text"
             android:layout_width="wrap_content"
@@ -30,10 +14,11 @@
             android:textStyle="bold"
             android:text="🎉但幕影视资源  ▼"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/search_btn"
-            app:layout_constraintTop_toTopOf="@+id/search_btn" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="24dp" />
 
     <ImageView
+            android:visibility="gone"
             android:id="@+id/search_btn"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -46,6 +31,7 @@
 
 
     <ImageView
+            android:visibility="gone"
             android:id="@+id/history_btn"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -75,8 +61,9 @@
             app:tabTextColor="#333333"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/history_btn"
-            app:layout_constraintHorizontal_bias="0.0" />
+            app:layout_constraintTop_toBottomOf="@+id/current_source_text"
+            app:layout_constraintHorizontal_bias="0.0"
+            android:layout_marginTop="5dp" />
 
     <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager"
@@ -95,5 +82,10 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tab_layout" />
+            app:layout_constraintTop_toTopOf="@+id/tab_layout">
+
+        <View
+                android:layout_width="0dp"
+                android:layout_height="0dp" />
+    </com.xxhoz.secbox.widget.PromptView>
 </androidx.constraintlayout.widget.ConstraintLayout>

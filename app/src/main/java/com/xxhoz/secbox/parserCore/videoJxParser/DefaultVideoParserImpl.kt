@@ -157,12 +157,12 @@ class DefaultVideoParserImpl {
             return
         }
 
+        val activity = GlobalActivityManager.getTopActivity() as BaseActivity<*>
         try {
-            val activity = GlobalActivityManager.getTopActivity() as BaseActivity<*>
             activity.SingleTask("temp_m3u8", activity.lifecycleScope.launch(IO) {
 
                 // 下载m3u8文件
-                val cacheFile = try {
+                val cacheM3u8File = try {
                     if (!res.contains(".mp4")) {
                         // 如果不是mp4多半是m3u8格式
                         HttpUtil.downLoad(
@@ -170,30 +170,38 @@ class DefaultVideoParserImpl {
                             App.instance.filesDir.absolutePath + "/temp.m3u8"
                         ).absolutePath
                     } else {
+                        LogUtils.d("MP4资源,使用源URL")
                         ""
                     }
                 } catch (e: Exception) {
-                    LogUtils.d("下载M3U8失败,使用源url," + e.message)
+                    LogUtils.d("下载M3U8失败,使用源URL, 错误:" + e.message)
                     ""
                 }
 
 
                 withContext(Main) {
-                    if (StringUtils.isEmpty(cacheFile)) {
+                    if (StringUtils.isEmpty(cacheM3u8File)) {
                         callback.success(parseBean!!, res)
                         return@withContext
                     }
                     // TODO 分P待优化
-                    val duration: Double = M3u8Client.create(cacheFile!!, res).getDuration()
-                    if (duration.toInt() != 0 && duration <= 180) {
+                    val duration: Double = M3u8Client.create(cacheM3u8File!!, res).getDuration()
+                    if (duration.toInt() == 0) {
+                        callback.success(parseBean!!, res)
+                        return@withContext
+                    }
+                    if (duration <= 180) {
                         // 解析结果小于3分钟大概率为失败广告
                         LogUtils.i("解析失败 [${parseBean!!.name}] Code: 1001 解析结果小于3分钟大概率为失败广告")
-                        callback.failed(parseBean, "解析失败 Code: 1001")
+                        callback.failed(
+                            parseBean,
+                            "解析失败 Code: 1001 解析结果小于3分钟大概率为失败广告"
+                        )
                         withContext(IO) {
                             next()
                         }
                     } else {
-                        callback.success(parseBean!!, cacheFile)
+                        callback.success(parseBean!!, cacheM3u8File)
                     }
 
                 }
@@ -201,6 +209,9 @@ class DefaultVideoParserImpl {
         } catch (e: Exception) {
             LogUtils.e("解析失败 Code: 1002", e)
             callback.failed(parseBean!!, "解析失败 Code: 1002")
+            activity.SingleTask("temp_m3u8", activity.lifecycleScope.launch(IO) {
+                next()
+            })
         }
     }
 

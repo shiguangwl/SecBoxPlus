@@ -7,7 +7,7 @@
 
 
     <androidx.cardview.widget.CardView
-            android:id="@+id/cardView"
+            android:id="@+id/cardView_search"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -55,7 +55,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@+id/cardView">
+            app:layout_constraintTop_toBottomOf="@+id/cardView_search">
 
         <TextView
                 android:text="自定义站源 (长按删除)"

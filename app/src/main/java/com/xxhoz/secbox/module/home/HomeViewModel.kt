@@ -1,11 +1,8 @@
 package com.xxhoz.secbox.module.home
 
-import com.xxhoz.constant.BaseConfig
 import com.xxhoz.secbox.base.list.base.BaseRecyclerViewModel
 import com.xxhoz.secbox.base.list.base.BaseViewData
-import com.xxhoz.secbox.bean.BannerBean
 import com.xxhoz.secbox.constant.PageName
-import com.xxhoz.secbox.item.BannerViewData
 import com.xxhoz.secbox.item.VideoViewData
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 
@@ -15,8 +12,8 @@ class HomeViewModel : BaseRecyclerViewModel() {
     fun loadData(homeVideoList: List<VideoBean>){
         val viewDataList = mutableListOf<BaseViewData<*>>()
 
-        val bannerBean = BannerBean(BaseConfig.CONFIG_BEAN.banner)
-        viewDataList.add(BannerViewData(bannerBean))
+//        val bannerBean = BannerBean(BaseConfig.CONFIG_BEAN.banner)
+//        viewDataList.add(BannerViewData(bannerBean))
 
         for (videoBean in homeVideoList) {
             viewDataList.add(VideoViewData(videoBean))

@@ -3,6 +3,7 @@ package com.xxhoz.secbox.module.home
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.xxhoz.constant.BaseConfig.DefaultSourceKey
 import com.xxhoz.constant.Key
+import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseFragment
 import com.xxhoz.secbox.base.list.XRecyclerView
 import com.xxhoz.secbox.base.list.base.BaseViewData
@@ -17,6 +19,8 @@ import com.xxhoz.secbox.bean.PlayInfoBean
 import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentHomeBinding
 import com.xxhoz.secbox.module.detail.DetailPlayerActivity
+import com.xxhoz.secbox.module.history.HistoryActivity
+import com.xxhoz.secbox.module.search.SearchActivity
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.widget.GridItemDecoration
@@ -24,7 +28,7 @@ import com.xxhoz.secbox.widget.GridItemDecoration
 /**
  * 首页
  */
-class HomeFragment : BaseFragment<FragmentHomeBinding> {
+class HomeFragment : BaseFragment<FragmentHomeBinding>, OnClickListener {
 
     private val viewModel: HomeViewModel by viewModels()
     override val inflater: (LayoutInflater, container: ViewGroup?, attachToRoot: Boolean) -> FragmentHomeBinding
@@ -46,6 +50,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding> {
     }
 
     private fun initView() {
+        viewBinding.cardViewSearch.setOnClickListener(this)
+        viewBinding.cardViewHistory.setOnClickListener(this)
+
         viewBinding.rvList.init(
             XRecyclerView.Config()
                 .setViewModel(viewModel)
@@ -92,5 +99,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding> {
 
     @PageName
     override fun getPageName() = PageName.HOME
+
+    override fun onClick(view: View?) {
+        when (view?.id) {
+            R.id.cardView_search -> {
+                SearchActivity.startActivity(requireContext())
+            }
+
+            R.id.cardView_history -> {
+                HistoryActivity.startActivity(requireContext())
+            }
+
+        }
+    }
 
 }

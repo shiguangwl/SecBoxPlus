@@ -139,9 +139,9 @@ class TabHomeFragment : BaseFragment<FragmentHomeTabBinding>(), OnClickListener 
 
     private fun initView() {
         // 搜索按钮
-        viewBinding.searchBtn.setOnClickListener(this)
-        // 历史记录
-        viewBinding.historyBtn.setOnClickListener(this)
+//        viewBinding.searchBtn.setOnClickListener(this)
+//        // 历史记录
+//        viewBinding.historyBtn.setOnClickListener(this)
 
         // 源选择
         viewBinding.currentSourceText.setOnClickListener(this)

@@ -18,7 +18,7 @@
     <dimen name="dkplayer_default_spacing">10dp</dimen>
     <dimen name="dkplayer_play_btn_size">50dp</dimen>
     <string name="dkplayer_continue_play">继续播放</string>
-    <string name="dkplayer_error_message">出了点小问题，若无法播放可尝试切换来源或路线</string>
+    <string name="dkplayer_error_message">出了点小问题，若无法播放可尝试切换来源或线路</string>
     <string name="dkplayer_replay">重新播放</string>
     <string name="dkplayer_retry"> 重    试 </string>
     <string name="dkplayer_wifi_tip">您正在使用移动网络，继续播放将消耗流量</string>
