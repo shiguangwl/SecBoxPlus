@@ -185,7 +185,9 @@ class DefaultVideoParserImpl {
                         return@withContext
                     }
                     // TODO 分P待优化
-                    val duration: Double = M3u8Client.create(cacheM3u8File!!, res).getDuration()
+                    val m3u8Client = M3u8Client.create(cacheM3u8File!!, res)
+                    val duration: Double = m3u8Client.getDuration()
+                    val tsListSize: Int = m3u8Client.getTsList()
                     if (duration.toInt() == 0) {
                         callback.success(parseBean!!, res)
                         return@withContext

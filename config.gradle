@@ -48,8 +48,8 @@ build_versions.target_sdk = 34
 build_versions.compile_sdk = 34
 build_versions.android_gradle_plugin = '8.1.1'
 build_versions.kotlin = '1.8.10'
-build_versions.app_version_name = "2.0.8"
-build_versions.app_version_code = 28
+build_versions.app_version_name = "2.0.9"
+build_versions.app_version_code = 29
 ext.build_versions = build_versions
 
 /**

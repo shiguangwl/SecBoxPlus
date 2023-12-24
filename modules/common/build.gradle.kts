@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.xxhoz.m3u8library"
+    namespace = "com.xxhoz.common"
     compileSdk = 33
 
     defaultConfig {
@@ -33,12 +33,13 @@ android {
 }
 
 dependencies {
-    implementation(project(":modules:common"))
 
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.10.0")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    // JSON
+    api("com.google.code.gson:gson:2.8.7")
+    // Gson 解析容错
+    api("com.github.getActivity:GsonFactory:8.0")
+
+    // OkHttp
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
 }

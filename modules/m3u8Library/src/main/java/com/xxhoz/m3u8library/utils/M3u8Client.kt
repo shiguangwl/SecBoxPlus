@@ -65,6 +65,13 @@ class M3u8Client private constructor(val path: String, val baseUrl: String?) {
         return durations.toDouble()
     }
 
+    /**
+     * 获取ts片段列表
+     * @return ts片段列表
+     */
+    fun getTsList(): Int {
+        return tsList.size
+    }
 
     data class tsItem(val url: String, val duration: Double)
 }

@@ -95,6 +95,7 @@ dependencies {
     implementation project(path: ':modules:danmuPlayer')
     implementation project(path: ':modules:snifferWebview')
     implementation project(path: ':modules:m3u8Library')
+    implementation project(path: ':modules:common')
 
     // 网络请求框架：https://github.com/getActivity/EasyHttp
     implementation 'com.github.getActivity:EasyHttp:12.2'
@@ -154,17 +155,17 @@ dependencies {
     // LeakCanary
     debugImplementation "com.squareup.leakcanary:leakcanary-android:${versions.leakcanary}"
 
-    // JSON
-    implementation("com.google.code.gson:gson:${versions.gson}")
-    // Gson 解析容错
-    implementation ("com.github.getActivity:GsonFactory:${versions.gson_factory}")
+//    // JSON
+//    implementation("com.google.code.gson:gson:${versions.gson}")
+//    // Gson 解析容错
+//    implementation ("com.github.getActivity:GsonFactory:${versions.gson_factory}")
 
     // OkIO
     implementation("com.squareup.okio:okio:${versions.okio}")
 
-    // OkHttp
-    implementation("com.squareup.okhttp3:okhttp:${versions.okhttp3}")
-    implementation("com.squareup.okhttp3:logging-interceptor:${versions.okhttp3}")
+//    // OkHttp
+//    implementation("com.squareup.okhttp3:okhttp:${versions.okhttp3}")
+//    implementation("com.squareup.okhttp3:logging-interceptor:${versions.okhttp3}")
 
 
     // 微信分享SDK

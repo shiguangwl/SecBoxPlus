@@ -55,3 +55,4 @@ gradle.buildFinished {
 }
 include ':modules:snifferWebview'
 include ':modules:m3u8Library'
+include ':modules:common'
