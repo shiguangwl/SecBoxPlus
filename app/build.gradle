@@ -29,7 +29,7 @@ android {
             minifyEnabled false
             shrinkResources false
             applicationIdSuffix ".dev"
-            resValue "string", "app_name", "@string/app_name_debug"
+            resValue "string", "app_name", "但幕影视Dev"
             manifestPlaceholders = [
                     networkSecurityConfig: "@xml/network_security_config_test"
             ]

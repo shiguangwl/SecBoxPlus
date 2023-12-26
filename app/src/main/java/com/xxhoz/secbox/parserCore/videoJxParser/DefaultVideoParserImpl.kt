@@ -2,7 +2,7 @@ package com.xxhoz.secbox.parserCore.videoJxParser
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.lifecycleScope
-import com.xxhoz.m3u8library.utils.M3u8Client
+import com.xxhoz.m3u8library.utils.M3u8Cache
 import com.xxhoz.secbox.App
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.network.HttpUtil
@@ -15,7 +15,11 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.json.JSONObject
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 /**
  * 轮训解析
@@ -157,6 +161,7 @@ class DefaultVideoParserImpl {
             return
         }
 
+        LogUtils.i("接口: [${parseBean?.name}]  解析成功  ${res}")
         val activity = GlobalActivityManager.getTopActivity() as BaseActivity<*>
         try {
             activity.SingleTask("temp_m3u8", activity.lifecycleScope.launch(IO) {
@@ -164,48 +169,40 @@ class DefaultVideoParserImpl {
                 // 下载m3u8文件
                 val cacheM3u8File = try {
                     if (!res.contains(".mp4")) {
+                        var finalUrl = res
                         // 如果不是mp4多半是m3u8格式
-                        HttpUtil.downLoad(
-                            res,
-                            App.instance.filesDir.absolutePath + "/temp.m3u8"
-                        ).absolutePath
+                        val filePath = App.instance.filesDir.absolutePath + "/temp.m3u8"
+                        val m3U8Cache = M3u8Cache.create(filePath, res)
+                        val duration: Double = m3U8Cache.getDuration()
+                        val tsListSize: Int = m3U8Cache.getTsList()
+
+                        if (duration.toInt() != 0 && duration <= 180) {
+                            // 解析结果小于3分钟大概率为失败广告
+                            LogUtils.i("解析失败 [${parseBean!!.name}] Code: 1001 解析结果小于3分钟大概率为失败广告")
+                            callback.failed(
+                                parseBean,
+                                "解析失败 Code: 1001 解析结果小于3分钟大概率为失败广告"
+                            )
+                            next()
+                            return@launch
+                        } else {
+                            if (duration.toInt() != 0) {
+                                finalUrl = m3U8Cache.getFinnalUrl()
+                            }
+                            finalUrl
+                        }
                     } else {
                         LogUtils.d("MP4资源,使用源URL")
-                        ""
+                        res
                     }
                 } catch (e: Exception) {
                     LogUtils.d("下载M3U8失败,使用源URL, 错误:" + e.message)
-                    ""
+                    res
                 }
 
 
                 withContext(Main) {
-                    if (StringUtils.isEmpty(cacheM3u8File)) {
-                        callback.success(parseBean!!, res)
-                        return@withContext
-                    }
-                    // TODO 分P待优化
-                    val m3u8Client = M3u8Client.create(cacheM3u8File!!, res)
-                    val duration: Double = m3u8Client.getDuration()
-                    val tsListSize: Int = m3u8Client.getTsList()
-                    if (duration.toInt() == 0) {
-                        callback.success(parseBean!!, res)
-                        return@withContext
-                    }
-                    if (duration <= 180) {
-                        // 解析结果小于3分钟大概率为失败广告
-                        LogUtils.i("解析失败 [${parseBean!!.name}] Code: 1001 解析结果小于3分钟大概率为失败广告")
-                        callback.failed(
-                            parseBean,
-                            "解析失败 Code: 1001 解析结果小于3分钟大概率为失败广告"
-                        )
-                        withContext(IO) {
-                            next()
-                        }
-                    } else {
-                        callback.success(parseBean!!, cacheM3u8File)
-                    }
-
+                    callback.success(parseBean!!, cacheM3u8File)
                 }
             })
         } catch (e: Exception) {
@@ -216,6 +213,40 @@ class DefaultVideoParserImpl {
             })
         }
     }
+
+    /**
+     * 获取重定向后的URL
+     */
+    fun HeadUrlRedirect(url: String, path: String): String {
+        val request = Request.Builder()
+            .url(url)
+            .addHeader(
+                "User-Agent",
+                "ExoPlayerLib/2.18.1 (Linux; Android 13; Manufacturer Model Build/20231225)"
+            )
+            .addHeader("Accept-Encoding", "gzip")
+            .head()
+            .build()
+
+        // 设置超时时间为20秒
+        val client = OkHttpClient.Builder()
+            // 设置连接超时时间，单位为秒
+            .connectTimeout(30, TimeUnit.SECONDS)
+            // 设置读取超时时间，单位为秒
+            .readTimeout(60, TimeUnit.SECONDS)
+            .addInterceptor(HttpUtil.DeflateInterceptor())
+            .build()
+
+
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                throw IOException("Unexpected code $response")
+            }
+
+            return response.request.url.toString()
+        }
+    }
+
 
     interface Callback {
         /**

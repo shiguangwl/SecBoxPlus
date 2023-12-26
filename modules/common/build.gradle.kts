@@ -40,6 +40,6 @@ dependencies {
     api("com.github.getActivity:GsonFactory:8.0")
 
     // OkHttp
-    implementation("com.squareup.okhttp3:okhttp:4.9.1")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+    api("com.squareup.okhttp3:okhttp:4.9.1")
+    api("com.squareup.okhttp3:logging-interceptor:4.9.1")
 }

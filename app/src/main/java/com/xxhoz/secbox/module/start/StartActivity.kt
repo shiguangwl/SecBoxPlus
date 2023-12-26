@@ -13,7 +13,9 @@ import com.lxj.xpopup.XPopup
 import com.umeng.commonsdk.UMConfigure
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.constant.Key
+import com.xxhoz.m3u8library.utils.M3u8Cache
 import com.xxhoz.parserCore.SourceManger
+import com.xxhoz.secbox.App
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.bean.ConfigBean
@@ -44,12 +46,25 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             navigationBarColor(R.color.white)
             navigationBarDarkIcon(true)
         }
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            unitTest()
+//        }
         if (!BaseConfig.DEBUG) {
             umengInit()
         }
         lifecycleScope.launch(Dispatchers.IO) {
             initData()
         }
+    }
+
+    fun unitTest() {
+        LogUtils.i("下载文件:" + App.instance.filesDir.absolutePath + "/temp.m3u8")
+        val m3U8Cache = M3u8Cache.create(
+            App.instance.filesDir.absolutePath + "/temp.m3u8",
+            "https://vip.ffzy-play1.com/20221117/18247_d528a6ca/index.m3u8"
+        )
+
+        println(m3U8Cache.getDuration())
     }
 
     /**
