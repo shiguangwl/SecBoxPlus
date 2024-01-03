@@ -81,7 +81,7 @@ class ErrorView : LinearLayout, IControlComponent {
     /**
      * 从试逻辑
      */
-    fun setOnRetryListener(listener: OnClickListener) {
+    fun onRetryListener(listener: OnClickListener) {
         findViewById<View>(R.id.status_btn).setOnClickListener {
             listener.onClick(it)
             visibility = GONE

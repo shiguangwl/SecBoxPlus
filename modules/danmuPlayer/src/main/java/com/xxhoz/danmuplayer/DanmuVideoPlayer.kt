@@ -126,7 +126,7 @@ class DanmuVideoPlayer : VideoView {
                 val completeView = CompleteView(getContext())
                 // 错误页面
                 val errorView: ErrorView = ErrorView(getContext())
-                errorView.setOnRetryListener {
+                errorView.onRetryListener {
                     actionCallback.retryClick()
                 }
                 // 封面预览

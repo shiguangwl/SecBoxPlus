@@ -123,7 +123,7 @@ class M3u8Cache private constructor(var baseUrl: String, var path: String) {
             }
 
             baseUrl = response.request.url.toString()
-            LogUtils.i("重定向后的地址:$baseUrl")
+            LogUtils.i("真实请求地址:$baseUrl")
 
             val file = File(path)
             if (file.exists()) {

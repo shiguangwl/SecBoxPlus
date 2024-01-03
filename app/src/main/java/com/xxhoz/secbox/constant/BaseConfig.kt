@@ -38,7 +38,8 @@ object BaseConfig {
         val sdf = SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA)
         val format = sdf.format(Date())
         val d = format.takeLast(2).toInt() / 15
-        "https://secbox.xxhoz.com/config.json?key=" + "${format.dropLast(2)}%02d".format(d)
+//        "https://secbox.xxhoz.com/config.json?key=" + "${format.dropLast(2)}%02d".format(d)
+        "https://secbox.xxhoz.com/config.json"
     }
 
     lateinit var CONFIG_BEAN: ConfigBean
