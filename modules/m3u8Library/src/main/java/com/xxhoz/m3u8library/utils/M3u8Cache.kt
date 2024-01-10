@@ -1,7 +1,8 @@
 package com.xxhoz.m3u8library.utils
 
-import com.xxhoz.secbox.network.HttpUtil
-import com.xxhoz.secbox.util.LogUtils
+
+import com.xxhoz.common.network.HttpUtil
+import com.xxhoz.common.util.LogUtils
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File

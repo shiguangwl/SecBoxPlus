@@ -1,10 +1,10 @@
 package com.xxhoz.secbox.parserCore.danmuParser
 
+import com.xxhoz.common.util.LogUtils
+import com.xxhoz.common.util.MD5Utils
 import com.xxhoz.secbox.App
 import com.xxhoz.secbox.base.CacheManger
 import com.xxhoz.secbox.network.HttpUtil
-import com.xxhoz.secbox.util.LogUtils
-import com.xxhoz.secbox.util.MD5Utils
 import java.io.File
 
 

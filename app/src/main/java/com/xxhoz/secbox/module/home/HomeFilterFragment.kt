@@ -8,6 +8,7 @@ import androidx.annotation.MainThread
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.xxhoz.common.util.LogUtils
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.constant.Key
 import com.xxhoz.secbox.base.BaseFragment
@@ -20,7 +21,6 @@ import com.xxhoz.secbox.module.detail.DetailPlayerActivity
 import com.xxhoz.secbox.parserCore.bean.CategoryBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 import com.xxhoz.secbox.persistence.XKeyValue
-import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.widget.ConditionTabView
 import com.xxhoz.secbox.widget.GridItemDecoration
 

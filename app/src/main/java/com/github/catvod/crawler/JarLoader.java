@@ -1,9 +1,9 @@
 package com.github.catvod.crawler;
 
 import com.umeng.commonsdk.internal.crash.UMCrashManager;
+import com.xxhoz.common.util.LogUtils;
 import com.xxhoz.secbox.App;
 import com.xxhoz.secbox.bean.exception.GlobalException;
-import com.xxhoz.secbox.util.LogUtils;
 
 import org.json.JSONObject;
 
@@ -18,7 +18,7 @@ import dalvik.system.DexClassLoader;
 
 public class JarLoader {
     private DexClassLoader classLoader = null;
-    private ConcurrentHashMap<String, Spider> spiders = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Spider> spiders = new ConcurrentHashMap<>();
     private Method proxyFun = null;
 
 

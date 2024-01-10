@@ -274,7 +274,7 @@
         public static *** e(...);
 }
 
--assumenosideeffects class com.xxhoz.secbox.util.LogUtils {
+-assumenosideeffects class com.xxhoz.common.util.LogUtils {
     public *** v(...);
     public *** d(...);
     public *** i(...);

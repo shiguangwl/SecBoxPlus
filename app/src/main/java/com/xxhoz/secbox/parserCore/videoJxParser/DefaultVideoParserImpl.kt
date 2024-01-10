@@ -1,13 +1,13 @@
 package com.xxhoz.secbox.parserCore.videoJxParser
 
 import androidx.annotation.WorkerThread
+import com.xxhoz.common.util.LogUtils
+import com.xxhoz.common.util.StringUtils
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.sourceEngine.SnifferEngine
 import com.xxhoz.secbox.util.GlobalActivityManager
-import com.xxhoz.secbox.util.LogUtils
-import com.xxhoz.secbox.util.StringUtils
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject

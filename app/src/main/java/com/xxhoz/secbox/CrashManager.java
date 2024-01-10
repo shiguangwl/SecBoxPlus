@@ -5,8 +5,8 @@ import android.os.Looper;
 
 import com.hjq.toast.Toaster;
 import com.umeng.commonsdk.internal.crash.UMCrashManager;
+import com.xxhoz.common.util.LogUtils;
 import com.xxhoz.secbox.util.GlobalActivityManager;
-import com.xxhoz.secbox.util.LogUtils;
 
 import java.util.Objects;
 

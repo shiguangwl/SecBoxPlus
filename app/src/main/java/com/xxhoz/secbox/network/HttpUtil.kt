@@ -2,7 +2,7 @@ package com.xxhoz.secbox.network
 
 
 import com.hjq.gson.factory.GsonFactory
-import com.xxhoz.secbox.util.LogUtils
+import com.xxhoz.common.util.LogUtils
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Interceptor

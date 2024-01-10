@@ -18,6 +18,7 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
 import com.lxj.xpopup.XPopup
 import com.lxj.xpopup.enums.PopupAnimation
+import com.xxhoz.common.util.LogUtils
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.R
@@ -32,7 +33,6 @@ import com.xxhoz.secbox.module.home.view.NotificationMsgPopup
 import com.xxhoz.secbox.module.search.SearchActivity
 import com.xxhoz.secbox.parserCore.bean.CategoryBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
-import com.xxhoz.secbox.util.LogUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch

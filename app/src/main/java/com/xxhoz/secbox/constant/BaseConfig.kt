@@ -1,12 +1,12 @@
 package com.xxhoz.constant
 
+import com.xxhoz.common.util.LogUtils
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.bean.ConfigBean
 import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.GlobalActivityManager
-import com.xxhoz.secbox.util.LogUtils
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

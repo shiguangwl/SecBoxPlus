@@ -2,14 +2,14 @@ package com.xxhoz.parserCore.parserImpl
 
 import com.github.catvod.crawler.Spider
 import com.hjq.gson.factory.GsonFactory
+import com.xxhoz.common.util.LogUtils
+import com.xxhoz.common.util.StringUtils
 import com.xxhoz.secbox.parserCore.bean.CategoryBean
 import com.xxhoz.secbox.parserCore.bean.CategoryPageBean
 import com.xxhoz.secbox.parserCore.bean.PlayLinkBean
 import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.parserCore.bean.VideoBean
 import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
-import com.xxhoz.secbox.util.LogUtils
-import com.xxhoz.secbox.util.StringUtils
 import org.json.JSONObject
 
 class SpiderSource(override var sourceBean: SourceBean, var spider: Spider)  :

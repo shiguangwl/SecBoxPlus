@@ -1,8 +1,8 @@
 package com.xxhoz.secbox
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.xxhoz.common.util.LogUtils
 import com.xxhoz.m3u8library.utils.M3u8Cache
-import com.xxhoz.secbox.util.LogUtils
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith

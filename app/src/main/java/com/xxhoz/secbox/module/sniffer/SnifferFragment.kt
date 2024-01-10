@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.hjq.toast.Toaster
 import com.lxj.xpopup.XPopup
+import com.xxhoz.common.util.StringUtils
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.constant.Key
 import com.xxhoz.secbox.base.BaseFragment
@@ -15,7 +16,6 @@ import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.databinding.FragmentSnifferBinding
 import com.xxhoz.secbox.databinding.ItemCustomBtnBinding
 import com.xxhoz.secbox.persistence.XKeyValue
-import com.xxhoz.secbox.util.StringUtils
 import com.xxhoz.secboxbrowser.SnifferWebViewActivity
 
 

@@ -11,6 +11,7 @@ import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.toast.Toaster
 import com.lxj.xpopup.XPopup
 import com.umeng.commonsdk.UMConfigure
+import com.xxhoz.common.util.LogUtils
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.constant.Key
 import com.xxhoz.m3u8library.utils.M3u8Cache
@@ -25,7 +26,6 @@ import com.xxhoz.secbox.databinding.ActivityStartBinding
 import com.xxhoz.secbox.module.main.MainActivity
 import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.secbox.persistence.XKeyValue
-import com.xxhoz.secbox.util.LogUtils
 import com.xxhoz.secbox.util.NetworkHelper
 import com.xxhoz.secbox.util.getActivity
 import kotlinx.coroutines.Dispatchers

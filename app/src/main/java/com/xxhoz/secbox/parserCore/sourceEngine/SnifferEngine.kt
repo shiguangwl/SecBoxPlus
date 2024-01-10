@@ -13,10 +13,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.xxhoz.common.util.LogUtils
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.parserCore.bean.ParseBean
-import com.xxhoz.secbox.util.LogUtils
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.atomic.AtomicBoolean

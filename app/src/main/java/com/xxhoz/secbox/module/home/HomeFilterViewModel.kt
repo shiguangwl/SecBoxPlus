@@ -1,6 +1,7 @@
 package com.xxhoz.secbox.module.home
 
 import androidx.lifecycle.viewModelScope
+import com.xxhoz.common.util.LogUtils
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.base.list.base.BaseRecyclerViewModel
@@ -9,7 +10,6 @@ import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.item.VideoViewData
 import com.xxhoz.secbox.parserCore.bean.CategoryBean
 import com.xxhoz.secbox.parserCore.bean.CategoryPageBean
-import com.xxhoz.secbox.util.LogUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

@@ -18,6 +18,7 @@ import com.gyf.immersionbar.ktx.immersionBar
 import com.hjq.gson.factory.GsonFactory
 import com.hjq.toast.Toaster
 import com.lxj.xpopup.XPopup
+import com.xxhoz.common.util.StringUtils
 import com.xxhoz.constant.Key
 import com.xxhoz.danmuplayer.DanmuVideoPlayer
 import com.xxhoz.danmuplayer.EpsodeEntity
@@ -32,7 +33,6 @@ import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.bean.VideoDetailBean
 import com.xxhoz.secbox.persistence.CRUD
 import com.xxhoz.secbox.persistence.XKeyValue
-import com.xxhoz.secbox.util.StringUtils
 import com.xxhoz.secbox.util.getActivity
 import com.xxhoz.secbox.util.setImageUrl
 import com.xxhoz.secbox.widget.RoundAngleImageView

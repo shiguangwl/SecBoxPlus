@@ -6,6 +6,7 @@ import com.github.catvod.crawler.JarLoader
 import com.github.catvod.crawler.JsLoader
 import com.github.catvod.crawler.Spider
 import com.google.gson.JsonObject
+import com.xxhoz.common.util.LogUtils
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.parserCore.parserImpl.SpiderSource
 import com.xxhoz.secbox.App
@@ -13,7 +14,6 @@ import com.xxhoz.secbox.bean.exception.GlobalException
 import com.xxhoz.secbox.network.HttpUtil
 import com.xxhoz.secbox.parserCore.bean.ParseBean
 import com.xxhoz.secbox.parserCore.bean.SourceBean
-import com.xxhoz.secbox.util.LogUtils
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream

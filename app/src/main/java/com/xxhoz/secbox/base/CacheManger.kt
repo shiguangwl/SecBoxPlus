@@ -1,10 +1,10 @@
 package com.xxhoz.secbox.base
 
 import com.umeng.commonsdk.internal.crash.UMCrashManager
+import com.xxhoz.common.util.LogUtils
 import com.xxhoz.constant.Key
 import com.xxhoz.secbox.App
 import com.xxhoz.secbox.persistence.XKeyValue
-import com.xxhoz.secbox.util.LogUtils
 import java.io.File
 
 /**

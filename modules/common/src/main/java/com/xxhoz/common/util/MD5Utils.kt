@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.util
+package com.xxhoz.common.util
 
 import java.security.MessageDigest
 
