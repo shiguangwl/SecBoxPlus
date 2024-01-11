@@ -11,9 +11,10 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.hjq.gson.factory.GsonFactory
 import com.hjq.toast.Toaster
 import com.xxhoz.common.util.LogUtils
+import com.xxhoz.players.exo.ExoMediaPlayerFactory
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.GlobalActivityManager
-import xyz.doikki.videoplayer.exo.ExoMediaPlayerFactory
+
 import xyz.doikki.videoplayer.player.VideoViewConfig
 import xyz.doikki.videoplayer.player.VideoViewManager
 

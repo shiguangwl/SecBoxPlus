@@ -47,4 +47,5 @@ dependencies {
     api("xyz.doikki.android.dkplayer:dkplayer-java:3.3.7")
     api("xyz.doikki.android.dkplayer:dkplayer-ui:3.3.7")
     api("xyz.doikki.android.dkplayer:player-exo:3.3.7")
+    implementation(project(":modules:common"))
 }
