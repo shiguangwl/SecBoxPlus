@@ -243,7 +243,9 @@ class DetailPlayerActivity : BaseActivity<ActivityDetailPlayerBinding>(),
             viewBinding.titleText.text = it.vod_name
             // 图片
             if (shareVodPicView == null) it.vod_pic.let {
-                viewBinding.roundAngleImageView.setImageUrl(it)
+                if (StringUtils.isNotEmpty(it)) {
+                    viewBinding.roundAngleImageView.setImageUrl(it)
+                }
             } else {
                 viewBinding.roundAngleImageView.setImageDrawable(shareVodPicView!!.drawable)
             }

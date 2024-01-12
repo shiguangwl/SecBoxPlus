@@ -23,9 +23,11 @@
             tools:targetApi="n">
         <activity
                 android:name=".module.mine.CustomSourceActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
                 android:exported="false" />
         <activity
                 android:name=".module.history.HistoryActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
                 android:exported="false" />
         <activity
                 android:name=".module.search.SearchActivity"
@@ -44,17 +46,14 @@
         <activity
                 android:name=".module.main.MainActivity"
                 android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
-                android:screenOrientation="portrait"
                 android:theme="@style/ActivityTheme" />
         <activity
                 android:name=".module.about.AboutActivity"
                 android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
-                android:screenOrientation="portrait"
                 android:theme="@style/ActivityTheme" />
         <activity
                 android:name=".module.detail.DetailPlayerActivity"
                 android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
-                android:screenOrientation="portrait"
                 android:theme="@style/ActivityTheme" />
     </application>
 

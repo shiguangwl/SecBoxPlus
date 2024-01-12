@@ -1,9 +1,12 @@
 package com.xxhoz.constant
 
+import androidx.annotation.WorkerThread
 import com.xxhoz.common.util.LogUtils
 import com.xxhoz.parserCore.SourceManger
 import com.xxhoz.parserCore.parserImpl.IBaseSource
 import com.xxhoz.secbox.bean.ConfigBean
+import com.xxhoz.secbox.constant.EventName
+import com.xxhoz.secbox.eventbus.XEventBus
 import com.xxhoz.secbox.parserCore.bean.SourceBean
 import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.GlobalActivityManager
@@ -96,5 +99,19 @@ object BaseConfig {
 
         LogUtils.i("站源数量:${sourceBeanList.size}  当前获取站源为:${sourceKey}")
         return source
+    }
+
+    /**
+     * 切换订阅源
+     */
+    @WorkerThread
+    fun changeSubscribe(sourceUrl: String) {
+        SourceManger.loadSourceConfig(sourceUrl)
+        // 加载成功
+        XKeyValue.putString(Key.CURRENT_SOURCE_URL, sourceUrl)
+        // 发送订阅变化事件
+        GlobalActivityManager.getTopActivity()?.runOnUiThread {
+            XEventBus.post(EventName.SOURCE_CHANGE, "订阅切换: ${sourceUrl}")
+        }
     }
 }

@@ -14,9 +14,7 @@ import com.umeng.commonsdk.UMConfigure
 import com.xxhoz.common.util.LogUtils
 import com.xxhoz.constant.BaseConfig
 import com.xxhoz.constant.Key
-import com.xxhoz.m3u8library.utils.M3u8Cache
 import com.xxhoz.parserCore.SourceManger
-import com.xxhoz.secbox.App
 import com.xxhoz.secbox.R
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.bean.ConfigBean
@@ -29,7 +27,9 @@ import com.xxhoz.secbox.persistence.XKeyValue
 import com.xxhoz.secbox.util.NetworkHelper
 import com.xxhoz.secbox.util.getActivity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class StartActivity : BaseActivity<ActivityStartBinding>() {
 
@@ -46,25 +46,42 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             navigationBarColor(R.color.white)
             navigationBarDarkIcon(true)
         }
-//        lifecycleScope.launch(Dispatchers.IO) {
-//            unitTest()
-//        }
+
+//        unitTest()
+
         if (!BaseConfig.DEBUG) {
             umengInit()
         }
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(IO) {
             initData()
         }
     }
 
     fun unitTest() {
-        LogUtils.i("下载文件:" + App.instance.filesDir.absolutePath + "/temp.m3u8")
-        val m3U8Cache = M3u8Cache.create(
-            App.instance.filesDir.absolutePath + "/temp.m3u8",
-            "https://vip.ffzy-play1.com/20221117/18247_d528a6ca/index.m3u8"
-        )
 
-        println(m3U8Cache.getDuration())
+
+        lifecycleScope.launch {
+
+            try {
+                Toaster.show("11111111")
+                withContext(IO) {
+                    Toaster.show("2222222")
+                    var d = 1 / 0
+                }
+                Toaster.show("3333333")
+            } catch (e: Exception) {
+                Toaster.show("44444444")
+            }
+        }
+
+
+//        LogUtils.i("下载文件:" + App.instance.filesDir.absolutePath + "/temp.m3u8")
+//        val m3U8Cache = M3u8Cache.create(
+//            App.instance.filesDir.absolutePath + "/temp.m3u8",
+//            "https://vip.ffzy-play1.com/20221117/18247_d528a6ca/index.m3u8"
+//        )
+//
+//        println(m3U8Cache.getDuration())
     }
 
     /**
@@ -92,7 +109,7 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
                     )
                 )
             } catch (e: GlobalException) {
-                Toaster.showLong(e.message)
+                Toaster.showLong("加载失败,请尝试退出重进 :" + e.message)
             } catch (e: Exception) {
                 LogUtils.e("数据源加载错误:", e)
                 // 切换默认源
@@ -104,9 +121,9 @@ class StartActivity : BaseActivity<ActivityStartBinding>() {
             runOnUiThread {
                 MainActivity.startActivity(getActivity()!!)
             }
-        }catch (e:Exception){
-            Toaster.showLong(e.message)
-            e.printStackTrace()
+        }catch (e:Exception) {
+            Toaster.showLong("加载失败,请尝试退出重进 :" + e.message)
+            LogUtils.e("加载失败,请重试退出重进", e)
         }
     }
 
