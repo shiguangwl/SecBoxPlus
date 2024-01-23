@@ -6,7 +6,7 @@ import kotlinx.coroutines.Job
 interface TaskManger {
     companion object {
         val jobs: HashMap<String, Job> = HashMap()
-        val DefaultJobName = "DefaultJob"
+        val DefaultJob = "DefaultJob"
     }
 
 
@@ -14,7 +14,7 @@ interface TaskManger {
      * 取消之前任务,提交一个新任务
      */
     fun SingleTask(task: Job): Job {
-        return SingleTask(DefaultJobName, task)
+        return SingleTask(DefaultJob, task)
     }
 
     /**

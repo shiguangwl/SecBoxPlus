@@ -5,8 +5,8 @@ import com.xxhoz.common.util.LogUtils
 import com.xxhoz.common.util.StringUtils
 import com.xxhoz.secbox.base.BaseActivity
 import com.xxhoz.secbox.network.HttpUtil
+import com.xxhoz.secbox.parserCore.SnifferEngine
 import com.xxhoz.secbox.parserCore.bean.ParseBean
-import com.xxhoz.secbox.parserCore.sourceEngine.SnifferEngine
 import com.xxhoz.secbox.util.GlobalActivityManager
 import okhttp3.OkHttpClient
 import okhttp3.Request

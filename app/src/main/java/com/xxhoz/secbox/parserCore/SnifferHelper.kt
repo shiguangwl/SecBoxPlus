@@ -1,4 +1,4 @@
-package com.xxhoz.secbox.parserCore.sourceEngine
+package com.xxhoz.secbox.parserCore
 
 import android.net.http.SslError
 import android.util.Log

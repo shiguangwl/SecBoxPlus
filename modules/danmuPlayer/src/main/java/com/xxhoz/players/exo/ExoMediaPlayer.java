@@ -37,6 +37,7 @@ import com.xxhoz.common.util.LogUtils;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 import xyz.doikki.videoplayer.player.AbstractPlayer;
 import xyz.doikki.videoplayer.player.VideoViewManager;
@@ -320,16 +321,16 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
         }
         if (error.getCause() instanceof HttpDataSource.InvalidResponseCodeException && mInternalPlayer.getCurrentManifest() != null && newStartTime != null) {
             HttpDataSource.InvalidResponseCodeException cause = (HttpDataSource.InvalidResponseCodeException) error.getCause();
-            seekToTime(newStartTime);
+            prepareAndSeekToTime(newStartTime);
             Log.w("ExoMediaPlayer", "播放出现资源错误:" + cause.dataSpec.uri, cause);
             Toast.makeText(mAppContext, "播放优化: 检测到播放错误片段,以为您自动跳过", Toast.LENGTH_LONG).show();
             return;
         }
 
         // 其他可能错误尝试后移15秒
-        if (tryCount < 5) {
-            seekToTime(mInternalPlayer.getCurrentPosition() + 15000L * (tryCount + 1));
-            LogUtils.INSTANCE.e("ExoMediaPlayer 未知错误尝试偏移修正 " + tryCount, error);
+        if (tryCount < 3) {
+            prepareAndSeekToTime(mInternalPlayer.getCurrentPosition() + 15000L * (tryCount + 1));
+            LogUtils.INSTANCE.e("ExoMediaPlayer 未知错误尝试偏移修正 " + tryCount + Optional.ofNullable(error.getCause()).map(Throwable::getMessage).orElse("NULL"), error);
             Toast.makeText(mAppContext, "未知错误,尝试修正:" + tryCount, Toast.LENGTH_SHORT).show();
             tryCount++;
             return;
@@ -339,7 +340,7 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
     }
 
 
-    public void seekToTime(Long time) {
+    public void prepareAndSeekToTime(Long time) {
         mInternalPlayer.setMediaSource(mMediaSource);
         mInternalPlayer.seekTo(time);
         mInternalPlayer.prepare();

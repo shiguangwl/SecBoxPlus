@@ -3,6 +3,7 @@ package com.xxhoz.secbox.base.list.base
 import androidx.lifecycle.MutableLiveData
 import com.xxhoz.secbox.base.BaseViewModel
 import com.xxhoz.secbox.bean.LoadError
+import com.xxhoz.secbox.constant.PageName
 import com.xxhoz.secbox.util.NetworkHelper
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -82,4 +83,8 @@ abstract class BaseRecyclerViewModel : BaseViewModel() {
             firstViewDataLiveData.postValue(LoadError)
         }
     }
+
+
+    override fun getPageName() = PageName.DEFAULT_RC
+
 }
